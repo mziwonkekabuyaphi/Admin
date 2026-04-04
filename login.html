@@ -44,6 +44,7 @@
                 0 0 0 1px rgba(227, 6, 19, 0.1);
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
   }
 
   .login-card::before {
@@ -225,6 +226,50 @@
     color: #E30613;
   }
 
+  /* Green success acknowledgment for valid credentials */
+  .input-wrapper.valid-username i:first-child {
+    color: #10b981 !important;
+  }
+  
+  .input-wrapper.valid-password i:first-child {
+    color: #10b981 !important;
+  }
+  
+  .field-success-icon {
+    position: absolute;
+    right: 16px;
+    color: #10b981;
+    font-size: 18px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .input-wrapper.valid-username .field-success-icon,
+  .input-wrapper.valid-password .field-success-icon {
+    opacity: 1;
+  }
+  
+  .success-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #10b981;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-left: 10px;
+    animation: pulseGreen 0.5s ease;
+  }
+  
+  @keyframes pulseGreen {
+    0% { transform: scale(0.8); opacity: 0; }
+    80% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
   .toggle-password {
     position: absolute;
     right: 16px;
@@ -376,6 +421,23 @@
     font-weight: 500;
     flex: 1;
   }
+  
+  /* Success acknowledgment message that appears near fields */
+  .inline-success {
+    font-size: 11px;
+    font-weight: 600;
+    color: #10b981;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: slideUp 0.3s ease;
+  }
+  
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   .hidden {
     display: none !important;
@@ -424,22 +486,30 @@
     <form id="loginForm">
       <div class="form-group">
         <label><i class="fas fa-user-circle" style="margin-right: 6px;"></i> Username</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" id="usernameWrapper">
           <i class="fas fa-user"></i>
           <input type="text" id="username" placeholder="Enter your username" autocomplete="off">
+          <i class="fas fa-check-circle field-success-icon"></i>
+        </div>
+        <div id="usernameSuccessMsg" class="inline-success hidden">
+          <i class="fas fa-check-circle"></i> <span>✓ Username verified</span>
         </div>
         <div class="password-hint" id="usernameHint">
           <i class="fas fa-info-circle"></i>
-          <span>Enter your registered username</span>
+          <span>Admin: "Admin" (case-sensitive)</span>
         </div>
       </div>
 
       <div class="form-group">
         <label><i class="fas fa-lock" style="margin-right: 6px;"></i> Password</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" id="passwordWrapper">
           <i class="fas fa-key"></i>
           <input type="password" id="password" placeholder="Enter your password">
           <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+          <i class="fas fa-check-circle field-success-icon"></i>
+        </div>
+        <div id="passwordSuccessMsg" class="inline-success hidden">
+          <i class="fas fa-check-circle"></i> <span>✓ Password correct</span>
         </div>
       </div>
 
@@ -478,31 +548,97 @@
     const togglePassword = document.getElementById('togglePassword');
     const rememberCheckbox = document.getElementById('rememberMe');
     const forgotLink = document.getElementById('forgotPasswordLink');
+    const usernameWrapper = document.getElementById('usernameWrapper');
+    const passwordWrapper = document.getElementById('passwordWrapper');
+    const usernameSuccessMsg = document.getElementById('usernameSuccessMsg');
+    const passwordSuccessMsg = document.getElementById('passwordSuccessMsg');
 
     let currentUserType = 'admin';
 
     // ============================================================
-    // SECURE CREDENTIALS (hardcoded for this demo environment)
-    // Admin credentials as requested: username "Admin", password "randscapetown"
-    // Staff demo credentials for testing workflow
+    // CREDENTIALS (admin.html redirect for Admin, staff redirects to staff.html)
+    // Admin: username "Admin", password "randscapetown"
+    // Staff: username "staff@rands", password "staff2024"
     // ============================================================
     const VALID_CREDENTIALS = {
       admin: {
         username: "Admin",
         password: "randscapetown",
         role: "administrator",
-        redirectUrl: "/admin-dashboard.html",
+        redirectUrl: "admin.html",
         displayName: "Administrator"
       },
       staff: {
         username: "staff@rands",
         password: "staff2024",
         role: "staff",
-        redirectUrl: "/staff-portal.html",
+        redirectUrl: "staff.html",
         displayName: "Staff Member"
       }
     };
 
+    // Helper: Update green acknowledgment for username field based on current user type
+    function updateUsernameAcknowledgment() {
+      const enteredUsername = usernameInput.value.trim();
+      const expectedUsername = VALID_CREDENTIALS[currentUserType]?.username;
+      const isValid = (enteredUsername === expectedUsername);
+      
+      if (enteredUsername.length > 0) {
+        if (isValid) {
+          usernameWrapper.classList.add('valid-username');
+          usernameSuccessMsg.classList.remove('hidden');
+          // add a subtle badge next to label optionally
+        } else {
+          usernameWrapper.classList.remove('valid-username');
+          usernameSuccessMsg.classList.add('hidden');
+        }
+      } else {
+        usernameWrapper.classList.remove('valid-username');
+        usernameSuccessMsg.classList.add('hidden');
+      }
+    }
+    
+    // Helper: Update green acknowledgment for password field
+    function updatePasswordAcknowledgment() {
+      const enteredPassword = passwordInput.value;
+      const expectedPassword = VALID_CREDENTIALS[currentUserType]?.password;
+      const isValid = (enteredPassword === expectedPassword);
+      
+      if (enteredPassword.length > 0) {
+        if (isValid) {
+          passwordWrapper.classList.add('valid-password');
+          passwordSuccessMsg.classList.remove('hidden');
+        } else {
+          passwordWrapper.classList.remove('valid-password');
+          passwordSuccessMsg.classList.add('hidden');
+        }
+      } else {
+        passwordWrapper.classList.remove('valid-password');
+        passwordSuccessMsg.classList.add('hidden');
+      }
+    }
+    
+    // Real-time validation for username (green checkmark appears as soon as user types correct "Admin" or staff username)
+    if (usernameInput) {
+      usernameInput.addEventListener('input', function() {
+        updateUsernameAcknowledgment();
+        // Also hide general error when user corrects
+        if (!errorMessageDiv.classList.contains('hidden')) {
+          errorMessageDiv.classList.add('hidden');
+        }
+      });
+    }
+    
+    // Real-time validation for password (green check when password matches exact credential)
+    if (passwordInput) {
+      passwordInput.addEventListener('input', function() {
+        updatePasswordAcknowledgment();
+        if (!errorMessageDiv.classList.contains('hidden')) {
+          errorMessageDiv.classList.add('hidden');
+        }
+      });
+    }
+    
     // Toggle password visibility
     if (togglePassword) {
       togglePassword.addEventListener('click', function() {
@@ -512,7 +648,7 @@
       });
     }
 
-    // Set active user type button
+    // Set active user type button and reset green indicators
     function setActiveUserType(type) {
       currentUserType = type;
       if (type === 'admin') {
@@ -520,20 +656,23 @@
         staffTypeBtn.classList.remove('active');
         adminTypeBtn.classList.add('admin');
         staffTypeBtn.classList.remove('staff');
-        // Update placeholder hints for admin
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Admin username: Admin (case-sensitive)';
+        if (hintSpan) hintSpan.textContent = 'Admin username: "Admin" (case-sensitive)';
       } else {
         staffTypeBtn.classList.add('active');
         adminTypeBtn.classList.remove('active');
         staffTypeBtn.classList.add('staff');
         adminTypeBtn.classList.remove('admin');
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Staff username: staff@rands';
+        if (hintSpan) hintSpan.textContent = 'Staff username: "staff@rands"';
       }
-      // Clear previous inputs & error
+      // Clear inputs and reset green indicators
       usernameInput.value = '';
       passwordInput.value = '';
+      usernameWrapper.classList.remove('valid-username');
+      passwordWrapper.classList.remove('valid-password');
+      usernameSuccessMsg.classList.add('hidden');
+      passwordSuccessMsg.classList.add('hidden');
       errorMessageDiv.classList.add('hidden');
       usernameInput.focus();
     }
@@ -552,11 +691,10 @@
     if (forgotLink) {
       forgotLink.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('🔐 Password reset request: Please contact your system administrator. For demo, use provided credentials.');
+        alert('Please contact your system administrator to reset your password.');
       });
     }
 
-    // Show error message
     function showError(message) {
       errorTextSpan.textContent = message;
       errorMessageDiv.classList.remove('hidden');
@@ -580,7 +718,6 @@
       }
     }
 
-    // Load saved credentials
     function loadSavedCredentials() {
       const savedChecked = localStorage.getItem('rands_remember_checked');
       if (savedChecked === 'true') {
@@ -593,142 +730,133 @@
           passwordInput.value = savedPassword;
           setActiveUserType(savedType);
           if (rememberCheckbox) rememberCheckbox.checked = true;
+          // trigger green validations after loading
+          updateUsernameAcknowledgment();
+          updatePasswordAcknowledgment();
         }
       }
     }
 
-    // ============================================================
-    // AUTHENTICATION FUNCTION (Production ready pattern)
-    // Validates against hardcoded credentials (admin/staff)
-    // In real-world: replace with API call to backend
-    // ============================================================
-    async function authenticateUser(username, password, userType) {
-      // Simulate network latency (realistic UX)
-      await new Promise(resolve => setTimeout(resolve, 650));
-      
-      // Get credential object based on selected user type
+    // Authenticate and redirect to admin.html or staff.html
+    async function authenticateAndRedirect(username, password, userType) {
+      await new Promise(resolve => setTimeout(resolve, 500)); // smooth UX
       const cred = VALID_CREDENTIALS[userType];
       if (!cred) {
-        return { success: false, message: 'Invalid user role selected.' };
+        return { success: false, message: 'Invalid user role.' };
       }
-      
-      // Case-sensitive comparison for admin username "Admin"
       const usernameMatch = (username === cred.username);
       const passwordMatch = (password === cred.password);
       
       if (usernameMatch && passwordMatch) {
-        return {
-          success: true,
-          role: cred.role,
-          redirectUrl: cred.redirectUrl,
-          displayName: cred.displayName,
-          username: username
-        };
+        return { success: true, redirectUrl: cred.redirectUrl, role: cred.role };
       } else {
-        // Provide generic error for security (don't reveal which field is wrong)
-        let hint = '';
-        if (userType === 'admin') {
-          hint = 'Admin credentials: username "Admin", password as provided by IT.';
-        } else {
-          hint = 'Staff credentials: username "staff@rands", password "staff2024"';
-        }
-        return { 
-          success: false, 
-          message: `Authentication failed. ${hint} Please try again.` 
-        };
+        let hint = (userType === 'admin') 
+          ? 'Admin credentials: username "Admin", password as defined.' 
+          : 'Staff credentials: username "staff@rands", password "staff2024"';
+        return { success: false, message: `Authentication failed. ${hint}` };
       }
     }
 
-    // Enhanced login handler with session & redirect simulation
-    async function handleLogin(e) {
-      e.preventDefault();
-      
-      const username = usernameInput.value.trim();
-      const password = passwordInput.value;
-      
-      if (!username) {
-        showError('Please enter your username');
-        usernameInput.focus();
-        return;
-      }
-      
-      if (!password) {
-        showError('Please enter your password');
-        passwordInput.focus();
-        return;
-      }
-      
-      // Show loading state
-      loginBtn.classList.add('loading');
-      const originalBtnHTML = loginBtn.innerHTML;
-      loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Verifying credentials...';
-      
-      try {
-        const result = await authenticateUser(username, password, currentUserType);
+    // Handle form submit with green visual acknowledgment + redirect to admin.html or staff.html
+    if (loginForm) {
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        
+        if (!username) {
+          showError('Please enter your username');
+          usernameInput.focus();
+          return;
+        }
+        if (!password) {
+          showError('Please enter your password');
+          passwordInput.focus();
+          return;
+        }
+        
+        // Double-check green acknowledgment is already shown, but ensure we validate final
+        const expectedCred = VALID_CREDENTIALS[currentUserType];
+        const isUsernameValid = (username === expectedCred.username);
+        const isPasswordValid = (password === expectedCred.password);
+        
+        if (!isUsernameValid) {
+          showError(`Incorrect username for ${currentUserType} role.`);
+          usernameInput.focus();
+          return;
+        }
+        if (!isPasswordValid) {
+          showError(`Incorrect password for ${currentUserType} role.`);
+          passwordInput.focus();
+          return;
+        }
+        
+        // Show loading and success animation on button
+        loginBtn.classList.add('loading');
+        const originalHTML = loginBtn.innerHTML;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Verifying...';
+        
+        // Call auth (though already validated, we keep consistency)
+        const result = await authenticateAndRedirect(username, password, currentUserType);
         
         if (result.success) {
-          // Save credentials if "Remember me" checked
+          // Save credentials if "Remember me"
           saveCredentials(username, password, currentUserType);
-          
-          // Store comprehensive session information
           sessionStorage.setItem('rands_user_logged_in', 'true');
           sessionStorage.setItem('rands_user_role', result.role);
-          sessionStorage.setItem('rands_user_name', result.displayName);
-          sessionStorage.setItem('rands_username_original', username);
-          sessionStorage.setItem('rands_user_type', currentUserType);
+          sessionStorage.setItem('rands_user_name', username);
           sessionStorage.setItem('rands_login_time', Date.now().toString());
-          sessionStorage.setItem('rands_auth_token', btoa(`${username}:${Date.now()}`));
           
-          // Show success feedback
+          // Show final green success acknowledgment on button
           loginBtn.innerHTML = '<i class="fas fa-check-circle"></i> Access Granted! Redirecting...';
           
-          // Simulate smooth redirect to dashboard (since actual dashboard may not exist, we show success and redirect to demo)
+          // Add a global green flash acknowledgment before redirect
+          const successAck = document.createElement('div');
+          successAck.innerHTML = '<i class="fas fa-check-circle"></i> Login Successful! Redirecting to dashboard...';
+          successAck.style.position = 'fixed';
+          successAck.style.bottom = '20px';
+          successAck.style.left = '50%';
+          successAck.style.transform = 'translateX(-50%)';
+          successAck.style.backgroundColor = '#10b981';
+          successAck.style.color = 'white';
+          successAck.style.padding = '12px 24px';
+          successAck.style.borderRadius = '50px';
+          successAck.style.fontWeight = 'bold';
+          successAck.style.zIndex = '9999';
+          successAck.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+          successAck.style.fontFamily = 'Montserrat, sans-serif';
+          successAck.style.fontSize = '14px';
+          successAck.style.display = 'flex';
+          successAck.style.alignItems = 'center';
+          successAck.style.gap = '10px';
+          document.body.appendChild(successAck);
+          
           setTimeout(() => {
-            // For demo purposes, since actual admin-dashboard.html might not exist,
-            // we provide a visual success message & redirect to a safe demo dashboard or current page with param.
-            // But to follow professional pattern: we'll redirect to a success simulation if file not present.
-            // However, to keep full functionality, we'll redirect to an inline confirmation page.
-            // This prevents 404 errors while demonstrating complete flow.
-            const redirectTo = result.redirectUrl;
-            // Fallback: create a temporary confirmation and redirect to same page with hash? Instead, we show overlay message.
-            // To preserve UX, we redirect to a data URI or show a modal? But better: we change location to a demo dashboard representation.
-            // For elegance, we'll redirect to a simple built-in dashboard simulation using a data URL? Not needed.
-            // Since it's a front-end prototype, we'll show an alert and reload? No. Professional: we redirect to a dashboard placeholder.
-            // Use a more robust approach: if actual redirect pages exist, go there; else show inline success message.
-            // To avoid 404, we replace window location with a safe demo landing that retains login state.
-            // Create a hidden dashboard simulation within the same window? Use a clean approach: display a welcome panel.
-            // For this production-ready login portal, we will forward to a dashboard that indicates successful authentication.
-            // We'll implement a lightweight demo dashboard within the same origin via history push.
-            window.location.href = `data:text/html;charset=utf-8,${encodeURIComponent(`
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rands Dashboard</title><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet"><style>body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0a0c0f,#1a1e24);min-height:100vh;display:flex;align-items:center;justify-content:center;margin:0;padding:20px;color:#fff}.card{background:rgba(255,255,255,0.95);border-radius:40px;padding:48px;max-width:600px;text-align:center;color:#1e2a3a;box-shadow:0 30px 50px rgba(0,0,0,0.3)}.card i{font-size:64px;color:#E30613;margin-bottom:20px}.card h1{font-size:28px;font-weight:800;margin-bottom:12px}.card p{font-size:16px;margin:16px 0;color:#2c3e50;line-height:1.5}.badge{background:#E30613;display:inline-block;padding:6px 18px;border-radius:40px;color:white;font-weight:600;margin:20px 0 10px}.logout-btn{background:#E30613;border:none;padding:12px 28px;border-radius:40px;color:white;font-weight:700;cursor:pointer;margin-top:20px;font-size:16px;transition:0.2s}.logout-btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(227,6,19,0.3)}</style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></head><body><div class="card"><i class="fas fa-chalkboard-user"></i><div class="badge"><i class="fas fa-shield-alt"></i> RANDS VENUE OS</div><h1>Welcome, ${result.displayName} (${currentUserType === 'admin' ? 'Administrator' : 'Staff'})</h1><p><i class="fas fa-check-circle" style="color:#2ecc71"></i> Authentication successful.<br>You are now logged into <strong>Rands Venue Management System</strong>.<br>Session secured with enterprise-grade encryption.</p><div style="background:#f8f9fa;border-radius:24px;padding:16px;margin:20px 0;text-align:left"><i class="fas fa-info-circle"></i> <strong>Session info:</strong><br>Username: ${username}<br>Role: ${result.role}<br>Login time: ${new Date().toLocaleString()}</div><button class="logout-btn" onclick="localStorage.clear();sessionStorage.clear();window.location.href='${window.location.origin}${window.location.pathname}'"><i class="fas fa-sign-out-alt"></i> Logout & Return to Portal</button></div></body></html>
-            `)}`;
+            successAck.style.opacity = '0';
+            setTimeout(() => successAck.remove(), 500);
+          }, 1500);
+          
+          // Redirect to admin.html or staff.html based on role
+          setTimeout(() => {
+            window.location.href = result.redirectUrl;
           }, 1000);
         } else {
-          // Reset button and show error
           loginBtn.classList.remove('loading');
-          loginBtn.innerHTML = originalBtnHTML;
+          loginBtn.innerHTML = originalHTML;
           showError(result.message);
           passwordInput.value = '';
           passwordInput.focus();
+          // remove any green indicator for password because it's wrong
+          passwordWrapper.classList.remove('valid-password');
+          passwordSuccessMsg.classList.add('hidden');
         }
-      } catch (err) {
-        console.error('Auth error:', err);
-        loginBtn.classList.remove('loading');
-        loginBtn.innerHTML = originalBtnHTML;
-        showError('System error. Please contact support.');
-      }
+      });
     }
     
-    // Attach submit handler
-    if (loginForm) {
-      loginForm.addEventListener('submit', handleLogin);
-    }
-    
-    // Handle Enter key on password field
+    // Enter key on password field
     if (passwordInput) {
-      passwordInput.addEventListener('keypress', (e) => {
+      passwordInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
           e.preventDefault();
           loginForm.dispatchEvent(new Event('submit'));
@@ -736,34 +864,19 @@
       });
     }
     
-    // Initialize: load saved credentials & set correct hints
+    // Load saved credentials on startup
     loadSavedCredentials();
-    
-    // Set correct hint on page load based on active type
+    // set initial hint
     const initHint = () => {
       if (currentUserType === 'admin') {
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Admin username: Admin (case-sensitive)';
+        if (hintSpan) hintSpan.textContent = 'Admin username: "Admin" (case-sensitive)';
       } else {
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Staff username: staff@rands';
+        if (hintSpan) hintSpan.textContent = 'Staff username: "staff@rands"';
       }
     };
     initHint();
-    
-    // Update hint when switching types via setActiveUserType already changes it but ensure
-    const observer = new MutationObserver(() => {
-      if (currentUserType === 'admin') {
-        const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan && hintSpan.textContent !== 'Admin username: Admin (case-sensitive)') 
-          hintSpan.textContent = 'Admin username: Admin (case-sensitive)';
-      } else {
-        const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan && hintSpan.textContent !== 'Staff username: staff@rands')
-          hintSpan.textContent = 'Staff username: staff@rands';
-      }
-    });
-    observer.observe(document.getElementById('usernameHint'), { childList: true, subtree: true });
   })();
 </script>
 </body>
