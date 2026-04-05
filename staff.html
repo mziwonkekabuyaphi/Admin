@@ -20,7 +20,6 @@
 <meta name="theme-color" content="#E30613">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -244,132 +243,16 @@ body {
 .main {
   flex: 1;
   margin-left: var(--sidebar-width);
-  padding: 0;
+  padding: 20px 30px;
   max-width: calc(100vw - var(--sidebar-width));
   overflow-y: auto;
   min-height: 100vh;
   transition: margin-left 0.3s ease;
 }
 
-/* Command Bar */
-.command-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: white;
-  padding: 12px 20px;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-
-.command-search {
-  position: relative;
-  flex: 0 1 300px;
-}
-
-.command-search input {
-  width: 100%;
-  padding: 8px 35px 8px 15px;
-  border-radius: 30px;
-  border: 1px solid #e0e0e0;
-  background: #f8f9fa;
-  font-size: 14px;
-}
-
-.command-search input:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: white;
-}
-
-.command-search::after {
-  content: '\f002';
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999;
-  font-size: 14px;
-  pointer-events: none;
-}
-
-.command-right {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-}
-
-.revenue-box {
-  text-align: right;
-}
-
-.revenue-box span {
-  font-size: 11px;
-  color: var(--gray-dark);
-  display: block;
-  margin-bottom: 2px;
-  text-transform: uppercase;
-}
-
-.revenue-box h3 {
-  color: var(--primary);
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.notification {
-  position: relative;
-  font-size: 20px;
-  cursor: pointer;
-  color: #555;
-}
-
-.notification:hover {
-  color: var(--primary);
-}
-
-.notif-count {
-  position: absolute;
-  top: -5px;
-  right: -8px;
-  background: var(--primary);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 12px;
-}
-
-.staff-user {
-  font-weight: 600;
-  color: var(--dark);
-  background: #f0f0f0;
-  padding: 6px 12px;
-  border-radius: 30px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.staff-user::before {
-  content: '\f2bd';
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
-  color: var(--primary);
-  font-size: 14px;
-}
-
 /* Content Sections */
 .content-section {
   display: none;
-  padding: 30px;
 }
 
 .content-section.active {
@@ -379,7 +262,7 @@ body {
 /* Dashboard Stats */
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -431,64 +314,10 @@ body {
   color: var(--success);
 }
 
-/* Quick Actions */
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  margin: 20px 0 30px 0;
-}
-
-.action-btn {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid #eee;
-}
-
-.action-btn i {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: 8px;
-  display: block;
-}
-
-.action-btn span {
-  font-weight: 500;
-}
-
-.action-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Analytics Card */
-.analytics-card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  margin-bottom: 20px;
-}
-
-.analytics-card h3 {
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.analytics-card h3 i {
-  color: var(--primary);
-}
-
 /* Staff Tasks Grid */
 .staff-tasks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
   margin-top: 15px;
 }
@@ -538,10 +367,16 @@ body {
   margin-top: 12px;
   width: 100%;
   font-weight: 600;
+  transition: background 0.2s;
 }
 
 .task-btn:hover {
   background: var(--primary-dark);
+}
+
+.task-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Footer */
@@ -622,6 +457,12 @@ body {
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 992px) {
   .sidebar {
     left: -100%;
@@ -632,6 +473,7 @@ body {
   .main {
     margin-left: 0;
     max-width: 100vw;
+    padding: 20px;
   }
   .menu-toggle {
     display: flex;
@@ -639,16 +481,10 @@ body {
   .stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  .quick-actions {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 768px) {
   .stats {
-    grid-template-columns: 1fr;
-  }
-  .quick-actions {
     grid-template-columns: 1fr;
   }
   .staff-tasks-grid {
@@ -700,7 +536,7 @@ body {
       </ul>
     </li>
     
-    <!-- Cashless Events (Rands Wallet REMOVED) -->
+    <!-- Cashless Events -->
     <li class="has-submenu" id="menu-wallet">
       <div class="menu-item"><i class="fas fa-wallet" style="color: #FBBF24;"></i> Cashless Events <i class="fas fa-chevron-down"></i></div>
       <ul class="submenu">
@@ -711,12 +547,10 @@ body {
       </ul>
     </li>
 
-    <!-- E-commerce -->
-    <li class="has-submenu" id="menu-ecommerce">
-      <div class="menu-item"><i class="fas fa-store"></i> E-commerce <i class="fas fa-chevron-down"></i></div>
+    <!-- Online Orders -->
+    <li class="has-submenu" id="menu-online-orders">
+      <div class="menu-item"><i class="fas fa-store"></i> Online Orders <i class="fas fa-chevron-down"></i></div>
       <ul class="submenu">
-        <li data-section="ecommerce-orders"><i class="fas fa-shopping-bag"></i> Orders</li>
-        <li data-section="ecommerce-products"><i class="fas fa-box"></i> Products</li>
         <li data-section="ecommerce-pickup-queue"><i class="fas fa-clock"></i> Order Pickup Queue</li>
         <li data-section="ecommerce-staff-calling"><i class="fas fa-mobile-alt"></i> Staff Calling App</li>
       </ul>
@@ -751,55 +585,77 @@ body {
 <!-- Main Content -->
 <div class="main" id="mainContent">
 
-  <!-- Command Bar -->
-  <div class="command-bar">
-    <div class="command-left"></div>
-    <div class="command-search">
-      <input type="text" placeholder="Search ticket, customer, order...">
-    </div>
-    <div class="command-right">
-      <div class="revenue-box">
-        <span>Today's Sales</span>
-        <h3 id="revenueToday">R0</h3>
-      </div>
-      <div class="notification">
-        🔔<span class="notif-count">3</span>
-      </div>
-      <div class="staff-user">Staff Member</div>
-    </div>
-  </div>
-
-  <!-- DASHBOARD SECTION -->
+  <!-- DASHBOARD SECTION - Only Stats and My Tasks Today -->
   <div id="dashboard-section" class="content-section active">
+    <!-- Stats Cards -->
     <div class="stats">
-      <div class="card"><div class="card-icon"><i class="fas fa-ticket-alt"></i></div><h3>Today's Check-ins</h3><div class="value">847</div><div class="trend up"><i class="fas fa-arrow-up"></i> +23 vs yesterday</div></div>
-      <div class="card"><div class="card-icon"><i class="fas fa-drumstick-bite"></i></div><h3>Butcher Shop Queue</h3><div class="value">34</div><div class="trend">Avg wait: 6 min</div></div>
-      <div class="card"><div class="card-icon"><i class="fas fa-smoking"></i></div><h3>Shisha Orders</h3><div class="value">56</div><div class="trend up">+12 pending</div></div>
-      <div class="card"><div class="card-icon"><i class="fas fa-lock"></i></div><h3>Lockers In Use</h3><div class="value">32/50</div><div class="trend">64% occupied</div></div>
-      <div class="card"><div class="card-icon"><i class="fas fa-clock"></i></div><h3>My Shift</h3><div class="value">4h 12m</div><div class="trend">Ends at 22:00</div></div>
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-ticket-alt"></i></div>
+        <h3>Today's Check-ins</h3>
+        <div class="value">847</div>
+        <div class="trend up"><i class="fas fa-arrow-up"></i> +23 vs yesterday</div>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-drumstick-bite"></i></div>
+        <h3>Butcher Shop Queue</h3>
+        <div class="value">34</div>
+        <div class="trend">Avg wait: 6 min</div>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-smoking"></i></div>
+        <h3>Shisha Orders</h3>
+        <div class="value">56</div>
+        <div class="trend up">+12 pending</div>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-lock"></i></div>
+        <h3>Lockers In Use</h3>
+        <div class="value">32/50</div>
+        <div class="trend">64% occupied</div>
+      </div>
     </div>
 
-    <div class="quick-actions">
-      <div class="action-btn" onclick="alert('Scanner ready - point camera at QR code')"><i class="fas fa-qrcode"></i><span>Scan Ticket</span></div>
-      <div class="action-btn" onclick="alert('Calling next customer in queue')"><i class="fas fa-bell"></i><span>Call Next</span></div>
-      <div class="action-btn" onclick="alert('New shisha order form opened')"><i class="fas fa-smoking"></i><span>New Shisha Order</span></div>
-      <div class="action-btn" onclick="alert('Locker assignment panel')"><i class="fas fa-lock-open"></i><span>Assign Locker</span></div>
-    </div>
-
+    <!-- My Tasks Today Section -->
     <div class="analytics-card">
       <h3><i class="fas fa-tasks"></i> My Tasks Today</h3>
       <div class="staff-tasks-grid">
-        <div class="task-card"><h4><i class="fas fa-qrcode"></i> Entry Gate</h4><p>Scan tickets at main entrance</p><span class="task-status status-pending">In Progress</span><button class="task-btn" onclick="alert('Marking entry gate task as completed')">Complete Task</button></div>
-        <div class="task-card"><h4><i class="fas fa-drumstick-bite"></i> Butcher Shop</h4><p>Manage queue and orders</p><span class="task-status status-pending">Pending</span><button class="task-btn" onclick="alert('Starting Butcher Shop duty')">Start Task</button></div>
-        <div class="task-card"><h4><i class="fas fa-chair"></i> VIP Section</h4><p>Assist VIP guests</p><span class="task-status status-completed">Completed</span><button class="task-btn" disabled style="opacity:0.6">Done</button></div>
+        <div class="task-card">
+          <h4><i class="fas fa-qrcode"></i> Entry Gate</h4>
+          <p>Scan tickets at main entrance</p>
+          <span class="task-status status-pending">In Progress</span>
+          <button class="task-btn" onclick="alert('Marking entry gate task as completed')">Complete Task</button>
+        </div>
+        <div class="task-card">
+          <h4><i class="fas fa-drumstick-bite"></i> Butcher Shop</h4>
+          <p>Manage queue and orders</p>
+          <span class="task-status status-pending">Pending</span>
+          <button class="task-btn" onclick="alert('Starting Butcher Shop duty')">Start Task</button>
+        </div>
+        <div class="task-card">
+          <h4><i class="fas fa-chair"></i> VIP Section</h4>
+          <p>Assist VIP guests with priority access</p>
+          <span class="task-status status-completed">Completed</span>
+          <button class="task-btn" disabled style="opacity:0.6">Done</button>
+        </div>
       </div>
     </div>
 
-    <div class="footer"><p><span class="rands-logo">Rands Cape Town</span> · Staff Operations Portal</p><p>Welcome, Team Member! | Shift: 18:00 - 22:00</p></div>
+    <!-- Footer with updated shift time -->
+    <div class="footer">
+      <p><span class="rands-logo">Rands Cape Town</span> · Staff Operations Portal</p>
+      <p>Welcome, Team Member! | Shift: 11:00 - 23:00</p>
+    </div>
   </div>
 
-  <!-- Other Sections -->
-  <div id="ticket-scanner-section" class="content-section"><h2><i class="fas fa-qrcode"></i> Ticket Scanners</h2><div style="background:#f5f5f5; padding:40px; text-align:center; border-radius:16px; margin-top:20px;"><i class="fas fa-camera" style="font-size:64px; color:var(--primary); margin-bottom:15px; display:block;"></i><p style="font-size:18px;">Camera ready - point at QR code to scan ticket</p><button class="task-btn" style="width:auto; padding:12px 30px; margin-top:20px;" onclick="alert('Scanner activated')">Start Scanning</button></div></div>
+  <!-- Other Sections (hidden until clicked) -->
+  <div id="ticket-scanner-section" class="content-section">
+    <h2><i class="fas fa-qrcode"></i> Ticket Scanners</h2>
+    <div style="background:#f5f5f5; padding:40px; text-align:center; border-radius:16px; margin-top:20px;">
+      <i class="fas fa-camera" style="font-size:64px; color:var(--primary); margin-bottom:15px; display:block;"></i>
+      <p style="font-size:18px;">Camera ready - point at QR code to scan ticket</p>
+      <button class="task-btn" style="width:auto; padding:12px 30px; margin-top:20px;" onclick="alert('Scanner activated')">Start Scanning</button>
+    </div>
+  </div>
   <div id="box-office-section" class="content-section"><h2><i class="fas fa-theater-masks"></i> Box Office</h2><p>Sell tickets at the venue box office</p></div>
   <div id="ticket-shop-section" class="content-section"><h2><i class="fas fa-store"></i> Ticket Shop</h2><p>Online ticket shop management</p></div>
   <div id="self-serve-section" class="content-section"><h2><i class="fas fa-tablet-alt"></i> Self-Serve Kiosk</h2><p>Kiosk configuration and monitoring</p></div>
@@ -807,8 +663,6 @@ body {
   <div id="smart-counter-section" class="content-section"><h2><i class="fas fa-cash-register"></i> Rands Smart Counter Orders</h2><p>Smart counter order management</p></div>
   <div id="shisha-orders-section" class="content-section"><h2><i class="fas fa-smoking"></i> Shisha Lounge Orders</h2><p>Manage shisha lounge orders</p></div>
   <div id="butcher-orders-section" class="content-section"><h2><i class="fas fa-drumstick-bite"></i> The Butcher Shop Orders</h2><p>Butcher shop order management</p></div>
-  <div id="ecommerce-orders-section" class="content-section"><h2><i class="fas fa-shopping-bag"></i> Orders</h2><p>Manage online orders</p></div>
-  <div id="ecommerce-products-section" class="content-section"><h2><i class="fas fa-box"></i> Products</h2><p>Product catalog management</p></div>
   <div id="ecommerce-pickup-queue-section" class="content-section"><h2><i class="fas fa-clock"></i> Order Pickup Queue</h2><p>Manage order pickup queue</p></div>
   <div id="ecommerce-staff-calling-section" class="content-section"><h2><i class="fas fa-mobile-alt"></i> Staff Calling App</h2><p>Call staff for order pickup</p></div>
   <div id="butcher-queue-section" class="content-section"><div class="butcher-header"><h1><i class="fas fa-drumstick-bite"></i> The Butcher Shop Queue</h1></div><p>Live queue monitoring for Butcher Shop</p></div>
@@ -820,24 +674,12 @@ body {
 </div>
 
 <script>
-// Revenue simulation
-let revenue = 0;
-function simulateRevenue() {
-  revenue += Math.floor(Math.random() * 800);
-  const revenueElement = document.getElementById("revenueToday");
-  if (revenueElement) revenueElement.innerText = "R" + revenue.toLocaleString();
-}
-setInterval(simulateRevenue, 5000);
-
-// LOGOUT FUNCTIONALITY - Working
+// Logout functionality
 function handleLogout() {
   if (confirm('Are you sure you want to logout from Rands Staff Dashboard?')) {
-    // Clear any session data if needed
     localStorage.removeItem('staffLoggedIn');
     sessionStorage.clear();
-    // Redirect to login page or reload to initial state
     window.location.href = 'login.html';
-    // Fallback: if login.html doesn't exist, just reload
     setTimeout(function() {
       window.location.reload();
     }, 100);
