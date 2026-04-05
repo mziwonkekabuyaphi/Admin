@@ -250,26 +250,6 @@
     opacity: 1;
   }
   
-  .success-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #10b981;
-    color: white;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 20px;
-    margin-left: 10px;
-    animation: pulseGreen 0.5s ease;
-  }
-  
-  @keyframes pulseGreen {
-    0% { transform: scale(0.8); opacity: 0; }
-    80% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
   .toggle-password {
     position: absolute;
     right: 16px;
@@ -290,40 +270,6 @@
     display: flex;
     align-items: center;
     gap: 6px;
-  }
-
-  .remember-forgot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-  }
-
-  .remember {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-  .remember input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: #E30613;
-  }
-
-  .forgot-link {
-    font-size: 14px;
-    color: #E30613;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-  }
-
-  .forgot-link:hover {
-    color: #b3000c;
-    text-decoration: underline;
   }
 
   .login-btn {
@@ -454,11 +400,6 @@
       padding: 12px 16px;
       font-size: 14px;
     }
-    .remember-forgot {
-      flex-direction: column;
-      gap: 12px;
-      align-items: flex-start;
-    }
   }
 </style>
 </head>
@@ -496,7 +437,7 @@
         </div>
         <div class="password-hint" id="usernameHint">
           <i class="fas fa-info-circle"></i>
-          <span>Admin: "Admin" (case-sensitive)</span>
+          <span>Admin: "Admin" | Staff: "Staff" (case-sensitive)</span>
         </div>
       </div>
 
@@ -511,14 +452,10 @@
         <div id="passwordSuccessMsg" class="inline-success hidden">
           <i class="fas fa-check-circle"></i> <span>✓ Password correct</span>
         </div>
-      </div>
-
-      <div class="remember-forgot">
-        <label class="remember">
-          <input type="checkbox" id="rememberMe">
-          <span>Remember me</span>
-        </label>
-        <a href="#" class="forgot-link" id="forgotPasswordLink">Forgot Password?</a>
+        <div class="password-hint">
+          <i class="fas fa-lock"></i>
+          <span>Password: "randscapetown" for both roles</span>
+        </div>
       </div>
 
       <button type="submit" class="login-btn" id="loginBtn">
@@ -546,8 +483,6 @@
     const errorMessageDiv = document.getElementById('errorMessage');
     const errorTextSpan = document.getElementById('errorText');
     const togglePassword = document.getElementById('togglePassword');
-    const rememberCheckbox = document.getElementById('rememberMe');
-    const forgotLink = document.getElementById('forgotPasswordLink');
     const usernameWrapper = document.getElementById('usernameWrapper');
     const passwordWrapper = document.getElementById('passwordWrapper');
     const usernameSuccessMsg = document.getElementById('usernameSuccessMsg');
@@ -556,9 +491,9 @@
     let currentUserType = 'admin';
 
     // ============================================================
-    // CREDENTIALS (admin.html redirect for Admin, staff redirects to staff.html)
-    // Admin: username "Admin", password "randscapetown"
-    // Staff: username "staff@rands", password "staff2024"
+    // UPDATED CREDENTIALS
+    // Admin: username "Admin", password "randscapetown" -> redirects to admin.html
+    // Staff: username "Staff", password "randscapetown" -> redirects to staff.html
     // ============================================================
     const VALID_CREDENTIALS = {
       admin: {
@@ -569,15 +504,15 @@
         displayName: "Administrator"
       },
       staff: {
-        username: "staff@rands",
-        password: "staff2024",
+        username: "Staff",
+        password: "randscapetown",
         role: "staff",
         redirectUrl: "staff.html",
         displayName: "Staff Member"
       }
     };
 
-    // Helper: Update green acknowledgment for username field based on current user type
+    // Helper: Update green acknowledgment for username field
     function updateUsernameAcknowledgment() {
       const enteredUsername = usernameInput.value.trim();
       const expectedUsername = VALID_CREDENTIALS[currentUserType]?.username;
@@ -587,7 +522,6 @@
         if (isValid) {
           usernameWrapper.classList.add('valid-username');
           usernameSuccessMsg.classList.remove('hidden');
-          // add a subtle badge next to label optionally
         } else {
           usernameWrapper.classList.remove('valid-username');
           usernameSuccessMsg.classList.add('hidden');
@@ -618,18 +552,17 @@
       }
     }
     
-    // Real-time validation for username (green checkmark appears as soon as user types correct "Admin" or staff username)
+    // Real-time validation for username
     if (usernameInput) {
       usernameInput.addEventListener('input', function() {
         updateUsernameAcknowledgment();
-        // Also hide general error when user corrects
         if (!errorMessageDiv.classList.contains('hidden')) {
           errorMessageDiv.classList.add('hidden');
         }
       });
     }
     
-    // Real-time validation for password (green check when password matches exact credential)
+    // Real-time validation for password
     if (passwordInput) {
       passwordInput.addEventListener('input', function() {
         updatePasswordAcknowledgment();
@@ -657,14 +590,14 @@
         adminTypeBtn.classList.add('admin');
         staffTypeBtn.classList.remove('staff');
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Admin username: "Admin" (case-sensitive)';
+        if (hintSpan) hintSpan.textContent = 'Admin username: "Admin" | Staff: "Staff" (case-sensitive)';
       } else {
         staffTypeBtn.classList.add('active');
         adminTypeBtn.classList.remove('active');
         staffTypeBtn.classList.add('staff');
         adminTypeBtn.classList.remove('admin');
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Staff username: "staff@rands"';
+        if (hintSpan) hintSpan.textContent = 'Staff username: "Staff" | Admin: "Admin" (case-sensitive)';
       }
       // Clear inputs and reset green indicators
       usernameInput.value = '';
@@ -687,14 +620,6 @@
       staffTypeBtn.addEventListener('click', () => setActiveUserType('staff'));
     }
 
-    // Forgot password handler
-    if (forgotLink) {
-      forgotLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Please contact your system administrator to reset your password.');
-      });
-    }
-
     function showError(message) {
       errorTextSpan.textContent = message;
       errorMessageDiv.classList.remove('hidden');
@@ -703,41 +628,7 @@
       }, 4000);
     }
 
-    // Save to localStorage if "Remember me" is checked
-    function saveCredentials(username, password, userType) {
-      if (rememberCheckbox && rememberCheckbox.checked) {
-        localStorage.setItem('rands_remember_username', username);
-        localStorage.setItem('rands_remember_password', password);
-        localStorage.setItem('rands_remember_type', userType);
-        localStorage.setItem('rands_remember_checked', 'true');
-      } else {
-        localStorage.removeItem('rands_remember_username');
-        localStorage.removeItem('rands_remember_password');
-        localStorage.removeItem('rands_remember_type');
-        localStorage.setItem('rands_remember_checked', 'false');
-      }
-    }
-
-    function loadSavedCredentials() {
-      const savedChecked = localStorage.getItem('rands_remember_checked');
-      if (savedChecked === 'true') {
-        const savedUsername = localStorage.getItem('rands_remember_username');
-        const savedPassword = localStorage.getItem('rands_remember_password');
-        const savedType = localStorage.getItem('rands_remember_type');
-        
-        if (savedUsername && savedPassword && savedType && (savedType === 'admin' || savedType === 'staff')) {
-          usernameInput.value = savedUsername;
-          passwordInput.value = savedPassword;
-          setActiveUserType(savedType);
-          if (rememberCheckbox) rememberCheckbox.checked = true;
-          // trigger green validations after loading
-          updateUsernameAcknowledgment();
-          updatePasswordAcknowledgment();
-        }
-      }
-    }
-
-    // Authenticate and redirect to admin.html or staff.html
+    // Authenticate and redirect
     async function authenticateAndRedirect(username, password, userType) {
       await new Promise(resolve => setTimeout(resolve, 500)); // smooth UX
       const cred = VALID_CREDENTIALS[userType];
@@ -751,13 +642,13 @@
         return { success: true, redirectUrl: cred.redirectUrl, role: cred.role };
       } else {
         let hint = (userType === 'admin') 
-          ? 'Admin credentials: username "Admin", password as defined.' 
-          : 'Staff credentials: username "staff@rands", password "staff2024"';
+          ? 'Admin credentials: username "Admin", password "randscapetown"' 
+          : 'Staff credentials: username "Staff", password "randscapetown"';
         return { success: false, message: `Authentication failed. ${hint}` };
       }
     }
 
-    // Handle form submit with green visual acknowledgment + redirect to admin.html or staff.html
+    // Handle form submit
     if (loginForm) {
       loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -776,13 +667,13 @@
           return;
         }
         
-        // Double-check green acknowledgment is already shown, but ensure we validate final
+        // Double-check credentials
         const expectedCred = VALID_CREDENTIALS[currentUserType];
         const isUsernameValid = (username === expectedCred.username);
         const isPasswordValid = (password === expectedCred.password);
         
         if (!isUsernameValid) {
-          showError(`Incorrect username for ${currentUserType} role.`);
+          showError(`Incorrect username for ${currentUserType} role. Expected: "${expectedCred.username}"`);
           usernameInput.focus();
           return;
         }
@@ -792,17 +683,15 @@
           return;
         }
         
-        // Show loading and success animation on button
+        // Show loading state
         loginBtn.classList.add('loading');
         const originalHTML = loginBtn.innerHTML;
         loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Verifying...';
         
-        // Call auth (though already validated, we keep consistency)
         const result = await authenticateAndRedirect(username, password, currentUserType);
         
         if (result.success) {
-          // Save credentials if "Remember me"
-          saveCredentials(username, password, currentUserType);
+          // Store session info
           sessionStorage.setItem('rands_user_logged_in', 'true');
           sessionStorage.setItem('rands_user_role', result.role);
           sessionStorage.setItem('rands_user_name', username);
@@ -837,7 +726,7 @@
             setTimeout(() => successAck.remove(), 500);
           }, 1500);
           
-          // Redirect to admin.html or staff.html based on role
+          // Redirect to the appropriate HTML file
           setTimeout(() => {
             window.location.href = result.redirectUrl;
           }, 1000);
@@ -847,7 +736,6 @@
           showError(result.message);
           passwordInput.value = '';
           passwordInput.focus();
-          // remove any green indicator for password because it's wrong
           passwordWrapper.classList.remove('valid-password');
           passwordSuccessMsg.classList.add('hidden');
         }
@@ -864,17 +752,10 @@
       });
     }
     
-    // Load saved credentials on startup
-    loadSavedCredentials();
-    // set initial hint
+    // Set initial hint
     const initHint = () => {
-      if (currentUserType === 'admin') {
-        const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Admin username: "Admin" (case-sensitive)';
-      } else {
-        const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Staff username: "staff@rands"';
-      }
+      const hintSpan = document.querySelector('#usernameHint span');
+      if (hintSpan) hintSpan.textContent = 'Admin: "Admin" | Staff: "Staff" (case-sensitive)';
     };
     initHint();
   })();
