@@ -20,7 +20,7 @@
 <meta name="theme-color" content="#E30613">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
 /* ========== STAFF DASHBOARD STYLES ========== */
@@ -42,7 +42,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 body {
@@ -250,6 +250,16 @@ body {
   transition: margin-left 0.3s ease;
 }
 
+/* When sidebar is hidden on mobile */
+.sidebar.hide-sidebar {
+  left: -100%;
+}
+
+.main.full-width {
+  margin-left: 0;
+  max-width: 100vw;
+}
+
 /* Content Sections */
 .content-section {
   display: none;
@@ -421,44 +431,147 @@ body {
 
 /* Shisha Header */
 .shisha-header h1 {
-  background: #d32f2f;
+  background: linear-gradient(135deg, #2c3e50 0%, #e67e22 100%);
   color: white;
   text-align: center;
   margin: 0 0 30px 0;
-  padding: 25px;
+  padding: 35px 25px;
   font-size: 42px;
   font-weight: 900;
   letter-spacing: 3px;
   text-transform: uppercase;
-  border-radius: 8px;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Locker Header */
-.locker-header {
-  background: #d32f2f;
+.shisha-header h1::before {
+  content: '🔥';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 50px;
+  opacity: 0.8;
+}
+
+.shisha-header h1::after {
+  content: '🔥';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 50px;
+  opacity: 0.8;
+}
+
+/* Booze Lockers Stunning Header */
+.booze-locker-header {
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
   color: white;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  text-align: center;
+  margin: 0 0 30px 0;
+  padding: 40px 25px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+  animation: headerGlow 3s ease-in-out infinite;
 }
 
-.locker-header h1 {
+@keyframes headerGlow {
+  0% { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); }
+  50% { box-shadow: 0 25px 50px rgba(227, 6, 19, 0.3); }
+  100% { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); }
+}
+
+.booze-locker-header::before {
+  content: '🍾';
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 55px;
+  opacity: 0.9;
+  animation: floatBottle 3s ease-in-out infinite;
+}
+
+.booze-locker-header::after {
+  content: '🥂';
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 55px;
+  opacity: 0.9;
+  animation: floatBottle 3s ease-in-out infinite reverse;
+}
+
+@keyframes floatBottle {
+  0%, 100% { transform: translateY(-50%) rotate(0deg); }
+  50% { transform: translateY(-55%) rotate(5deg); }
+}
+
+.booze-locker-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #fff, #FFD700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
 }
 
-/* The Butcher Shop Header */
+.booze-locker-header p {
+  margin-top: 12px;
+  font-size: 16px;
+  opacity: 0.9;
+  letter-spacing: 1px;
+}
+
+.booze-locker-header .locker-badge {
+  display: inline-block;
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(5px);
+}
+
+/* Butcher Header */
 .butcher-header {
-  background: #8B0000;
+  background: linear-gradient(135deg, #8B0000 0%, #5a0000 100%);
   color: white;
-  padding: 20px;
-  border-radius: 8px;
+  padding: 25px;
+  border-radius: 20px;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .butcher-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
+}
+
+/* VVIP Header */
+.vvip-header {
+  background: linear-gradient(135deg, #9C27B0 0%, #6A1B9A 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.vvip-header h1 {
+  margin: 0;
+  font-size: 28px;
 }
 
 /* ========== STUNNING POPUP MODAL ========== */
@@ -615,7 +728,7 @@ body {
   transform: rotate(90deg);
 }
 
-/* Confetti effect for success modals */
+/* Confetti effect */
 @keyframes confetti {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
@@ -646,6 +759,13 @@ body {
   .stats {
     grid-template-columns: repeat(2, 1fr);
   }
+  .booze-locker-header h1 {
+    font-size: 24px;
+  }
+  .booze-locker-header::before,
+  .booze-locker-header::after {
+    font-size: 35px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -660,6 +780,13 @@ body {
   }
   .modal-footer {
     flex-direction: column;
+  }
+  .booze-locker-header::before,
+  .booze-locker-header::after {
+    display: none;
+  }
+  .booze-locker-header h1 {
+    font-size: 20px;
   }
 }
 
@@ -698,11 +825,10 @@ body {
       <ul class="submenu">
         <li data-section="box-office"><i class="fas fa-theater-masks"></i> Box Office</li>
         <li data-section="ticket-shop"><i class="fas fa-store"></i> Ticket Shop</li>
-        <li data-section="self-serve"><i class="fas fa-tablet-alt"></i> Self-Serve Kiosk</li>
       </ul>
     </li>
     <li class="has-submenu" id="menu-wallet">
-      <div class="menu-item"><i class="fas fa-wallet" style="color: #FBBF24;"></i> Cashless Events <i class="fas fa-chevron-down"></i></div>
+      <div class="menu-item"><i class="fas fa-crown" style="color: #FFD700;"></i> VVIP Management <i class="fas fa-chevron-down"></i></div>
       <ul class="submenu">
         <li data-section="vvip-pos"><i class="fas fa-crown" style="color: #FFD700;"></i> VVIP POS Tab System</li>
         <li data-section="smart-counter"><i class="fas fa-cash-register"></i> Rands Smart Counter Orders</li>
@@ -727,7 +853,7 @@ body {
       </ul>
     </li>
     <li data-section="shisha" class="menu-item-shisha"><i class="fas fa-smoking"></i> Shisha Lounge</li>
-    <li data-section="locker" class="menu-item-locker"><i class="fas fa-lock"></i> Rands Locker</li>
+    <li data-section="locker" class="menu-item-locker"><i class="fas fa-wine-bottle"></i> Rands Booze Lockers</li>
   </ul>
   <div class="sidebar-footer">
     <ul>
@@ -782,8 +908,8 @@ body {
         <div class="trend up">+12 pending</div>
       </div>
       <div class="card">
-        <div class="card-icon"><i class="fas fa-lock"></i></div>
-        <h3>Lockers In Use</h3>
+        <div class="card-icon"><i class="fas fa-wine-bottle"></i></div>
+        <h3>Booze Lockers In Use</h3>
         <div class="value">32/50</div>
         <div class="trend">64% occupied</div>
       </div>
@@ -830,8 +956,7 @@ body {
   </div>
   <div id="box-office-section" class="content-section"><h2><i class="fas fa-theater-masks"></i> Box Office</h2><p>Sell tickets at the venue box office</p><button class="task-btn" style="width:auto; margin-top:15px;" onclick="showInfoModal('Box Office', 'Box office terminal ready. Select ticket type to sell.')">Open Terminal</button></div>
   <div id="ticket-shop-section" class="content-section"><h2><i class="fas fa-store"></i> Ticket Shop</h2><p>Online ticket shop management</p></div>
-  <div id="self-serve-section" class="content-section"><h2><i class="fas fa-tablet-alt"></i> Self-Serve Kiosk</h2><p>Kiosk configuration and monitoring</p></div>
-  <div id="vvip-pos-section" class="content-section"><h2><i class="fas fa-crown"></i> VVIP POS Tab System</h2><p>Tab management for VVIP customers</p></div>
+  <div id="vvip-pos-section" class="content-section"><div class="vvip-header"><h1><i class="fas fa-crown"></i> VVIP POS Tab System</h1><p>Premium tab management for VVIP customers</p></div><button class="task-btn" style="width:auto; margin-top:15px;" onclick="showInfoModal('VVIP POS', 'VVIP Tab System ready. Manage premium customer tabs.')">Open VVIP Terminal</button></div>
   <div id="smart-counter-section" class="content-section"><h2><i class="fas fa-cash-register"></i> Rands Smart Counter Orders</h2><p>Smart counter order management</p></div>
   <div id="shisha-orders-section" class="content-section"><h2><i class="fas fa-smoking"></i> Shisha Lounge Orders</h2><p>Manage shisha lounge orders</p></div>
   <div id="butcher-orders-section" class="content-section"><h2><i class="fas fa-drumstick-bite"></i> The Butcher Shop Orders</h2><p>Butcher shop order management</p></div>
@@ -842,10 +967,54 @@ body {
   <div id="butcher-queue-tv-section" class="content-section"><h2>Queue TV Display</h2><p>TV display for Butcher Shop queue status</p></div>
   <div id="butcher-staff-calling-section" class="content-section"><h2>Staff Calling App</h2><p>Call next customer in Butcher Shop queue</p></div>
   <div id="shisha-section" class="content-section"><div class="shisha-header"><h1>🔥 RANDS SHISHA LOUNGE 🔥</h1><p>Staff view - Manage shisha orders and tables</p></div></div>
-  <div id="locker-section" class="content-section"><div class="locker-header"><h1><i class="fas fa-lock"></i> Rands Locker</h1><p>Staff locker management</p></div></div>
+  
+  <div id="locker-section" class="content-section">
+    <div class="booze-locker-header">
+      <h1><i class="fas fa-wine-bottle"></i> Rands Booze Lockers</h1>
+      <p>Premium Beverage Storage & Security Management System</p>
+      <div class="locker-badge"><i class="fas fa-temperature-low"></i> Climate Controlled | <i class="fas fa-fingerprint"></i> Biometric Security | 24/7 Monitoring</div>
+    </div>
+    <div style="background:white; border-radius:20px; padding:30px; margin-top:20px; box-shadow:0 5px 20px rgba(0,0,0,0.05);">
+      <h3><i class="fas fa-info-circle" style="color:var(--primary);"></i> Locker Management Dashboard</h3>
+      <p style="margin-top:15px;">Monitor and manage all booze locker units. Track occupancy, temperature, and access logs.</p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:15px; margin-top:25px;">
+        <div style="background:#f8f9fa; border-radius:12px; padding:15px; text-align:center;"><i class="fas fa-check-circle" style="color:#28a745; font-size:24px;"></i><p style="margin-top:8px;"><strong>32 Lockers</strong><br>In Use</p></div>
+        <div style="background:#f8f9fa; border-radius:12px; padding:15px; text-align:center;"><i class="fas fa-door-open" style="color:#17a2b8; font-size:24px;"></i><p style="margin-top:8px;"><strong>18 Lockers</strong><br>Available</p></div>
+        <div style="background:#f8f9fa; border-radius:12px; padding:15px; text-align:center;"><i class="fas fa-temperature-high" style="color:#ffc107; font-size:24px;"></i><p style="margin-top:8px;"><strong>4°C</strong><br>Avg Temperature</p></div>
+        <div style="background:#f8f9fa; border-radius:12px; padding:15px; text-align:center;"><i class="fas fa-clock" style="color:#6f42c1; font-size:24px;"></i><p style="margin-top:8px;"><strong>Last Access</strong><br>2 min ago</p></div>
+      </div>
+      <button class="task-btn" style="width:auto; margin-top:25px; padding:12px 28px;" onclick="showInfoModal('Rands Booze Lockers', 'Booze Locker Management System ready. Temperature: 4°C | Humidity: 55% | All systems operational.')"><i class="fas fa-cog"></i> Manage Lockers</button>
+    </div>
+  </div>
 </div>
 
 <script>
+// Function to hide sidebar (collapse it) - for mobile/responsive view
+function hideSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.querySelector('.main');
+  const isMobile = window.innerWidth <= 992;
+  
+  if (isMobile) {
+    sidebar.classList.remove('active');
+    sidebar.classList.add('hide-sidebar');
+    main.classList.add('full-width');
+  }
+}
+
+// Function to show sidebar (only needed for toggle)
+function showSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.querySelector('.main');
+  const isMobile = window.innerWidth <= 992;
+  
+  if (isMobile) {
+    sidebar.classList.add('active');
+    sidebar.classList.remove('hide-sidebar');
+    main.classList.remove('full-width');
+  }
+}
+
 // Stunning Modal Functions
 function showModal(title, subtitle, message, detail, iconType = 'success') {
   const modal = document.getElementById('stunningModal');
@@ -890,7 +1059,6 @@ function showModal(title, subtitle, message, detail, iconType = 'success') {
   
   modal.classList.add('active');
   
-  // Add confetti effect for success
   if (iconType === 'success') {
     createConfetti();
   }
@@ -928,11 +1096,8 @@ function closeModal() {
   modal.classList.remove('active');
 }
 
-// Logout functionality with modal
 function handleLogout() {
   showModal('Logout', 'Confirm Logout', 'Are you sure you want to logout from Rands Staff Dashboard?', 'You will need to log in again to access your dashboard.', 'warning');
-  
-  // Override modal buttons for confirmation
   const modalFooter = document.getElementById('modalFooter');
   modalFooter.innerHTML = `
     <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
@@ -946,21 +1111,18 @@ function confirmLogout() {
   sessionStorage.clear();
   setTimeout(() => {
     window.location.href = 'login.html';
-    setTimeout(() => window.location.reload(), 100);
   }, 300);
 }
 
-// Reset modal footer when closed normally
 function resetModalFooter() {
   const modalFooter = document.getElementById('modalFooter');
   modalFooter.innerHTML = `<button class="modal-btn modal-btn-primary" onclick="closeModal()">Got it</button>`;
 }
 
-// Override closeModal to reset footer
-const originalCloseModal = closeModal;
 window.closeModal = function() {
   resetModalFooter();
-  originalCloseModal();
+  const modal = document.getElementById('stunningModal');
+  if (modal) modal.classList.remove('active');
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -975,15 +1137,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const menuToggle = document.getElementById('menuToggle');
   const sidebar = document.getElementById('sidebar');
+  const main = document.querySelector('.main');
+  
   if (menuToggle && sidebar) {
-    menuToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
-    document.addEventListener('click', function(event) {
-      if (window.innerWidth <= 992 && !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+    menuToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (sidebar.classList.contains('active')) {
         sidebar.classList.remove('active');
+        main.classList.add('full-width');
+      } else {
+        sidebar.classList.add('active');
+        main.classList.remove('full-width');
       }
     });
   }
 
+  // Handle submenu toggles - prevent hiding when clicking parent menu items
   document.querySelectorAll('.has-submenu .menu-item').forEach(item => {
     item.addEventListener('click', function(e) {
       e.preventDefault();
@@ -1012,7 +1181,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  document.querySelectorAll('[data-section]').forEach(item => {
+  // Handle ALL menu items (both main and submenu) to hide sidebar on click
+  const allMenuItems = document.querySelectorAll('[data-section]');
+  allMenuItems.forEach(item => {
     item.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -1026,10 +1197,14 @@ document.addEventListener('DOMContentLoaded', function() {
           if (parentLi) parentLi.classList.add('active');
         }
         showSection(section);
+        
+        // HIDE SIDEBAR AFTER CLICKING ANY MENU ITEM (submenu or main)
+        hideSidebar();
       }
     });
   });
 
+  // Handle Dashboard separately
   const dashboardItem = document.querySelector('.menu-item-dashboard');
   if (dashboardItem) {
     dashboardItem.addEventListener('click', function(e) {
@@ -1038,6 +1213,32 @@ document.addEventListener('DOMContentLoaded', function() {
       removeAllActiveClasses();
       this.classList.add('active');
       showSection('dashboard');
+      // HIDE SIDEBAR AFTER CLICKING DASHBOARD
+      hideSidebar();
+    });
+  }
+  
+  // Also handle the main Ticket Scanners (non-submenu item)
+  const ticketScannerItem = document.querySelector('li[data-section="ticket-scanner"]');
+  if (ticketScannerItem) {
+    ticketScannerItem.addEventListener('click', function() {
+      hideSidebar();
+    });
+  }
+  
+  // Handle Shisha Lounge
+  const shishaItem = document.querySelector('li[data-section="shisha"]');
+  if (shishaItem) {
+    shishaItem.addEventListener('click', function() {
+      hideSidebar();
+    });
+  }
+  
+  // Handle Rands Booze Lockers
+  const lockerItem = document.querySelector('li[data-section="locker"]');
+  if (lockerItem) {
+    lockerItem.addEventListener('click', function() {
+      hideSidebar();
     });
   }
 });
