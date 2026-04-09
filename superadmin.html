@@ -3,889 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Rands | Super Admin Dashboard</title>
+    <title>Rands | Tenant Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f5f7fb;
-            overflow-x: hidden;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f7fb; overflow-x: hidden; }
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 270px;
-            height: 100%;
-            background: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-            z-index: 100;
-            transition: all 0.3s ease;
-            overflow-y: auto;
+            position: fixed; left: 0; top: 0; width: 270px; height: 100%;
+            background: #ffffff; box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            z-index: 100; transition: all 0.3s ease; overflow-y: auto;
             border-right: 1px solid #edf2f7;
         }
-
-        .sidebar-header {
-            padding: 24px 20px;
-            border-bottom: 1px solid #eff3f8;
-        }
-
-        .sidebar-header h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #E30613, #9f0110);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        .sidebar-header p {
-            font-size: 0.7rem;
-            color: #6c7a8e;
-            margin-top: 4px;
-        }
-
-        .nav-menu {
-            padding: 20px 0;
-        }
-
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid #eff3f8; display: flex; align-items: center; gap: 12px; }
+        .tenant-logo { width: 42px; height: 42px; background: #E30613; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.2rem; }
+        .tenant-info h3 { font-size: 1rem; font-weight: 700; color: #1e293b; }
+        .tenant-info p { font-size: 0.7rem; color: #6c7a8e; }
+        .nav-menu { padding: 20px 0; }
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            margin: 4px 12px;
-            border-radius: 12px;
-            color: #4a5568;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
+            display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+            margin: 4px 12px; border-radius: 12px; color: #4a5568;
+            font-weight: 500; transition: all 0.2s; cursor: pointer;
         }
-
-        .nav-item i {
-            width: 22px;
-            font-size: 1.1rem;
-        }
-
-        .nav-item:hover {
-            background: #fff0f0;
-            color: #E30613;
-        }
-
-        .nav-item.active {
-            background: #E30613;
-            color: white;
-            box-shadow: 0 4px 10px rgba(227, 6, 19, 0.2);
-        }
-
-        .main-content {
-            margin-left: 270px;
-            transition: all 0.3s ease;
-            min-height: 100vh;
-        }
-
+        .nav-item i { width: 22px; font-size: 1.1rem; }
+        .nav-item:hover { background: #fff0f0; color: #E30613; }
+        .nav-item.active { background: #E30613; color: white; box-shadow: 0 4px 10px rgba(227,6,19,0.2); }
+        .nav-item.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        .main-content { margin-left: 270px; transition: all 0.3s ease; min-height: 100vh; }
         .top-header {
-            background: white;
-            padding: 14px 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #edf2f7;
-            position: sticky;
-            top: 0;
-            z-index: 99;
+            background: white; padding: 14px 28px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #edf2f7; position: sticky; top: 0; z-index: 99;
         }
-
-        .header-left h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .profile-dropdown {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 40px;
-            background: #f8fafd;
-        }
-
-        .avatar {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #E30613, #b0020e);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .dashboard-container {
-            padding: 28px 32px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 28px;
-            padding: 20px;
-            border: 1px solid #edf2f7;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            background: #fff0f0;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #E30613;
-            font-size: 1.4rem;
-            margin-bottom: 16px;
-        }
-
-        .stat-title {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #6c7a8e;
-            text-transform: uppercase;
-        }
-
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #1e293b;
-            margin-top: 6px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 32px 0 20px 0;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .section-header h2 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .btn-primary {
-            background: #E30613;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.1s;
-        }
-        .btn-primary:active { transform: scale(0.97); }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #e2e8f0;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-outline:hover { background: #f1f5f9; }
-
-        .table-wrapper {
-            overflow-x: auto;
-            background: white;
-            border-radius: 24px;
-            border: 1px solid #edf2f7;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-        }
-
-        .data-table th, .data-table td {
-            padding: 14px 20px;
-            text-align: left;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.85rem;
-        }
-
-        .data-table th {
-            background: #fafcff;
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .status-active {
-            background: #e6f7e6;
-            color: #10b981;
-        }
-
-        .status-suspended {
-            background: #fee2e2;
-            color: #E30613;
-        }
-
-        .credential-cell {
-            font-family: monospace;
-            font-size: 0.75rem;
-            background: #f1f5f9;
-            padding: 4px 8px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        .copy-icon {
-            margin-left: 6px;
-            cursor: pointer;
-            color: #64748b;
-        }
-        .copy-icon:hover { color: #E30613; }
-
-        .action-icons {
-            display: flex;
-            gap: 12px;
-            color: #94a3b8;
-            cursor: pointer;
-        }
+        .header-left h3 { font-size: 1.2rem; font-weight: 600; color: #1e293b; }
+        .tenant-badge { background: #fef2f2; padding: 6px 12px; border-radius: 40px; font-size: 0.7rem; color: #E30613; font-weight: 600; }
+        .profile-dropdown { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 12px; border-radius: 40px; background: #f8fafd; }
+        .avatar { width: 38px; height: 38px; background: linear-gradient(135deg, #E30613, #b0020e); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+        .dashboard-container { padding: 28px 32px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 32px; }
+        .stat-card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #edf2f7; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .stat-icon { width: 48px; height: 48px; background: #fff0f0; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #E30613; font-size: 1.3rem; margin-bottom: 12px; }
+        .stat-title { font-size: 0.75rem; font-weight: 500; color: #6c7a8e; text-transform: uppercase; }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: #1e293b; margin-top: 4px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 20px 0; flex-wrap: wrap; gap: 12px; }
+        .section-header h2 { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+        .btn-primary { background: #E30613; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-outline { background: transparent; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 40px; font-size: 0.75rem; cursor: pointer; }
+        .table-wrapper { overflow-x: auto; background: white; border-radius: 24px; border: 1px solid #edf2f7; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        .data-table th, .data-table td { padding: 14px 20px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        .status-badge { padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .status-active { background: #e6f7e6; color: #10b981; }
+        .status-inactive { background: #fee2e2; color: #E30613; }
+        .role-badge { background: #e0e7ff; color: #4f46e5; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .action-icons { display: flex; gap: 12px; color: #94a3b8; cursor: pointer; }
         .action-icons i:hover { color: #E30613; }
-
-        /* Modules Grid */
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .module-card {
-            background: white;
-            border-radius: 20px;
-            padding: 16px 20px;
-            border: 1px solid #edf2f7;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: box-shadow 0.2s;
-        }
-        .module-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-
-        .module-info h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .module-info p {
-            font-size: 0.7rem;
-            color: #6c7a8e;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 26px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #cbd5e1;
-            transition: 0.3s;
-            border-radius: 26px;
-        }
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-        input:checked + .toggle-slider {
-            background-color: #E30613;
-        }
-        input:checked + .toggle-slider:before {
-            transform: translateX(26px);
-        }
-
-        .tenant-selector {
-            background: white;
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 24px;
-            border: 1px solid #edf2f7;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .tenant-dropdown {
-            padding: 10px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 40px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            background: white;
-            cursor: pointer;
-            min-width: 220px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 40px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #1e293b;
-        }
-
-        .modal-mask {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.2s;
-        }
-        .modal-mask.active {
-            visibility: visible;
-            opacity: 1;
-        }
-        .modal-container {
-            background: white;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 32px;
-            padding: 28px;
-            animation: modalSlideIn 0.3s ease;
-        }
-        @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .settings-panel {
-            background: white;
-            border-radius: 28px;
-            padding: 24px;
-            border: 1px solid #edf2f7;
-            margin-top: 20px;
-        }
-
-        .color-preview {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 8px;
-        }
-        .preview-box {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #1e293b;
-        }
-
+        .credential-cell { font-family: monospace; font-size: 0.75rem; background: #f1f5f9; padding: 4px 8px; border-radius: 8px; display: inline-block; }
+        .copy-icon { margin-left: 6px; cursor: pointer; color: #64748b; }
+        .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .module-card { background: white; border-radius: 20px; padding: 16px; border: 1px solid #edf2f7; display: flex; justify-content: space-between; align-items: center; }
+        .module-info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 0.7rem; color: #6c7a8e; }
+        .form-control { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 40px; font-family: 'Inter', sans-serif; font-size: 0.85rem; }
+        .modal-mask { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity: 0; transition: 0.2s; }
+        .modal-mask.active { visibility: visible; opacity: 1; }
+        .modal-container { background: white; width: 90%; max-width: 500px; border-radius: 32px; padding: 28px; }
+        .menu-toggle { display: none; font-size: 1.3rem; cursor: pointer; color: #1e293b; }
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 260px;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .dashboard-container {
-                padding: 20px;
-            }
-            .top-header {
-                padding: 12px 20px;
-            }
-            .menu-toggle {
-                display: block;
-                margin-right: 16px;
-            }
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .dashboard-container { padding: 20px; }
+            .top-header { padding: 12px 20px; }
+            .menu-toggle { display: block; margin-right: 16px; }
         }
     </style>
 </head>
 <body>
 <div id="app">
-    <!-- Sidebar Navigation -->
     <aside class="sidebar" :class="{ open: sidebarOpen }">
         <div class="sidebar-header">
-            <h2>Rands Venue OS</h2>
-            <p>Super Admin Console</p>
+            <div class="tenant-logo" :style="{ backgroundColor: branding.primaryColor }">{{ tenantInitial }}</div>
+            <div class="tenant-info">
+                <h3>{{ tenantName }}</h3>
+                <p>Venue Dashboard</p>
+            </div>
         </div>
         <div class="nav-menu">
-            <div v-for="item in navItems" :key="item.id" class="nav-item" :class="{ active: currentSection === item.id }" @click="currentSection = item.id; closeSidebar()">
+            <div v-for="item in dynamicMenu" :key="item.id" class="nav-item" :class="{ active: currentSection === item.id, disabled: !item.enabled }" @click="item.enabled && (currentSection = item.id, closeSidebar())">
                 <i :class="item.icon"></i>
                 <span>{{ item.label }}</span>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="top-header">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="menu-toggle" @click="sidebarOpen = !sidebarOpen"><i class="fas fa-bars"></i></div>
                 <div class="header-left"><h3>{{ currentSectionTitle }}</h3></div>
             </div>
-            <div class="profile-dropdown" @click="logout">
-                <div class="avatar">SA</div>
-                <span style="font-size:0.85rem;">{{ adminName }}</span>
-                <i class="fas fa-sign-out-alt"></i>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span class="tenant-badge"><i class="fas fa-building"></i> {{ tenantName }}</span>
+                <div class="profile-dropdown" @click="logout">
+                    <div class="avatar">{{ adminInitial }}</div>
+                    <span style="font-weight: 500; font-size:0.85rem;">{{ adminName }}</span>
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
             </div>
         </div>
 
         <div class="dashboard-container">
-            <!-- ==================== DASHBOARD SECTION ==================== -->
+            <!-- DASHBOARD -->
             <div v-if="currentSection === 'dashboard'">
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-store"></i></div><div class="stat-title">Total Tenants</div><div class="stat-number">{{ tenants.length }}</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-title">Active Tenants</div><div class="stat-number">{{ activeTenantsCount }}</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-title">Total Staff</div><div class="stat-number">{{ totalStaffCount }}</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-title">Platform Revenue</div><div class="stat-number">R 142,800</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-title">Total Staff</div><div class="stat-number">{{ staffList.length }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-title">Active Staff</div><div class="stat-number">{{ activeStaffCount }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-ticket-alt"></i></div><div class="stat-title">Tickets Sold</div><div class="stat-number">1,284</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-rand-sign"></i></div><div class="stat-title">Revenue (MTD)</div><div class="stat-number">R 48,250</div></div>
                 </div>
-                <div class="section-header"><h2>Recent Tenants</h2><button class="btn-outline" @click="currentSection = 'tenants'">View All <i class="fas fa-arrow-right"></i></button></div>
+                <div class="section-header"><h2>Recent Staff Activity</h2><button class="btn-outline" @click="currentSection = 'staff'">Manage Staff <i class="fas fa-arrow-right"></i></button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead><tr><th>Business Name</th><th>Owner</th><th>Username</th><th>Status</th></tr></thead>
+                        <thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Status</th></tr></thead>
                         <tbody>
-                            <tr v-for="tenant in recentTenants" :key="tenant.id">
-                                <td><strong>{{ tenant.businessName }}</strong></td>
-                                <td>{{ tenant.ownerName }}</td>
-                                <td><span class="credential-cell">{{ tenant.username }}</span></td>
-                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
-                            </tr>
-                            <tr v-if="tenants.length === 0"><td colspan="4" style="text-align:center; padding:30px;">No tenants yet. Click "Create Tenant" to add one.</td></tr>
+                            <tr v-for="staff in recentStaff" :key="staff.id"><td>{{ staff.name }}</td><td><span class="role-badge">{{ staff.role }}</span></td><td>{{ staff.username }}</td><td><span class="status-badge" :class="staff.status === 'Active' ? 'status-active' : 'status-inactive'">{{ staff.status }}</span></td></tr>
+                            <tr v-if="recentStaff.length === 0"><td colspan="4" style="text-align:center; color:#999;">No staff members yet</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- ==================== TENANTS SECTION ==================== -->
-            <div v-if="currentSection === 'tenants'">
-                <div class="section-header"><h2>All Tenants</h2><button class="btn-primary" @click="openCreateTenantModal"><i class="fas fa-plus"></i> Create Tenant</button></div>
+            <!-- STAFF MANAGEMENT -->
+            <div v-if="currentSection === 'staff'">
+                <div class="section-header"><h2><i class="fas fa-users"></i> Staff Management</h2><button class="btn-primary" @click="openCreateStaffModal"><i class="fas fa-plus"></i> Add Staff</button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead><tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody>
-                            <tr v-for="tenant in tenants" :key="tenant.id">
-                                <td><strong>{{ tenant.businessName }}</strong></td>
-                                <td>{{ tenant.ownerName }}</td>
-                                <td>{{ tenant.phone }}</td>
-                                <td><span class="credential-cell">{{ tenant.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.username)"></i></span></td>
-                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.password)"></i></span></td>
-                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
-                                <td><div class="action-icons"><i class="fas fa-eye" @click="viewTenant(tenant)"></i><i class="fas fa-ban" v-if="tenant.status === 'Active'" @click="suspendTenant(tenant.id)" style="color:#E30613;"></i><i class="fas fa-check-circle" v-else @click="activateTenant(tenant.id)" style="color:#10b981;"></i><i class="fas fa-key" @click="resetTenantPassword(tenant)" style="color:#f59e0b;"></i></div></td>
+                            <tr v-for="staff in staffList" :key="staff.id">
+                                <td><strong>{{ staff.name }}</strong></td>
+                                <td><span class="role-badge">{{ staff.role }}</span></td>
+                                <td><span class="credential-cell">{{ staff.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.username)"></i></span></td>
+                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.password)"></i></span></td>
+                                <td><span class="status-badge" :class="staff.status === 'Active' ? 'status-active' : 'status-inactive'">{{ staff.status }}</span></td>
+                                <td><div class="action-icons"><i class="fas fa-edit" @click="editStaff(staff)"></i><i class="fas fa-key" @click="resetStaffPassword(staff)" style="color:#f59e0b;"></i><i class="fas fa-toggle-on" v-if="staff.status === 'Active'" @click="toggleStaffStatus(staff.id)" style="color:#E30613;"></i><i class="fas fa-toggle-off" v-else @click="toggleStaffStatus(staff.id)" style="color:#10b981;"></i></div></td>
                             </tr>
-                            <tr v-if="tenants.length === 0"><td colspan="7" style="text-align:center; padding:40px;">No tenants. Click "Create Tenant" to add your first venue.</td></tr>
+                            <tr v-if="staffList.length === 0"><td colspan="6" style="text-align:center; padding:40px;">No staff members. Click "Add Staff" to create one.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- ==================== MODULES SECTION (WITH TOGGLES) ==================== -->
+            <!-- MODULES (Read-only from Super Admin) -->
             <div v-if="currentSection === 'modules'">
-                <div class="section-header">
-                    <h2><i class="fas fa-puzzle-piece"></i> Module Configuration</h2>
-                    <p style="color:#64748b; font-size:0.8rem;">Enable/disable features per tenant</p>
-                </div>
-                
-                <!-- Tenant Selector -->
-                <div class="tenant-selector">
-                    <label><i class="fas fa-building"></i> <strong>Select Tenant:</strong></label>
-                    <select v-model="selectedTenantId" class="tenant-dropdown" @change="loadTenantModules">
-                        <option v-for="tenant in tenants" :key="tenant.id" :value="tenant.id">{{ tenant.businessName }} ({{ tenant.status }})</option>
-                    </select>
-                    <span v-if="selectedTenant" style="background:#f0fdf4; padding:6px 12px; border-radius:20px; font-size:0.7rem; color:#10b981;">
-                        <i class="fas fa-check-circle"></i> Editing: {{ selectedTenant.businessName }}
-                    </span>
-                </div>
-
-                <!-- Modules Grid with Toggles -->
-                <div class="modules-grid" v-if="selectedTenant">
-                    <div class="module-card" v-for="module in currentTenantModules" :key="module.id">
-                        <div class="module-info">
-                            <h4><i :class="module.icon" style="margin-right:8px; color:#E30613;"></i> {{ module.name }}</h4>
-                            <p>{{ module.description }}</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" v-model="module.enabled" @change="toggleModuleForTenant(module)">
-                            <span class="toggle-slider"></span>
-                        </label>
+                <div class="section-header"><h2><i class="fas fa-puzzle-piece"></i> Available Modules</h2><p style="color:#64748b;">Modules configured by Super Admin</p></div>
+                <div class="modules-grid">
+                    <div class="module-card" v-for="module in tenantModules" :key="module.id">
+                        <div class="module-info"><h4><i :class="module.icon" style="margin-right: 6px; color:#E30613;"></i> {{ module.name }}</h4><p>{{ module.description }}</p></div>
+                        <div><span v-if="module.enabled" style="color:#10b981;"><i class="fas fa-check-circle"></i> Active</span><span v-else style="color:#94a3b8;"><i class="fas fa-ban"></i> Disabled</span></div>
                     </div>
-                </div>
-                <div v-else class="settings-panel" style="text-align:center; padding:40px;">
-                    <i class="fas fa-building" style="font-size:48px; color:#cbd5e1; margin-bottom:12px; display:block;"></i>
-                    <p>Select a tenant from the dropdown above to configure their modules</p>
                 </div>
             </div>
 
-            <!-- ==================== SETTINGS SECTION ==================== -->
+            <!-- SETTINGS -->
             <div v-if="currentSection === 'settings'">
-                <div class="section-header"><h2><i class="fas fa-cog"></i> System Settings</h2></div>
-                
-                <div class="settings-panel">
-                    <h3 style="margin-bottom: 16px;"><i class="fas fa-palette"></i> White Label & Branding</h3>
-                    <div class="form-group"><label>System Name</label><input type="text" class="form-control" v-model="systemSettings.systemName"></div>
-                    <div class="form-group"><label>Logo URL</label><input type="text" class="form-control" v-model="systemSettings.logoUrl" placeholder="https://example.com/logo.png"></div>
-                    <div class="form-group">
-                        <label>Primary Brand Color</label>
-                        <div class="color-preview">
-                            <input type="color" class="form-control" style="width:80px; padding:4px;" v-model="systemSettings.primaryColor">
-                            <div class="preview-box" :style="{ backgroundColor: systemSettings.primaryColor }"></div>
-                            <span>{{ systemSettings.primaryColor }}</span>
-                        </div>
-                    </div>
-                    <button class="btn-primary" @click="saveBranding"><i class="fas fa-save"></i> Save Branding</button>
-                </div>
-
-                <div class="settings-panel">
-                    <h3 style="margin-bottom: 16px;"><i class="fas fa-globe"></i> System Configuration</h3>
-                    <div class="form-group"><label>Default Currency</label><select class="form-control" v-model="systemSettings.currency"><option value="ZAR">South African Rand (ZAR)</option><option value="USD">US Dollar (USD)</option><option value="EUR">Euro (EUR)</option></select></div>
-                    <div class="form-group"><label>Date Format</label><select class="form-control" v-model="systemSettings.dateFormat"><option value="DD/MM/YYYY">DD/MM/YYYY</option><option value="MM/DD/YYYY">MM/DD/YYYY</option></select></div>
-                    <button class="btn-primary" @click="saveSystemConfig"><i class="fas fa-save"></i> Save Configuration</button>
+                <div class="section-header"><h2>Branding & Settings</h2></div>
+                <div class="settings-panel" style="background:white; border-radius:28px; padding:24px;">
+                    <div class="form-group"><label>Tenant Name</label><input class="form-control" v-model="tenantName" @blur="saveTenantName"></div>
+                    <div class="form-group"><label>Primary Color</label><input type="color" v-model="branding.primaryColor" class="form-control" style="width:80px;" @change="saveBranding"></div>
+                    <button class="btn-primary" @click="saveBranding">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Create Tenant Modal -->
-    <div class="modal-mask" :class="{ active: showTenantModal }">
-        <div class="modal-container">
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-building"></i> Create New Tenant</h3>
-            <div class="form-group"><label>Business Name *</label><input class="form-control" v-model="newTenant.businessName" placeholder="e.g., Skyline Lounge"></div>
-            <div class="form-group"><label>Owner Name *</label><input class="form-control" v-model="newTenant.ownerName" placeholder="Full name"></div>
-            <div class="form-group"><label>Phone *</label><input class="form-control" v-model="newTenant.phone" placeholder="Phone number"></div>
-            <div class="form-group"><label>Username *</label><input class="form-control" v-model="newTenant.username" placeholder="Login username"></div>
-            <div class="form-group"><label>Password *</label><input type="password" class="form-control" v-model="newTenant.password" placeholder="Login password"></div>
-            <div style="display:flex; gap:12px; margin-top:20px;">
-                <button class="btn-outline" @click="showTenantModal = false">Cancel</button>
-                <button class="btn-primary" @click="createTenant">Create Tenant</button>
-            </div>
+    <!-- Modals -->
+    <div class="modal-mask" :class="{ active: showStaffModal }">
+        <div class="modal-container"><h3><i class="fas fa-user-plus"></i> {{ isEditing ? 'Edit Staff' : 'Add New Staff' }}</h3>
+            <div class="form-group"><label>Full Name</label><input class="form-control" v-model="staffForm.name"></div>
+            <div class="form-group"><label>Username</label><input class="form-control" v-model="staffForm.username"></div>
+            <div class="form-group"><label>Password</label><input type="password" class="form-control" v-model="staffForm.password"></div>
+            <div class="form-group"><label>Role</label><select class="form-control" v-model="staffForm.role"><option value="cashier">Cashier</option><option value="manager">Manager</option><option value="bartender">Bartender</option></select></div>
+            <div class="modal-buttons" style="display:flex; gap:12px; margin-top:20px;"><button class="btn-outline" @click="closeStaffModal">Cancel</button><button class="btn-primary" @click="saveStaff">{{ isEditing ? 'Update' : 'Create' }}</button></div>
         </div>
     </div>
 
-    <!-- View Tenant Modal -->
-    <div class="modal-mask" :class="{ active: showViewModal }">
-        <div class="modal-container">
-            <h3><i class="fas fa-building"></i> Tenant Details</h3>
-            <div v-if="viewingTenant" style="margin-top:20px;">
-                <p><strong>Business:</strong> {{ viewingTenant.businessName }}</p>
-                <p><strong>Owner:</strong> {{ viewingTenant.ownerName }}</p>
-                <p><strong>Phone:</strong> {{ viewingTenant.phone }}</p>
-                <p><strong>Username:</strong> <span class="credential-cell">{{ viewingTenant.username }}</span></p>
-                <p><strong>Password:</strong> <span class="credential-cell">{{ viewingTenant.password }}</span></p>
-                <p><strong>Status:</strong> <span class="status-badge" :class="viewingTenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ viewingTenant.status }}</span></p>
-            </div>
-            <div style="display:flex; gap:12px; margin-top:24px;"><button class="btn-primary" @click="showViewModal = false">Close</button></div>
-        </div>
-    </div>
-
-    <!-- Reset Password Modal -->
     <div class="modal-mask" :class="{ active: showResetModal }">
-        <div class="modal-container">
-            <h3><i class="fas fa-key"></i> Reset Password</h3>
-            <p>New password for <strong>{{ resettingTenant?.businessName }}</strong></p>
-            <input type="password" class="form-control" v-model="newPassword" placeholder="New password (min 4 characters)" style="margin:16px 0;">
-            <div style="display:flex; gap:12px;">
-                <button class="btn-outline" @click="showResetModal = false">Cancel</button>
-                <button class="btn-primary" @click="confirmResetPassword">Reset</button>
-            </div>
-        </div>
+        <div class="modal-container"><h3><i class="fas fa-key"></i> Reset Password</h3><p>New password for <strong>{{ resettingStaff?.name }}</strong></p><input type="password" class="form-control" v-model="newPassword"><div style="display:flex; gap:12px; margin-top:16px;"><button class="btn-outline" @click="showResetModal = false">Cancel</button><button class="btn-primary" @click="confirmResetPassword">Reset</button></div></div>
+    </div>
+
+    <div class="modal-mask" :class="{ active: showInfoModal }">
+        <div class="modal-container"><h3><i :class="infoIcon"></i> {{ infoTitle }}</h3><p>{{ infoMessage }}</p><div class="modal-buttons"><button class="btn-primary" @click="showInfoModal = false">OK</button></div></div>
     </div>
 </div>
 
 <script>
-    const STORAGE_KEYS = {
-        TENANTS: 'qless_tenants',
-        STAFF: 'qless_staff',
-        TENANT_MODULES: 'qless_tenant_modules',
-        SYSTEM_SETTINGS: 'qless_system_settings'
-    };
+    const STORAGE_KEYS = { TENANTS: 'qless_tenants', STAFF: 'qless_staff', TENANT_MODULES: 'qless_tenant_modules' };
 
-    const MASTER_MODULES = [
-        { id: 1, name: 'Tickets', description: 'Event ticketing & reservations', icon: 'fas fa-ticket-alt' },
-        { id: 2, name: 'Queue Management', description: 'Smart virtual queuing system', icon: 'fas fa-hourglass-half' },
-        { id: 3, name: 'Self-Serve Kiosk', description: 'Food & beverage ordering kiosk', icon: 'fas fa-clipboard-list' },
-        { id: 4, name: 'Virtual Booze Lockers', description: 'Secure bottle storage', icon: 'fas fa-lock' },
-        { id: 5, name: 'Shisha System', description: 'Hookah management', icon: 'fas fa-smoking' },
-        { id: 6, name: 'VVIP Management', description: 'Exclusive VIP accounts & tabs', icon: 'fas fa-crown' },
-        { id: 7, name: 'Staff Management', description: 'Employee scheduling', icon: 'fas fa-users-cog' },
-        { id: 8, name: 'Inventory Control', description: 'Stock & supply chain', icon: 'fas fa-boxes' }
-    ];
+    // Module mapping for display
+    const MODULE_NAMES = {
+        'Tickets': { name: 'Tickets', description: 'Event ticketing & reservations', icon: 'fas fa-ticket-alt' },
+        'Queue Management': { name: 'Queue Management', description: 'Smart virtual queuing', icon: 'fas fa-hourglass-half' },
+        'Self-Serve Kiosk': { name: 'Orders', description: 'Food & beverage ordering', icon: 'fas fa-clipboard-list' },
+        'Virtual Booze Lockers': { name: 'Lockers', description: 'Secure bottle storage', icon: 'fas fa-lock' },
+        'Shisha System': { name: 'Shisha', description: 'Hookah management', icon: 'fas fa-smoking' },
+        'VVIP Management': { name: 'VVIP', description: 'Exclusive VIP accounts', icon: 'fas fa-crown' }
+    };
 
     new Vue({
         el: '#app',
         data: {
             sidebarOpen: false,
             currentSection: 'dashboard',
-            adminName: 'Super Admin',
-            tenants: [],
-            tenantModules: {},
-            selectedTenantId: null,
-            showTenantModal: false,
-            showViewModal: false,
+            tenantId: null,
+            tenantName: 'Loading...',
+            adminName: 'Tenant Admin',
+            branding: { primaryColor: '#E30613', logoUrl: '' },
+            tenantModules: [],
+            staffList: [],
+            showStaffModal: false,
             showResetModal: false,
-            viewingTenant: null,
-            resettingTenant: null,
+            showInfoModal: false,
+            isEditing: false,
+            editingStaffId: null,
+            staffForm: { name: '', username: '', password: '', role: 'cashier' },
+            resettingStaff: null,
             newPassword: '',
-            newTenant: { businessName: '', ownerName: '', phone: '', username: '', password: '' },
-            systemSettings: {
-                systemName: 'Rands Venue OS',
-                logoUrl: '',
-                primaryColor: '#E30613',
-                secondaryColor: '#9f0110',
-                currency: 'ZAR',
-                dateFormat: 'DD/MM/YYYY',
-                timezone: 'Africa/Johannesburg',
-                smtpHost: '',
-                smtpPort: '587',
-                fromEmail: ''
-            },
-            navItems: [
-                { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
-                { id: 'tenants', label: 'Tenants', icon: 'fas fa-building' },
-                { id: 'modules', label: 'Modules', icon: 'fas fa-puzzle-piece' },
-                { id: 'settings', label: 'Settings', icon: 'fas fa-cog' }
-            ]
+            infoTitle: '', infoMessage: '', infoIcon: 'fas fa-info-circle'
         },
         computed: {
-            currentSectionTitle() {
-                const item = this.navItems.find(i => i.id === this.currentSection);
-                return item ? item.label : 'Dashboard';
-            },
-            activeTenantsCount() {
-                return this.tenants.filter(t => t.status === 'Active').length;
-            },
-            totalStaffCount() {
-                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
-                return allStaff.length;
-            },
-            recentTenants() {
-                return this.tenants.slice(0, 5);
-            },
-            selectedTenant() {
-                return this.tenants.find(t => t.id === this.selectedTenantId);
-            },
-            currentTenantModules() {
-                if (!this.selectedTenantId) return [];
-                if (!this.tenantModules[this.selectedTenantId]) {
-                    this.tenantModules[this.selectedTenantId] = MASTER_MODULES.map(m => ({ ...m, enabled: false }));
+            tenantInitial() { return this.tenantName ? this.tenantName.charAt(0).toUpperCase() : 'R'; },
+            adminInitial() { return this.adminName ? this.adminName.charAt(0).toUpperCase() : 'A'; },
+            activeStaffCount() { return this.staffList.filter(s => s.status === 'Active').length; },
+            recentStaff() { return this.staffList.slice(0, 5); },
+            dynamicMenu() {
+                const menuItems = [
+                    { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt', enabled: true },
+                    { id: 'staff', label: 'Staff Management', icon: 'fas fa-users', enabled: true },
+                    { id: 'settings', label: 'Settings', icon: 'fas fa-cog', enabled: true }
+                ];
+                
+                // Add modules that are enabled by Super Admin
+                for (const module of this.tenantModules) {
+                    if (module.enabled && MODULE_NAMES[module.name]) {
+                        const moduleInfo = MODULE_NAMES[module.name];
+                        menuItems.push({
+                            id: module.name.toLowerCase().replace(/ /g, '_'),
+                            label: moduleInfo.name,
+                            icon: moduleInfo.icon,
+                            enabled: true
+                        });
+                    }
                 }
-                return this.tenantModules[this.selectedTenantId];
+                
+                // Add Modules view (read-only)
+                menuItems.push({ id: 'modules', label: 'Modules', icon: 'fas fa-puzzle-piece', enabled: true });
+                
+                return menuItems;
+            },
+            currentSectionTitle() {
+                const item = this.dynamicMenu.find(i => i.id === this.currentSection);
+                return item ? item.label : 'Dashboard';
             }
         },
         methods: {
-            closeSidebar() { if (window.innerWidth <= 768) this.sidebarOpen = false; },
-            copyToClipboard(text) {
-                navigator.clipboard.writeText(text);
-                alert('Copied to clipboard!');
+            closeSidebar() { if(window.innerWidth <= 768) this.sidebarOpen = false; },
+            showAlert(title, message, icon = 'fas fa-info-circle') {
+                this.infoTitle = title; this.infoMessage = message; this.infoIcon = icon; this.showInfoModal = true;
             },
-            loadData() {
-                const tenantsStr = localStorage.getItem(STORAGE_KEYS.TENANTS);
-                if (tenantsStr) {
-                    this.tenants = JSON.parse(tenantsStr);
-                } else {
-                    this.tenants = [
-                        { id: 1, businessName: 'Skyline Lounge', ownerName: 'Thabo Nkosi', phone: '0821112233', username: 'skyline_admin', password: 'skyline123', status: 'Active' },
-                        { id: 2, businessName: 'Cape Tavern', ownerName: 'Lerato Dlamini', phone: '0834455667', username: 'capetavern', password: 'tavern456', status: 'Active' },
-                        { id: 3, businessName: 'Gold Reef Venue', ownerName: 'Sipho Mbele', phone: '0719988776', username: 'goldreef', password: 'reef789', status: 'Suspended' }
-                    ];
-                    localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(this.tenants));
-                }
-
-                const modulesStr = localStorage.getItem(STORAGE_KEYS.TENANT_MODULES);
-                if (modulesStr) {
-                    this.tenantModules = JSON.parse(modulesStr);
-                }
-                
-                const settingsStr = localStorage.getItem(STORAGE_KEYS.SYSTEM_SETTINGS);
-                if (settingsStr) {
-                    this.systemSettings = JSON.parse(settingsStr);
-                }
-                
-                if (this.tenants.length > 0 && !this.selectedTenantId) {
-                    this.selectedTenantId = this.tenants[0].id;
-                }
-            },
-            saveTenants() { localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(this.tenants)); },
-            saveModules() { localStorage.setItem(STORAGE_KEYS.TENANT_MODULES, JSON.stringify(this.tenantModules)); },
-            saveSystemSettings() { localStorage.setItem(STORAGE_KEYS.SYSTEM_SETTINGS, JSON.stringify(this.systemSettings)); },
+            copyToClipboard(text) { navigator.clipboard.writeText(text); this.showAlert('Copied!', 'Text copied to clipboard', 'fas fa-check-circle'); },
             
-            openCreateTenantModal() {
-                this.newTenant = { businessName: '', ownerName: '', phone: '', username: '', password: '' };
-                this.showTenantModal = true;
-            },
-            createTenant() {
-                if (!this.newTenant.businessName || !this.newTenant.ownerName || !this.newTenant.username || !this.newTenant.password) {
-                    alert('Please fill all required fields');
+            loadTenantData() {
+                // Get tenant info from session (set by login page)
+                const tenantId = sessionStorage.getItem('qless_tenant_id');
+                const tenantName = sessionStorage.getItem('qless_tenant_name');
+                const adminUser = sessionStorage.getItem('qless_user_name');
+                
+                console.log('Loading tenant data:', { tenantId, tenantName, adminUser });
+                
+                if (!tenantId) {
+                    this.showAlert('Session Error', 'No tenant session found. Please log in again.', 'fas fa-exclamation-triangle');
+                    setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                     return;
                 }
-                const newId = this.tenants.length > 0 ? Math.max(...this.tenants.map(t => t.id)) + 1 : 1;
-                const newTenantObj = {
-                    id: newId,
-                    businessName: this.newTenant.businessName,
-                    ownerName: this.newTenant.ownerName,
-                    phone: this.newTenant.phone || 'N/A',
-                    username: this.newTenant.username,
-                    password: this.newTenant.password,
-                    status: 'Active'
-                };
-                this.tenants.push(newTenantObj);
-                this.tenantModules[newId] = MASTER_MODULES.map(m => ({ ...m, enabled: false }));
-                this.saveTenants();
-                this.saveModules();
-                this.showTenantModal = false;
-                alert(`Tenant "${this.newTenant.businessName}" created!\nUsername: ${this.newTenant.username}\nPassword: ${this.newTenant.password}`);
+                
+                this.tenantId = parseInt(tenantId);
+                this.tenantName = tenantName || 'Venue';
+                this.adminName = adminUser || 'Tenant Admin';
+                
+                this.loadStaff();
+                this.loadModules();
+                this.loadBranding();
             },
-            suspendTenant(id) {
-                const tenant = this.tenants.find(t => t.id === id);
-                if (tenant && confirm(`Suspend ${tenant.businessName}?`)) {
-                    tenant.status = 'Suspended';
-                    this.saveTenants();
-                    alert(`${tenant.businessName} suspended`);
+            
+            loadStaff() {
+                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
+                this.staffList = allStaff.filter(s => s.tenantId === this.tenantId);
+            },
+            
+            saveStaffToStorage() {
+                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
+                const otherStaff = allStaff.filter(s => s.tenantId !== this.tenantId);
+                localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify([...otherStaff, ...this.staffList]));
+            },
+            
+            loadModules() {
+                const allModules = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANT_MODULES) || '{}');
+                const modules = allModules[this.tenantId] || [];
+                
+                // Convert to display format
+                this.tenantModules = modules.map(m => {
+                    const moduleInfo = MODULE_NAMES[m.name] || { name: m.name, description: 'System module', icon: 'fas fa-cog' };
+                    return {
+                        id: m.id,
+                        name: moduleInfo.name,
+                        description: moduleInfo.description,
+                        icon: moduleInfo.icon,
+                        enabled: m.enabled
+                    };
+                });
+                
+                console.log(`Loaded ${this.tenantModules.length} modules for tenant ${this.tenantName}:`, this.tenantModules);
+            },
+            
+            loadBranding() {
+                const saved = localStorage.getItem(`qless_tenant_branding_${this.tenantId}`);
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.tenantName = data.tenantName || this.tenantName;
+                    this.branding = data.branding || { primaryColor: '#E30613', logoUrl: '' };
                 }
             },
-            activateTenant(id) {
-                const tenant = this.tenants.find(t => t.id === id);
-                if (tenant) {
-                    tenant.status = 'Active';
-                    this.saveTenants();
-                    alert(`${tenant.businessName} activated`);
+            
+            saveBranding() {
+                const data = { tenantName: this.tenantName, branding: this.branding };
+                localStorage.setItem(`qless_tenant_branding_${this.tenantId}`, JSON.stringify(data));
+                const tenants = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANTS) || '[]');
+                const tenant = tenants.find(t => t.id === this.tenantId);
+                if (tenant) tenant.businessName = this.tenantName;
+                localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(tenants));
+                this.showAlert('Saved', 'Branding saved successfully!', 'fas fa-check-circle');
+            },
+            
+            saveTenantName() { this.saveBranding(); },
+            
+            openCreateStaffModal() {
+                this.isEditing = false;
+                this.editingStaffId = null;
+                this.staffForm = { name: '', username: '', password: '', role: 'cashier' };
+                this.showStaffModal = true;
+            },
+            
+            editStaff(staff) {
+                this.isEditing = true;
+                this.editingStaffId = staff.id;
+                this.staffForm = { name: staff.name, username: staff.username, password: staff.password, role: staff.role };
+                this.showStaffModal = true;
+            },
+            
+            saveStaff() {
+                if (!this.staffForm.name || !this.staffForm.username || !this.staffForm.password) {
+                    this.showAlert('Missing Fields', 'Please fill all required fields', 'fas fa-exclamation-triangle');
+                    return;
+                }
+                if (this.staffForm.password.length < 4) {
+                    this.showAlert('Invalid Password', 'Password must be at least 4 characters', 'fas fa-exclamation-triangle');
+                    return;
+                }
+                
+                const existing = this.staffList.find(s => s.username === this.staffForm.username && s.id !== this.editingStaffId);
+                if (existing) { this.showAlert('Duplicate', 'Username already exists', 'fas fa-exclamation-triangle'); return; }
+                
+                if (this.isEditing && this.editingStaffId) {
+                    const index = this.staffList.findIndex(s => s.id === this.editingStaffId);
+                    if (index !== -1) {
+                        this.staffList[index] = { ...this.staffList[index], ...this.staffForm };
+                        this.showAlert('Updated', `Staff member updated`, 'fas fa-check-circle');
+                    }
+                } else {
+                    const newStaff = {
+                        id: Date.now(), tenantId: this.tenantId, name: this.staffForm.name,
+                        username: this.staffForm.username, password: this.staffForm.password,
+                        role: this.staffForm.role, status: 'Active', createdAt: new Date().toISOString()
+                    };
+                    this.staffList.push(newStaff);
+                    this.showAlert('Staff Created', `Username: ${newStaff.username}\nPassword: ${newStaff.password}`, 'fas fa-check-circle');
+                }
+                this.saveStaffToStorage();
+                this.closeStaffModal();
+            },
+            
+            closeStaffModal() {
+                this.showStaffModal = false;
+                this.isEditing = false;
+                this.editingStaffId = null;
+                this.staffForm = { name: '', username: '', password: '', role: 'cashier' };
+            },
+            
+            toggleStaffStatus(staffId) {
+                const staff = this.staffList.find(s => s.id === staffId);
+                if (staff) {
+                    staff.status = staff.status === 'Active' ? 'Inactive' : 'Active';
+                    this.saveStaffToStorage();
+                    this.showAlert('Status Updated', `${staff.name} is now ${staff.status}`, 'fas fa-check-circle');
                 }
             },
-            viewTenant(tenant) {
-                this.viewingTenant = tenant;
-                this.showViewModal = true;
-            },
-            resetTenantPassword(tenant) {
-                this.resettingTenant = tenant;
+            
+            resetStaffPassword(staff) {
+                this.resettingStaff = staff;
                 this.newPassword = '';
                 this.showResetModal = true;
             },
+            
             confirmResetPassword() {
                 if (!this.newPassword || this.newPassword.length < 4) {
-                    alert('Password must be at least 4 characters');
+                    this.showAlert('Invalid Password', 'Password must be at least 4 characters', 'fas fa-exclamation-triangle');
                     return;
                 }
-                if (this.resettingTenant) {
-                    this.resettingTenant.password = this.newPassword;
-                    this.saveTenants();
-                    alert(`Password reset for ${this.resettingTenant.businessName}: ${this.newPassword}`);
-                    this.showResetModal = false;
-                    this.resettingTenant = null;
+                const staff = this.staffList.find(s => s.id === this.resettingStaff.id);
+                if (staff) {
+                    staff.password = this.newPassword;
+                    this.saveStaffToStorage();
+                    this.showAlert('Password Reset', `New password for ${staff.name}: ${this.newPassword}`, 'fas fa-key');
                 }
+                this.showResetModal = false;
+                this.resettingStaff = null;
+                this.newPassword = '';
             },
-            loadTenantModules() {
-                this.$forceUpdate();
-            },
-            toggleModuleForTenant(module) {
-                const tenantId = this.selectedTenantId;
-                if (!tenantId) return;
-                const index = this.tenantModules[tenantId].findIndex(m => m.id === module.id);
-                if (index !== -1) {
-                    this.tenantModules[tenantId][index].enabled = module.enabled;
-                }
-                this.saveModules();
-                const tenant = this.tenants.find(t => t.id === tenantId);
-                alert(`${tenant?.businessName}: ${module.name} is now ${module.enabled ? 'ENABLED' : 'DISABLED'}`);
-            },
-            saveBranding() {
-                this.saveSystemSettings();
-                alert(`Branding saved! System name: ${this.systemSettings.systemName}`);
-            },
-            saveSystemConfig() {
-                this.saveSystemSettings();
-                alert('System configuration saved successfully!');
-            },
+            
             logout() {
                 sessionStorage.clear();
                 window.location.href = 'login.html';
@@ -894,19 +442,15 @@
         mounted() {
             const isLoggedIn = sessionStorage.getItem('qless_logged_in');
             const role = sessionStorage.getItem('qless_user_role');
-            const userName = sessionStorage.getItem('qless_user_name');
+            console.log('Auth check:', { isLoggedIn, role });
             
-            if (!isLoggedIn || role !== 'super_administrator') {
+            if (!isLoggedIn || role !== 'tenant_administrator') {
                 window.location.href = 'login.html';
                 return;
             }
             
-            this.adminName = userName || 'Super Admin';
-            this.loadData();
-            
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) this.sidebarOpen = false;
-            });
+            this.loadTenantData();
+            window.addEventListener('resize', () => { if(window.innerWidth > 768) this.sidebarOpen = false; });
         }
     });
 </script>
