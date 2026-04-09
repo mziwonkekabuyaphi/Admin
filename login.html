@@ -165,6 +165,11 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   }
 
+  .user-type-btn.superadmin.active {
+    background: linear-gradient(135deg, #8B0000 0%, #E30613 100%);
+    color: white;
+  }
+
   .user-type-btn.admin.active {
     background: linear-gradient(135deg, #E30613 0%, #b3000c 100%);
     color: white;
@@ -415,7 +420,8 @@
     </div>
 
     <div class="user-type-selector">
-      <button class="user-type-btn admin active" id="adminTypeBtn"><i class="fas fa-user-tie"></i> Admin</button>
+      <button class="user-type-btn superadmin" id="superadminTypeBtn"><i class="fas fa-crown"></i> Super Admin</button>
+      <button class="user-type-btn admin" id="adminTypeBtn"><i class="fas fa-user-tie"></i> Tenant Admin</button>
       <button class="user-type-btn staff" id="staffTypeBtn"><i class="fas fa-users"></i> Staff</button>
     </div>
 
@@ -437,7 +443,7 @@
         </div>
         <div class="password-hint" id="usernameHint">
           <i class="fas fa-info-circle"></i>
-          <span>Admin: "Admin" | Staff: "Staff" (case-sensitive)</span>
+          <span>Super Admin: "Superadmin" | Tenant Admin: "Admin" | Staff: "Staff"</span>
         </div>
       </div>
 
@@ -454,7 +460,7 @@
         </div>
         <div class="password-hint">
           <i class="fas fa-lock"></i>
-          <span>Password: "randscapetown" for both roles</span>
+          <span>Password: "randscapetown" for all roles</span>
         </div>
       </div>
 
@@ -474,6 +480,7 @@
 <script>
   (function() {
     // DOM Elements
+    const superadminTypeBtn = document.getElementById('superadminTypeBtn');
     const adminTypeBtn = document.getElementById('adminTypeBtn');
     const staffTypeBtn = document.getElementById('staffTypeBtn');
     const usernameInput = document.getElementById('username');
@@ -488,27 +495,38 @@
     const usernameSuccessMsg = document.getElementById('usernameSuccessMsg');
     const passwordSuccessMsg = document.getElementById('passwordSuccessMsg');
 
-    let currentUserType = 'admin';
+    let currentUserType = 'superadmin';
 
     // ============================================================
-    // UPDATED CREDENTIALS
-    // Admin: username "Admin", password "randscapetown" -> redirects to admin.html
-    // Staff: username "Staff", password "randscapetown" -> redirects to staff.html
+    // THREE CREDENTIALS:
+    // 1. Super Admin: username "Superadmin", password "randscapetown" -> redirects to superadmin.html
+    // 2. Tenant Admin: username "Admin", password "randscapetown" -> redirects to admin.html
+    // 3. Staff: username "Staff", password "randscapetown" -> redirects to staff.html
     // ============================================================
     const VALID_CREDENTIALS = {
+      superadmin: {
+        username: "Superadmin",
+        password: "randscapetown",
+        role: "super_administrator",
+        redirectUrl: "superadmin.html",
+        displayName: "Super Administrator",
+        icon: "crown"
+      },
       admin: {
         username: "Admin",
         password: "randscapetown",
-        role: "administrator",
+        role: "tenant_administrator",
         redirectUrl: "admin.html",
-        displayName: "Administrator"
+        displayName: "Tenant Administrator",
+        icon: "user-tie"
       },
       staff: {
         username: "Staff",
         password: "randscapetown",
         role: "staff",
         redirectUrl: "staff.html",
-        displayName: "Staff Member"
+        displayName: "Staff Member",
+        icon: "users"
       }
     };
 
@@ -584,21 +602,26 @@
     // Set active user type button and reset green indicators
     function setActiveUserType(type) {
       currentUserType = type;
-      if (type === 'admin') {
-        adminTypeBtn.classList.add('active');
-        staffTypeBtn.classList.remove('active');
-        adminTypeBtn.classList.add('admin');
-        staffTypeBtn.classList.remove('staff');
+      
+      // Update button active states
+      superadminTypeBtn.classList.remove('active');
+      adminTypeBtn.classList.remove('active');
+      staffTypeBtn.classList.remove('active');
+      
+      if (type === 'superadmin') {
+        superadminTypeBtn.classList.add('active');
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Admin username: "Admin" | Staff: "Staff" (case-sensitive)';
+        if (hintSpan) hintSpan.textContent = 'Super Admin username: "Superadmin" | Tenant Admin: "Admin" | Staff: "Staff"';
+      } else if (type === 'admin') {
+        adminTypeBtn.classList.add('active');
+        const hintSpan = document.querySelector('#usernameHint span');
+        if (hintSpan) hintSpan.textContent = 'Tenant Admin username: "Admin" | Super Admin: "Superadmin" | Staff: "Staff"';
       } else {
         staffTypeBtn.classList.add('active');
-        adminTypeBtn.classList.remove('active');
-        staffTypeBtn.classList.add('staff');
-        adminTypeBtn.classList.remove('admin');
         const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Staff username: "Staff" | Admin: "Admin" (case-sensitive)';
+        if (hintSpan) hintSpan.textContent = 'Staff username: "Staff" | Super Admin: "Superadmin" | Tenant Admin: "Admin"';
       }
+      
       // Clear inputs and reset green indicators
       usernameInput.value = '';
       passwordInput.value = '';
@@ -610,7 +633,12 @@
       usernameInput.focus();
     }
 
-    // Admin button click
+    // Super Admin button click
+    if (superadminTypeBtn) {
+      superadminTypeBtn.addEventListener('click', () => setActiveUserType('superadmin'));
+    }
+
+    // Tenant Admin button click
     if (adminTypeBtn) {
       adminTypeBtn.addEventListener('click', () => setActiveUserType('admin'));
     }
@@ -625,7 +653,7 @@
       errorMessageDiv.classList.remove('hidden');
       setTimeout(() => {
         errorMessageDiv.classList.add('hidden');
-      }, 4000);
+      }, 5000);
     }
 
     // Authenticate and redirect
@@ -633,17 +661,29 @@
       await new Promise(resolve => setTimeout(resolve, 500)); // smooth UX
       const cred = VALID_CREDENTIALS[userType];
       if (!cred) {
-        return { success: false, message: 'Invalid user role.' };
+        return { success: false, message: 'Invalid user role selected.' };
       }
+      
       const usernameMatch = (username === cred.username);
       const passwordMatch = (password === cred.password);
       
       if (usernameMatch && passwordMatch) {
-        return { success: true, redirectUrl: cred.redirectUrl, role: cred.role };
+        return { 
+          success: true, 
+          redirectUrl: cred.redirectUrl, 
+          role: cred.role,
+          displayName: cred.displayName,
+          username: username
+        };
       } else {
-        let hint = (userType === 'admin') 
-          ? 'Admin credentials: username "Admin", password "randscapetown"' 
-          : 'Staff credentials: username "Staff", password "randscapetown"';
+        let hint = '';
+        if (userType === 'superadmin') {
+          hint = 'Super Admin credentials: username "Superadmin", password "randscapetown"';
+        } else if (userType === 'admin') {
+          hint = 'Tenant Admin credentials: username "Admin", password "randscapetown"';
+        } else {
+          hint = 'Staff credentials: username "Staff", password "randscapetown"';
+        }
         return { success: false, message: `Authentication failed. ${hint}` };
       }
     }
@@ -669,16 +709,23 @@
         
         // Double-check credentials
         const expectedCred = VALID_CREDENTIALS[currentUserType];
+        if (!expectedCred) {
+          showError('Invalid user role selected.');
+          return;
+        }
+        
         const isUsernameValid = (username === expectedCred.username);
         const isPasswordValid = (password === expectedCred.password);
         
         if (!isUsernameValid) {
-          showError(`Incorrect username for ${currentUserType} role. Expected: "${expectedCred.username}"`);
+          let roleDisplay = currentUserType === 'superadmin' ? 'Super Admin' : (currentUserType === 'admin' ? 'Tenant Admin' : 'Staff');
+          showError(`Incorrect username for ${roleDisplay} role. Expected: "${expectedCred.username}"`);
           usernameInput.focus();
           return;
         }
         if (!isPasswordValid) {
-          showError(`Incorrect password for ${currentUserType} role.`);
+          let roleDisplay = currentUserType === 'superadmin' ? 'Super Admin' : (currentUserType === 'admin' ? 'Tenant Admin' : 'Staff');
+          showError(`Incorrect password for ${roleDisplay} role.`);
           passwordInput.focus();
           return;
         }
@@ -686,7 +733,7 @@
         // Show loading state
         loginBtn.classList.add('loading');
         const originalHTML = loginBtn.innerHTML;
-        loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Verifying...';
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Verifying credentials...';
         
         const result = await authenticateAndRedirect(username, password, currentUserType);
         
@@ -694,22 +741,44 @@
           // Store session info
           sessionStorage.setItem('rands_user_logged_in', 'true');
           sessionStorage.setItem('rands_user_role', result.role);
-          sessionStorage.setItem('rands_user_name', username);
+          sessionStorage.setItem('rands_user_type', currentUserType);
+          sessionStorage.setItem('rands_user_name', result.username);
+          sessionStorage.setItem('rands_display_name', result.displayName);
           sessionStorage.setItem('rands_login_time', Date.now().toString());
+          
+          // Set a flag for role-based dashboard access
+          if (currentUserType === 'superadmin') {
+            sessionStorage.setItem('is_super_admin', 'true');
+            sessionStorage.setItem('is_tenant_admin', 'false');
+            sessionStorage.setItem('is_staff', 'false');
+          } else if (currentUserType === 'admin') {
+            sessionStorage.setItem('is_super_admin', 'false');
+            sessionStorage.setItem('is_tenant_admin', 'true');
+            sessionStorage.setItem('is_staff', 'false');
+          } else {
+            sessionStorage.setItem('is_super_admin', 'false');
+            sessionStorage.setItem('is_tenant_admin', 'false');
+            sessionStorage.setItem('is_staff', 'true');
+          }
           
           // Show final green success acknowledgment on button
           loginBtn.innerHTML = '<i class="fas fa-check-circle"></i> Access Granted! Redirecting...';
           
           // Add a global green flash acknowledgment before redirect
           const successAck = document.createElement('div');
-          successAck.innerHTML = '<i class="fas fa-check-circle"></i> Login Successful! Redirecting to dashboard...';
+          let roleIcon = '';
+          if (currentUserType === 'superadmin') roleIcon = '<i class="fas fa-crown"></i>';
+          else if (currentUserType === 'admin') roleIcon = '<i class="fas fa-user-tie"></i>';
+          else roleIcon = '<i class="fas fa-users"></i>';
+          
+          successAck.innerHTML = `${roleIcon} Welcome, ${result.displayName}! Redirecting to dashboard...`;
           successAck.style.position = 'fixed';
           successAck.style.bottom = '20px';
           successAck.style.left = '50%';
           successAck.style.transform = 'translateX(-50%)';
           successAck.style.backgroundColor = '#10b981';
           successAck.style.color = 'white';
-          successAck.style.padding = '12px 24px';
+          successAck.style.padding = '14px 28px';
           successAck.style.borderRadius = '50px';
           successAck.style.fontWeight = 'bold';
           successAck.style.zIndex = '9999';
@@ -723,6 +792,7 @@
           
           setTimeout(() => {
             successAck.style.opacity = '0';
+            successAck.style.transition = 'opacity 0.5s ease';
             setTimeout(() => successAck.remove(), 500);
           }, 1500);
           
@@ -752,12 +822,15 @@
       });
     }
     
-    // Set initial hint
-    const initHint = () => {
+    // Set initial hint and active state
+    const init = () => {
+      // Set Super Admin as default active
+      superadminTypeBtn.classList.add('active');
       const hintSpan = document.querySelector('#usernameHint span');
-      if (hintSpan) hintSpan.textContent = 'Admin: "Admin" | Staff: "Staff" (case-sensitive)';
+      if (hintSpan) hintSpan.textContent = 'Super Admin: "Superadmin" | Tenant Admin: "Admin" | Staff: "Staff"';
+      usernameInput.focus();
     };
-    initHint();
+    init();
   })();
 </script>
 </body>
