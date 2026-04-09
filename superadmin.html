@@ -417,6 +417,29 @@
             color: #1e293b;
         }
 
+        /* Settings Panel */
+        .settings-panel {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid #edf2f7;
+            margin-top: 20px;
+        }
+
+        .color-preview {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .preview-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -439,22 +462,10 @@
                 margin-right: 16px;
             }
         }
-
-        /* Debug banner */
-        .debug-banner {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 8px 16px;
-            font-size: 12px;
-            text-align: center;
-            border-bottom: 1px solid #fde68a;
-        }
     </style>
 </head>
 <body>
 <div id="app">
-    <div class="debug-banner" id="debugBanner" style="display: none;"></div>
-    
     <aside class="sidebar" :class="{ open: sidebarOpen }">
         <div class="sidebar-header">
             <h2>Rands Venue OS</h2>
@@ -501,7 +512,7 @@
                                 <td><span class="credential-cell">{{ tenant.username }}</span></td>
                                 <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
                             </tr>
-                            <tr v-if="tenants.length === 0"><td colspan="4" style="text-align:center;">No tenants yet. Click "Create Tenant" to add one.</td></tr>
+                            <tr v-if="tenants.length === 0"><td colspan="4" style="text-align:center;">No tenants yet. Click "Create Tenant" to add one.<\/td><\/tr>
                         </tbody>
                     </table>
                 </div>
@@ -513,28 +524,27 @@
                 <div class="table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th>
-                            </tr>
+                            <tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             <tr v-for="tenant in tenants" :key="tenant.id">
-                                <td><strong>{{ tenant.businessName }}</strong></td>
-                                <td>{{ tenant.ownerName }}</td>
-                                <td>{{ tenant.phone }}</td>
-                                <td><span class="credential-cell">{{ tenant.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.username)"></i></span></td>
-                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.password)"></i></span></td>
-                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
-                                <td><div class="action-icons"><i class="fas fa-eye" @click="viewTenant(tenant)"></i><i class="fas fa-ban" v-if="tenant.status === 'Active'" @click="suspendTenant(tenant.id)" style="color:#E30613;"></i><i class="fas fa-check-circle" v-else @click="activateTenant(tenant.id)" style="color:#10b981;"></i><i class="fas fa-key" @click="resetTenantPassword(tenant)" style="color:#f59e0b;"></i></div></td>
-                            </tr>
-                            <tr v-if="tenants.length === 0"><td colspan="7" style="text-align:center; padding:40px;">No tenants. Click "Create Tenant" to add your first venue.</td></tr>
+                                <td><strong>{{ tenant.businessName }}</strong><\/td>
+                                <td>{{ tenant.ownerName }}<\/td>
+                                <td>{{ tenant.phone }}<\/td>
+                                <td><span class="credential-cell">{{ tenant.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.username)"></i></span><\/td>
+                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.password)"></i></span><\/td>
+                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span><\/td>
+                                <td><div class="action-icons"><i class="fas fa-eye" @click="viewTenant(tenant)"></i><i class="fas fa-ban" v-if="tenant.status === 'Active'" @click="suspendTenant(tenant.id)" style="color:#E30613;"></i><i class="fas fa-check-circle" v-else @click="activateTenant(tenant.id)" style="color:#10b981;"></i><i class="fas fa-key" @click="resetTenantPassword(tenant)" style="color:#f59e0b;"></i></div><\/td>
+                            <\/tr>
+                            <tr v-if="tenants.length === 0"><td colspan="7" style="text-align:center; padding:40px;">No tenants. Click "Create Tenant" to add your first venue.<\/td><\/tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- MODULES CONFIGURATION -->
+            <!-- MODULES CONFIGURATION (TOGGLES PER TENANT) -->
             <div v-if="currentSection === 'modules'">
-                <div class="section-header"><h2>Module Configuration</h2><p style="color:#64748b;">Enable/disable features per tenant</p></div>
+                <div class="section-header"><h2><i class="fas fa-puzzle-piece"></i> Module Configuration</h2><p style="color:#64748b;">Enable/disable features per tenant</p></div>
                 <div class="tenant-selector">
                     <label><i class="fas fa-building"></i> Select Tenant:</label>
                     <select v-model="selectedTenantId" class="tenant-dropdown" @change="loadTenantModules">
@@ -548,6 +558,91 @@
                     </div>
                 </div>
                 <div v-else class="table-wrapper" style="padding:40px; text-align:center;">Select a tenant to configure their modules</div>
+            </div>
+
+            <!-- SETTINGS (White-label & System Settings) -->
+            <div v-if="currentSection === 'settings'">
+                <div class="section-header"><h2><i class="fas fa-cog"></i> System Settings</h2></div>
+                
+                <!-- White Label Settings -->
+                <div class="settings-panel">
+                    <h3 style="margin-bottom: 16px;"><i class="fas fa-palette"></i> White Label & Branding</h3>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>System Name</label>
+                        <input type="text" class="form-control" v-model="systemSettings.systemName" placeholder="Rands Venue OS">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Logo URL</label>
+                        <input type="text" class="form-control" v-model="systemSettings.logoUrl" placeholder="https://example.com/logo.png">
+                        <div v-if="systemSettings.logoUrl" style="margin-top:8px;"><img :src="systemSettings.logoUrl" style="height:40px; border-radius:8px;" alt="logo preview"></div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Primary Brand Color</label>
+                        <div class="color-preview">
+                            <input type="color" class="form-control" style="width:80px; padding:4px;" v-model="systemSettings.primaryColor">
+                            <div class="preview-box" :style="{ backgroundColor: systemSettings.primaryColor }"></div>
+                            <span>{{ systemSettings.primaryColor }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Secondary Color</label>
+                        <div class="color-preview">
+                            <input type="color" class="form-control" style="width:80px; padding:4px;" v-model="systemSettings.secondaryColor">
+                            <div class="preview-box" :style="{ backgroundColor: systemSettings.secondaryColor }"></div>
+                        </div>
+                    </div>
+                    <button class="btn-primary" @click="saveBranding">Save Branding</button>
+                </div>
+
+                <!-- System Configuration -->
+                <div class="settings-panel" style="margin-top: 24px;">
+                    <h3 style="margin-bottom: 16px;"><i class="fas fa-globe"></i> System Configuration</h3>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Default Currency</label>
+                        <select class="form-control" v-model="systemSettings.currency">
+                            <option value="ZAR">South African Rand (ZAR)</option>
+                            <option value="USD">US Dollar (USD)</option>
+                            <option value="EUR">Euro (EUR)</option>
+                            <option value="GBP">British Pound (GBP)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Date Format</label>
+                        <select class="form-control" v-model="systemSettings.dateFormat">
+                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Time Zone</label>
+                        <select class="form-control" v-model="systemSettings.timezone">
+                            <option value="Africa/Johannesburg">Africa/Johannesburg (SAST)</option>
+                            <option value="Africa/Cairo">Africa/Cairo (CAT)</option>
+                            <option value="Europe/London">Europe/London (GMT)</option>
+                            <option value="America/New_York">America/New_York (EST)</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" @click="saveSystemConfig">Save Configuration</button>
+                </div>
+
+                <!-- Email Settings -->
+                <div class="settings-panel" style="margin-top: 24px;">
+                    <h3 style="margin-bottom: 16px;"><i class="fas fa-envelope"></i> Email Notifications</h3>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>SMTP Host</label>
+                        <input type="text" class="form-control" v-model="systemSettings.smtpHost" placeholder="smtp.gmail.com">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>SMTP Port</label>
+                        <input type="text" class="form-control" v-model="systemSettings.smtpPort" placeholder="587">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>From Email</label>
+                        <input type="email" class="form-control" v-model="systemSettings.fromEmail" placeholder="noreply@randswallet.com">
+                    </div>
+                    <button class="btn-primary" @click="saveEmailSettings">Save Email Settings</button>
+                </div>
             </div>
         </div>
     </div>
@@ -602,7 +697,8 @@
     const STORAGE_KEYS = {
         TENANTS: 'qless_tenants',
         STAFF: 'qless_staff',
-        TENANT_MODULES: 'qless_tenant_modules'
+        TENANT_MODULES: 'qless_tenant_modules',
+        SYSTEM_SETTINGS: 'qless_system_settings'
     };
 
     const MASTER_MODULES = [
@@ -632,10 +728,23 @@
             resettingTenant: null,
             newPassword: '',
             newTenant: { businessName: '', ownerName: '', phone: '', username: '', password: '' },
+            systemSettings: {
+                systemName: 'Rands Venue OS',
+                logoUrl: '',
+                primaryColor: '#E30613',
+                secondaryColor: '#9f0110',
+                currency: 'ZAR',
+                dateFormat: 'DD/MM/YYYY',
+                timezone: 'Africa/Johannesburg',
+                smtpHost: '',
+                smtpPort: '587',
+                fromEmail: ''
+            },
             navItems: [
                 { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
                 { id: 'tenants', label: 'Tenants', icon: 'fas fa-building' },
-                { id: 'modules', label: 'Modules', icon: 'fas fa-puzzle-piece' }
+                { id: 'modules', label: 'Modules', icon: 'fas fa-puzzle-piece' },
+                { id: 'settings', label: 'Settings', icon: 'fas fa-cog' }
             ]
         },
         computed: {
@@ -685,6 +794,11 @@
                     this.tenantModules = JSON.parse(modulesStr);
                 }
                 
+                const settingsStr = localStorage.getItem(STORAGE_KEYS.SYSTEM_SETTINGS);
+                if (settingsStr) {
+                    this.systemSettings = JSON.parse(settingsStr);
+                }
+                
                 if (this.tenants.length > 0 && !this.selectedTenantId) {
                     this.selectedTenantId = this.tenants[0].id;
                 }
@@ -694,6 +808,9 @@
             },
             saveModules() {
                 localStorage.setItem(STORAGE_KEYS.TENANT_MODULES, JSON.stringify(this.tenantModules));
+            },
+            saveSystemSettings() {
+                localStorage.setItem(STORAGE_KEYS.SYSTEM_SETTINGS, JSON.stringify(this.systemSettings));
             },
             openCreateTenantModal() {
                 this.newTenant = { businessName: '', ownerName: '', phone: '', username: '', password: '' };
@@ -773,40 +890,35 @@
                 const tenant = this.tenants.find(t => t.id === tenantId);
                 alert(`${tenant?.businessName}: ${module.name} is now ${module.enabled ? 'ENABLED' : 'DISABLED'}`);
             },
+            saveBranding() {
+                this.saveSystemSettings();
+                alert(`Branding saved! Primary color: ${this.systemSettings.primaryColor}`);
+                document.documentElement.style.setProperty('--primary-color', this.systemSettings.primaryColor);
+            },
+            saveSystemConfig() {
+                this.saveSystemSettings();
+                alert('System configuration saved successfully!');
+            },
+            saveEmailSettings() {
+                this.saveSystemSettings();
+                alert('Email settings saved successfully!');
+            },
             logout() {
                 sessionStorage.clear();
                 window.location.href = 'login.html';
             }
         },
         mounted() {
-            // DEBUG: Check what's in sessionStorage
-            console.log('=== SESSION DEBUG ===');
-            console.log('qless_logged_in:', sessionStorage.getItem('qless_logged_in'));
-            console.log('qless_user_role:', sessionStorage.getItem('qless_user_role'));
-            console.log('qless_user_name:', sessionStorage.getItem('qless_user_name'));
-            console.log('All sessionStorage:', sessionStorage);
-            
             const isLoggedIn = sessionStorage.getItem('qless_logged_in');
             const role = sessionStorage.getItem('qless_user_role');
+            const userName = sessionStorage.getItem('qless_user_name');
             
-            // Show debug banner if not logged in
-            const debugBanner = document.getElementById('debugBanner');
             if (!isLoggedIn || role !== 'super_administrator') {
-                debugBanner.style.display = 'block';
-                debugBanner.innerHTML = `⚠️ DEBUG: Not authenticated! isLoggedIn=${isLoggedIn}, role=${role}. Redirecting to login in 3 seconds...`;
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 3000);
+                window.location.href = 'login.html';
                 return;
             }
             
-            debugBanner.style.display = 'block';
-            debugBanner.innerHTML = `✅ Authenticated! Role: ${role}, User: ${sessionStorage.getItem('qless_user_name')}`;
-            setTimeout(() => {
-                debugBanner.style.display = 'none';
-            }, 5000);
-            
-            this.adminName = sessionStorage.getItem('qless_user_name') || 'Super Admin';
+            this.adminName = userName || 'Super Admin';
             this.loadData();
             
             window.addEventListener('resize', () => {
