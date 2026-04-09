@@ -216,16 +216,6 @@
             cursor: pointer;
         }
 
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-
         .table-wrapper {
             overflow-x: auto;
             background: white;
@@ -279,19 +269,11 @@
             color: #64748b;
         }
 
-        .copy-icon:hover {
-            color: #E30613;
-        }
-
         .action-icons {
             display: flex;
             gap: 12px;
             color: #94a3b8;
             cursor: pointer;
-        }
-
-        .action-icons i:hover {
-            color: #E30613;
         }
 
         .modules-grid {
@@ -457,10 +439,22 @@
                 margin-right: 16px;
             }
         }
+
+        /* Debug banner */
+        .debug-banner {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 8px 16px;
+            font-size: 12px;
+            text-align: center;
+            border-bottom: 1px solid #fde68a;
+        }
     </style>
 </head>
 <body>
 <div id="app">
+    <div class="debug-banner" id="debugBanner" style="display: none;"></div>
+    
     <aside class="sidebar" :class="{ open: sidebarOpen }">
         <div class="sidebar-header">
             <h2>Rands Venue OS</h2>
@@ -518,7 +512,10 @@
                 <div class="section-header"><h2>All Tenants</h2><button class="btn-primary" @click="openCreateTenantModal"><i class="fas fa-plus"></i> Create Tenant</button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead><tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr v-for="tenant in tenants" :key="tenant.id">
                                 <td><strong>{{ tenant.businessName }}</strong></td>
@@ -782,16 +779,34 @@
             }
         },
         mounted() {
+            // DEBUG: Check what's in sessionStorage
+            console.log('=== SESSION DEBUG ===');
+            console.log('qless_logged_in:', sessionStorage.getItem('qless_logged_in'));
+            console.log('qless_user_role:', sessionStorage.getItem('qless_user_role'));
+            console.log('qless_user_name:', sessionStorage.getItem('qless_user_name'));
+            console.log('All sessionStorage:', sessionStorage);
+            
             const isLoggedIn = sessionStorage.getItem('qless_logged_in');
             const role = sessionStorage.getItem('qless_user_role');
-            const userName = sessionStorage.getItem('qless_user_name');
             
+            // Show debug banner if not logged in
+            const debugBanner = document.getElementById('debugBanner');
             if (!isLoggedIn || role !== 'super_administrator') {
-                window.location.href = 'login.html';
+                debugBanner.style.display = 'block';
+                debugBanner.innerHTML = `⚠️ DEBUG: Not authenticated! isLoggedIn=${isLoggedIn}, role=${role}. Redirecting to login in 3 seconds...`;
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
                 return;
             }
             
-            this.adminName = userName || 'Super Admin';
+            debugBanner.style.display = 'block';
+            debugBanner.innerHTML = `✅ Authenticated! Role: ${role}, User: ${sessionStorage.getItem('qless_user_name')}`;
+            setTimeout(() => {
+                debugBanner.style.display = 'none';
+            }, 5000);
+            
+            this.adminName = sessionStorage.getItem('qless_user_name') || 'Super Admin';
             this.loadData();
             
             window.addEventListener('resize', () => {
