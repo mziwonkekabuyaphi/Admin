@@ -231,15 +231,6 @@
     color: #E30613;
   }
 
-  /* Green success acknowledgment for valid credentials */
-  .input-wrapper.valid-username i:first-child {
-    color: #10b981 !important;
-  }
-  
-  .input-wrapper.valid-password i:first-child {
-    color: #10b981 !important;
-  }
-  
   .field-success-icon {
     position: absolute;
     right: 16px;
@@ -373,7 +364,6 @@
     flex: 1;
   }
   
-  /* Success acknowledgment message that appears near fields */
   .inline-success {
     font-size: 11px;
     font-weight: 600;
@@ -443,7 +433,7 @@
         </div>
         <div class="password-hint" id="usernameHint">
           <i class="fas fa-info-circle"></i>
-          <span>Super Admin: "Superadmin" | Tenant Admin: "Admin" | Staff: "Staff"</span>
+          <span>Enter your credentials</span>
         </div>
       </div>
 
@@ -460,7 +450,7 @@
         </div>
         <div class="password-hint">
           <i class="fas fa-lock"></i>
-          <span>Password: "randscapetown" for all roles</span>
+          <span>Enter your secure password</span>
         </div>
       </div>
 
@@ -479,6 +469,12 @@
 
 <script>
   (function() {
+    // Storage Keys (must match Super Admin and Tenant Admin dashboards)
+    const STORAGE_KEYS = {
+      TENANTS: 'qless_tenants',      // Created by Super Admin
+      STAFF: 'qless_staff'           // Created by Tenant Admin
+    };
+
     // DOM Elements
     const superadminTypeBtn = document.getElementById('superadminTypeBtn');
     const adminTypeBtn = document.getElementById('adminTypeBtn');
@@ -496,45 +492,146 @@
     const passwordSuccessMsg = document.getElementById('passwordSuccessMsg');
 
     let currentUserType = 'superadmin';
+    let cachedTenants = [];
+    let cachedStaff = [];
 
     // ============================================================
-    // THREE CREDENTIALS:
-    // 1. Super Admin: username "Superadmin", password "randscapetown" -> redirects to superadmin.html
-    // 2. Tenant Admin: username "Admin", password "randscapetown" -> redirects to admin.html
-    // 3. Staff: username "Staff", password "randscapetown" -> redirects to staff.html
+    // DYNAMIC CREDENTIALS - Reads from localStorage
+    // 1. Super Admin: hardcoded (master access)
+    // 2. Tenant Admin: from qless_tenants (created in Super Admin dashboard)
+    // 3. Staff: from qless_staff (created in Tenant Admin dashboard)
     // ============================================================
-    const VALID_CREDENTIALS = {
-      superadmin: {
-        username: "Superadmin",
-        password: "randscapetown",
-        role: "super_administrator",
-        redirectUrl: "superadmin.html",
-        displayName: "Super Administrator",
-        icon: "crown"
-      },
-      admin: {
-        username: "Admin",
-        password: "randscapetown",
-        role: "tenant_administrator",
-        redirectUrl: "admin.html",
-        displayName: "Tenant Administrator",
-        icon: "user-tie"
-      },
-      staff: {
-        username: "Staff",
-        password: "randscapetown",
-        role: "staff",
-        redirectUrl: "staff.html",
-        displayName: "Staff Member",
-        icon: "users"
-      }
+    const SUPER_ADMIN = {
+      username: "Superadmin",
+      password: "randscapetown",
+      role: "super_administrator",
+      redirectUrl: "superadmin.html",
+      displayName: "Super Administrator"
     };
 
-    // Helper: Update green acknowledgment for username field
+    // Load dynamic data from localStorage
+    function loadDynamicCredentials() {
+      const tenantsStr = localStorage.getItem(STORAGE_KEYS.TENANTS);
+      cachedTenants = tenantsStr ? JSON.parse(tenantsStr) : [];
+      
+      const staffStr = localStorage.getItem(STORAGE_KEYS.STAFF);
+      cachedStaff = staffStr ? JSON.parse(staffStr) : [];
+      
+      // Initialize with demo data if empty (for first-time users)
+      if (cachedTenants.length === 0) {
+        cachedTenants = [
+          { id: 1, businessName: "Skyline Lounge", ownerName: "Thabo Nkosi", phone: "0821112233", username: "skyline_admin", password: "skyline123", status: "Active" },
+          { id: 2, businessName: "Cape Tavern", ownerName: "Lerato Dlamini", phone: "0834455667", username: "capetavern", password: "tavern456", status: "Active" },
+          { id: 3, businessName: "Gold Reef Venue", ownerName: "Sipho Mbele", phone: "0719988776", username: "goldreef", password: "reef789", status: "Suspended" },
+          { id: 4, businessName: "Durban Shisha", ownerName: "Priya Singh", phone: "0812345678", username: "durban_shisha", password: "shisha321", status: "Active" }
+        ];
+        localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(cachedTenants));
+      }
+      
+      if (cachedStaff.length === 0) {
+        cachedStaff = [
+          { id: 1, tenantId: 1, name: "John Doe", username: "john_doe", password: "staff123", role: "cashier", status: "Active" },
+          { id: 2, tenantId: 1, name: "Jane Smith", username: "jane_smith", password: "jane456", role: "manager", status: "Active" },
+          { id: 3, tenantId: 2, name: "Mike Johnson", username: "mike_j", password: "mike789", role: "bartender", status: "Active" }
+        ];
+        localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify(cachedStaff));
+      }
+    }
+
+    // Check if username exists for current role
+    function isValidUsernameForRole(username, userType) {
+      if (userType === 'superadmin') {
+        return username === SUPER_ADMIN.username;
+      } else if (userType === 'admin') {
+        return cachedTenants.some(t => t.username === username && t.status === 'Active');
+      } else {
+        return cachedStaff.some(s => s.username === username && s.status === 'Active');
+      }
+    }
+
+    // Get full user data for authentication
+    function authenticateUser(username, password, userType) {
+      if (userType === 'superadmin') {
+        if (username === SUPER_ADMIN.username && password === SUPER_ADMIN.password) {
+          return {
+            success: true,
+            role: SUPER_ADMIN.role,
+            redirectUrl: SUPER_ADMIN.redirectUrl,
+            displayName: SUPER_ADMIN.displayName,
+            username: username,
+            userType: 'superadmin'
+          };
+        }
+        return { success: false, message: 'Invalid Super Admin credentials' };
+      }
+      
+      if (userType === 'admin') {
+        const tenant = cachedTenants.find(t => t.username === username && t.password === password && t.status === 'Active');
+        if (tenant) {
+          return {
+            success: true,
+            role: 'tenant_administrator',
+            redirectUrl: 'admin.html',
+            displayName: tenant.businessName,
+            username: username,
+            userType: 'admin',
+            tenantId: tenant.id,
+            tenantName: tenant.businessName,
+            tenantData: tenant
+          };
+        }
+        return { success: false, message: 'Invalid Tenant Admin credentials or account suspended' };
+      }
+      
+      if (userType === 'staff') {
+        const staff = cachedStaff.find(s => s.username === username && s.password === password && s.status === 'Active');
+        if (staff) {
+          const parentTenant = cachedTenants.find(t => t.id === staff.tenantId);
+          return {
+            success: true,
+            role: 'staff',
+            redirectUrl: 'staff.html',
+            displayName: staff.name,
+            username: username,
+            userType: 'staff',
+            tenantId: staff.tenantId,
+            tenantName: parentTenant?.businessName || 'Unknown Venue',
+            staffRole: staff.role,
+            staffData: staff
+          };
+        }
+        return { success: false, message: 'Invalid Staff credentials or account inactive' };
+      }
+      
+      return { success: false, message: 'Invalid user type' };
+    }
+
+    // Update hint text based on selected role
+    function updateHintText() {
+      const hintSpan = document.querySelector('#usernameHint span');
+      if (currentUserType === 'superadmin') {
+        hintSpan.textContent = 'Enter Super Admin username';
+      } else if (currentUserType === 'admin') {
+        const activeTenants = cachedTenants.filter(t => t.status === 'Active');
+        if (activeTenants.length > 0) {
+          hintSpan.textContent = `Enter your tenant admin username`;
+        } else {
+          hintSpan.textContent = 'No tenant admins created yet';
+        }
+      } else {
+        const activeStaff = cachedStaff.filter(s => s.status === 'Active');
+        if (activeStaff.length > 0) {
+          hintSpan.textContent = `Enter your staff username`;
+        } else {
+          hintSpan.textContent = 'No staff accounts created yet';
+        }
+      }
+    }
+
+    // Update green acknowledgment for username field (dynamic)
     function updateUsernameAcknowledgment() {
       const enteredUsername = usernameInput.value.trim();
-      const expectedUsername = VALID_CREDENTIALS[currentUserType]?.username;
-      const isValid = (enteredUsername === expectedUsername);
+      const isValid = isValidUsernameForRole(enteredUsername, currentUserType);
       
       if (enteredUsername.length > 0) {
         if (isValid) {
@@ -550,11 +647,22 @@
       }
     }
     
-    // Helper: Update green acknowledgment for password field
+    // Update green acknowledgment for password field (dynamic)
     function updatePasswordAcknowledgment() {
       const enteredPassword = passwordInput.value;
-      const expectedPassword = VALID_CREDENTIALS[currentUserType]?.password;
-      const isValid = (enteredPassword === expectedPassword);
+      let isValid = false;
+      
+      if (currentUserType === 'superadmin') {
+        isValid = (enteredPassword === SUPER_ADMIN.password);
+      } else if (currentUserType === 'admin') {
+        const username = usernameInput.value.trim();
+        const tenant = cachedTenants.find(t => t.username === username);
+        isValid = (tenant && tenant.password === enteredPassword);
+      } else {
+        const username = usernameInput.value.trim();
+        const staff = cachedStaff.find(s => s.username === username);
+        isValid = (staff && staff.password === enteredPassword);
+      }
       
       if (enteredPassword.length > 0) {
         if (isValid) {
@@ -570,7 +678,7 @@
       }
     }
     
-    // Real-time validation for username
+    // Real-time validation
     if (usernameInput) {
       usernameInput.addEventListener('input', function() {
         updateUsernameAcknowledgment();
@@ -580,7 +688,6 @@
       });
     }
     
-    // Real-time validation for password
     if (passwordInput) {
       passwordInput.addEventListener('input', function() {
         updatePasswordAcknowledgment();
@@ -599,30 +706,23 @@
       });
     }
 
-    // Set active user type button and reset green indicators
+    // Set active user type
     function setActiveUserType(type) {
       currentUserType = type;
       
-      // Update button active states
       superadminTypeBtn.classList.remove('active');
       adminTypeBtn.classList.remove('active');
       staffTypeBtn.classList.remove('active');
       
       if (type === 'superadmin') {
         superadminTypeBtn.classList.add('active');
-        const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Super Admin username: "Superadmin" | Tenant Admin: "Admin" | Staff: "Staff"';
       } else if (type === 'admin') {
         adminTypeBtn.classList.add('active');
-        const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Tenant Admin username: "Admin" | Super Admin: "Superadmin" | Staff: "Staff"';
       } else {
         staffTypeBtn.classList.add('active');
-        const hintSpan = document.querySelector('#usernameHint span');
-        if (hintSpan) hintSpan.textContent = 'Staff username: "Staff" | Super Admin: "Superadmin" | Tenant Admin: "Admin"';
       }
       
-      // Clear inputs and reset green indicators
+      // Clear inputs and reset indicators
       usernameInput.value = '';
       passwordInput.value = '';
       usernameWrapper.classList.remove('valid-username');
@@ -630,20 +730,19 @@
       usernameSuccessMsg.classList.add('hidden');
       passwordSuccessMsg.classList.add('hidden');
       errorMessageDiv.classList.add('hidden');
+      
+      // Update hint text
+      updateHintText();
       usernameInput.focus();
     }
 
-    // Super Admin button click
+    // Button click handlers
     if (superadminTypeBtn) {
       superadminTypeBtn.addEventListener('click', () => setActiveUserType('superadmin'));
     }
-
-    // Tenant Admin button click
     if (adminTypeBtn) {
       adminTypeBtn.addEventListener('click', () => setActiveUserType('admin'));
     }
-
-    // Staff button click
     if (staffTypeBtn) {
       staffTypeBtn.addEventListener('click', () => setActiveUserType('staff'));
     }
@@ -654,38 +753,6 @@
       setTimeout(() => {
         errorMessageDiv.classList.add('hidden');
       }, 5000);
-    }
-
-    // Authenticate and redirect
-    async function authenticateAndRedirect(username, password, userType) {
-      await new Promise(resolve => setTimeout(resolve, 500)); // smooth UX
-      const cred = VALID_CREDENTIALS[userType];
-      if (!cred) {
-        return { success: false, message: 'Invalid user role selected.' };
-      }
-      
-      const usernameMatch = (username === cred.username);
-      const passwordMatch = (password === cred.password);
-      
-      if (usernameMatch && passwordMatch) {
-        return { 
-          success: true, 
-          redirectUrl: cred.redirectUrl, 
-          role: cred.role,
-          displayName: cred.displayName,
-          username: username
-        };
-      } else {
-        let hint = '';
-        if (userType === 'superadmin') {
-          hint = 'Super Admin credentials: username "Superadmin", password "randscapetown"';
-        } else if (userType === 'admin') {
-          hint = 'Tenant Admin credentials: username "Admin", password "randscapetown"';
-        } else {
-          hint = 'Staff credentials: username "Staff", password "randscapetown"';
-        }
-        return { success: false, message: `Authentication failed. ${hint}` };
-      }
     }
 
     // Handle form submit
@@ -707,26 +774,15 @@
           return;
         }
         
-        // Double-check credentials
-        const expectedCred = VALID_CREDENTIALS[currentUserType];
-        if (!expectedCred) {
-          showError('Invalid user role selected.');
-          return;
-        }
+        // Reload fresh data before authentication
+        loadDynamicCredentials();
         
-        const isUsernameValid = (username === expectedCred.username);
-        const isPasswordValid = (password === expectedCred.password);
-        
-        if (!isUsernameValid) {
-          let roleDisplay = currentUserType === 'superadmin' ? 'Super Admin' : (currentUserType === 'admin' ? 'Tenant Admin' : 'Staff');
-          showError(`Incorrect username for ${roleDisplay} role. Expected: "${expectedCred.username}"`);
+        // Validate based on selected role
+        const isValid = isValidUsernameForRole(username, currentUserType);
+        if (!isValid) {
+          let roleName = currentUserType === 'superadmin' ? 'Super Admin' : (currentUserType === 'admin' ? 'Tenant Admin' : 'Staff');
+          showError(`Invalid username for ${roleName} role`);
           usernameInput.focus();
-          return;
-        }
-        if (!isPasswordValid) {
-          let roleDisplay = currentUserType === 'superadmin' ? 'Super Admin' : (currentUserType === 'admin' ? 'Tenant Admin' : 'Staff');
-          showError(`Incorrect password for ${roleDisplay} role.`);
-          passwordInput.focus();
           return;
         }
         
@@ -735,42 +791,35 @@
         const originalHTML = loginBtn.innerHTML;
         loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Verifying credentials...';
         
-        const result = await authenticateAndRedirect(username, password, currentUserType);
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const result = authenticateUser(username, password, currentUserType);
         
         if (result.success) {
           // Store session info
-          sessionStorage.setItem('rands_user_logged_in', 'true');
-          sessionStorage.setItem('rands_user_role', result.role);
-          sessionStorage.setItem('rands_user_type', currentUserType);
-          sessionStorage.setItem('rands_user_name', result.username);
-          sessionStorage.setItem('rands_display_name', result.displayName);
-          sessionStorage.setItem('rands_login_time', Date.now().toString());
+          sessionStorage.setItem('qless_logged_in', 'true');
+          sessionStorage.setItem('qless_user_role', result.role);
+          sessionStorage.setItem('qless_user_type', result.userType);
+          sessionStorage.setItem('qless_user_name', result.displayName);
+          sessionStorage.setItem('qless_username', result.username);
+          sessionStorage.setItem('qless_login_time', Date.now().toString());
           
-          // Set a flag for role-based dashboard access
-          if (currentUserType === 'superadmin') {
-            sessionStorage.setItem('is_super_admin', 'true');
-            sessionStorage.setItem('is_tenant_admin', 'false');
-            sessionStorage.setItem('is_staff', 'false');
-          } else if (currentUserType === 'admin') {
-            sessionStorage.setItem('is_super_admin', 'false');
-            sessionStorage.setItem('is_tenant_admin', 'true');
-            sessionStorage.setItem('is_staff', 'false');
-          } else {
-            sessionStorage.setItem('is_super_admin', 'false');
-            sessionStorage.setItem('is_tenant_admin', 'false');
-            sessionStorage.setItem('is_staff', 'true');
+          if (result.tenantId) {
+            sessionStorage.setItem('qless_tenant_id', result.tenantId);
+            sessionStorage.setItem('qless_tenant_name', result.tenantName);
           }
           
-          // Show final green success acknowledgment on button
+          if (result.staffRole) {
+            sessionStorage.setItem('qless_staff_role', result.staffRole);
+          }
+          
+          // Show success
           loginBtn.innerHTML = '<i class="fas fa-check-circle"></i> Access Granted! Redirecting...';
           
-          // Add a global green flash acknowledgment before redirect
+          // Success flash message
           const successAck = document.createElement('div');
-          let roleIcon = '';
-          if (currentUserType === 'superadmin') roleIcon = '<i class="fas fa-crown"></i>';
-          else if (currentUserType === 'admin') roleIcon = '<i class="fas fa-user-tie"></i>';
-          else roleIcon = '<i class="fas fa-users"></i>';
-          
+          let roleIcon = result.userType === 'superadmin' ? '<i class="fas fa-crown"></i>' : (result.userType === 'admin' ? '<i class="fas fa-user-tie"></i>' : '<i class="fas fa-users"></i>');
           successAck.innerHTML = `${roleIcon} Welcome, ${result.displayName}! Redirecting to dashboard...`;
           successAck.style.position = 'fixed';
           successAck.style.bottom = '20px';
@@ -783,7 +832,6 @@
           successAck.style.fontWeight = 'bold';
           successAck.style.zIndex = '9999';
           successAck.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
-          successAck.style.fontFamily = 'Montserrat, sans-serif';
           successAck.style.fontSize = '14px';
           successAck.style.display = 'flex';
           successAck.style.alignItems = 'center';
@@ -796,7 +844,7 @@
             setTimeout(() => successAck.remove(), 500);
           }, 1500);
           
-          // Redirect to the appropriate HTML file
+          // Redirect
           setTimeout(() => {
             window.location.href = result.redirectUrl;
           }, 1000);
@@ -812,7 +860,7 @@
       });
     }
     
-    // Enter key on password field
+    // Enter key support
     if (passwordInput) {
       passwordInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -822,15 +870,28 @@
       });
     }
     
-    // Set initial hint and active state
+    // Initialize
     const init = () => {
-      // Set Super Admin as default active
+      loadDynamicCredentials();
       superadminTypeBtn.classList.add('active');
-      const hintSpan = document.querySelector('#usernameHint span');
-      if (hintSpan) hintSpan.textContent = 'Super Admin: "Superadmin" | Tenant Admin: "Admin" | Staff: "Staff"';
+      updateHintText();
       usernameInput.focus();
     };
+    
     init();
+    
+    // Listen for storage changes (if another tab updates tenants/staff)
+    window.addEventListener('storage', function(e) {
+      if (e.key === STORAGE_KEYS.TENANTS || e.key === STORAGE_KEYS.STAFF) {
+        loadDynamicCredentials();
+        updateHintText();
+        // Reset validation
+        usernameWrapper.classList.remove('valid-username');
+        passwordWrapper.classList.remove('valid-password');
+        usernameSuccessMsg.classList.add('hidden');
+        passwordSuccessMsg.classList.add('hidden');
+      }
+    });
   })();
 </script>
 </body>
