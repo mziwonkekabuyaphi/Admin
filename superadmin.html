@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Rands Venue OS | Tenant Admin Dashboard</title>
+    <title>Rands | Super Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
@@ -20,12 +20,11 @@
             overflow-x: hidden;
         }
 
-        /* Sidebar */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 260px;
+            width: 270px;
             height: 100%;
             background: #ffffff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
@@ -63,7 +62,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 24px;
+            padding: 12px 20px;
             margin: 4px 12px;
             border-radius: 12px;
             color: #4a5568;
@@ -88,16 +87,15 @@
             box-shadow: 0 4px 10px rgba(227, 6, 19, 0.2);
         }
 
-        /* Main Content */
         .main-content {
-            margin-left: 260px;
+            margin-left: 270px;
             transition: all 0.3s ease;
             min-height: 100vh;
         }
 
         .top-header {
             background: white;
-            padding: 16px 32px;
+            padding: 14px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -113,15 +111,6 @@
             color: #1e293b;
         }
 
-        .tenant-badge {
-            background: #fef2f2;
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            color: #E30613;
-            font-weight: 600;
-        }
-
         .profile-dropdown {
             display: flex;
             align-items: center;
@@ -130,11 +119,6 @@
             padding: 6px 12px;
             border-radius: 40px;
             background: #f8fafd;
-            transition: background 0.2s;
-        }
-
-        .profile-dropdown:hover {
-            background: #fee2e2;
         }
 
         .avatar {
@@ -153,25 +137,18 @@
             padding: 28px 32px;
         }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            gap: 24px;
             margin-bottom: 32px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 24px;
+            border-radius: 28px;
             padding: 20px;
             border: 1px solid #edf2f7;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
 
         .stat-icon {
@@ -183,29 +160,29 @@
             align-items: center;
             justify-content: center;
             color: #E30613;
-            font-size: 1.3rem;
-            margin-bottom: 12px;
+            font-size: 1.4rem;
+            margin-bottom: 16px;
         }
 
         .stat-title {
             font-size: 0.75rem;
             font-weight: 500;
             color: #6c7a8e;
+            text-transform: uppercase;
         }
 
         .stat-number {
             font-size: 1.8rem;
             font-weight: 800;
             color: #1e293b;
-            margin-top: 4px;
+            margin-top: 6px;
         }
 
-        /* Section Header */
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 24px 0 20px 0;
+            margin: 32px 0 20px 0;
             flex-wrap: wrap;
             gap: 12px;
         }
@@ -228,11 +205,6 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.1s;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.97);
         }
 
         .btn-outline {
@@ -240,13 +212,8 @@
             border: 1px solid #e2e8f0;
             padding: 8px 16px;
             border-radius: 40px;
-            font-size: 0.75rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-outline:hover {
-            background: #f1f5f9;
         }
 
         .btn-danger {
@@ -259,7 +226,6 @@
             cursor: pointer;
         }
 
-        /* Tables */
         .table-wrapper {
             overflow-x: auto;
             background: white;
@@ -270,32 +236,22 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px;
+            min-width: 700px;
         }
 
-        .data-table th {
-            text-align: left;
-            padding: 16px 20px;
-            background: #fafcff;
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: #4a5568;
-            border-bottom: 1px solid #edf2f7;
-        }
-
-        .data-table td {
+        .data-table th, .data-table td {
             padding: 14px 20px;
+            text-align: left;
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.85rem;
-            color: #1e293b;
         }
 
         .status-badge {
-            display: inline-flex;
             padding: 4px 12px;
             border-radius: 40px;
             font-size: 0.7rem;
             font-weight: 600;
+            display: inline-block;
         }
 
         .status-active {
@@ -303,28 +259,8 @@
             color: #10b981;
         }
 
-        .status-inactive {
+        .status-suspended {
             background: #fee2e2;
-            color: #E30613;
-        }
-
-        .role-badge {
-            background: #e0e7ff;
-            color: #4f46e5;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .action-icons {
-            display: flex;
-            gap: 12px;
-            color: #94a3b8;
-            cursor: pointer;
-        }
-
-        .action-icons i:hover {
             color: #E30613;
         }
 
@@ -347,7 +283,17 @@
             color: #E30613;
         }
 
-        /* Modules Grid */
+        .action-icons {
+            display: flex;
+            gap: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .action-icons i:hover {
+            color: #E30613;
+        }
+
         .modules-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -376,55 +322,74 @@
             color: #6c7a8e;
         }
 
-        /* Modal */
-        .modal-mask {
-            position: fixed;
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #E30613;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .tenant-selector {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #edf2f7;
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.2s;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        .modal-mask.active {
-            visibility: visible;
-            opacity: 1;
-        }
-        .modal-container {
+
+        .tenant-dropdown {
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
             background: white;
-            width: 90%;
-            max-width: 480px;
-            border-radius: 32px;
-            padding: 28px;
-            box-shadow: 0 25px 40px rgba(0,0,0,0.2);
-            animation: modalSlideIn 0.3s ease;
+            cursor: pointer;
+            min-width: 200px;
         }
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .form-group {
-            margin-bottom: 18px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #1e293b;
-        }
+
         .form-control {
             width: 100%;
             padding: 12px 16px;
@@ -433,28 +398,36 @@
             font-family: 'Inter', sans-serif;
             font-size: 0.85rem;
         }
-        .form-control:focus {
-            outline: none;
-            border-color: #E30613;
-        }
-        select.form-control {
-            cursor: pointer;
-        }
-        .modal-buttons {
+
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 24px;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
         }
 
-        /* Logout Confirmation Modal */
-        .logout-warning {
-            text-align: center;
-            margin: 16px 0;
-            color: #64748b;
+        .modal-mask.active {
+            visibility: visible;
+            opacity: 1;
         }
 
-        /* Menu Toggle */
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 32px;
+            padding: 28px;
+        }
+
         .menu-toggle {
             display: none;
             font-size: 1.3rem;
@@ -465,6 +438,7 @@
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                width: 260px;
             }
             .sidebar.open {
                 transform: translateX(0);
@@ -472,53 +446,44 @@
             .main-content {
                 margin-left: 0;
             }
-            .menu-toggle {
-                display: block;
-                margin-right: 16px;
-            }
             .dashboard-container {
                 padding: 20px;
             }
             .top-header {
                 padding: 12px 20px;
             }
+            .menu-toggle {
+                display: block;
+                margin-right: 16px;
+            }
         }
     </style>
 </head>
 <body>
 <div id="app">
-    <!-- Sidebar -->
     <aside class="sidebar" :class="{ open: sidebarOpen }">
         <div class="sidebar-header">
             <h2>Rands Venue OS</h2>
-            <p>Tenant Admin Console</p>
+            <p>Super Admin Console</p>
         </div>
         <div class="nav-menu">
-            <div v-for="item in navItems" :key="item.id" class="nav-item" :class="{ active: currentSection === item.id }" @click="currentSection = item.id; closeSidebarOnMobile()">
+            <div v-for="item in navItems" :key="item.id" class="nav-item" :class="{ active: currentSection === item.id }" @click="currentSection = item.id; closeSidebar()">
                 <i :class="item.icon"></i>
                 <span>{{ item.label }}</span>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="top-header">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="menu-toggle" @click="sidebarOpen = !sidebarOpen">
-                    <i class="fas fa-bars"></i>
-                </div>
-                <div class="header-left">
-                    <h3>{{ currentSectionTitle }}</h3>
-                </div>
+                <div class="menu-toggle" @click="sidebarOpen = !sidebarOpen"><i class="fas fa-bars"></i></div>
+                <div class="header-left"><h3>{{ currentSectionTitle }}</h3></div>
             </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <span class="tenant-badge"><i class="fas fa-building"></i> {{ tenantName }}</span>
-                <div class="profile-dropdown" @click="openLogoutModal">
-                    <div class="avatar">TA</div>
-                    <span style="font-weight: 500; font-size:0.85rem;">{{ adminName }}</span>
-                    <i class="fas fa-sign-out-alt" style="color:#E30613;"></i>
-                </div>
+            <div class="profile-dropdown" @click="logout">
+                <div class="avatar">SA</div>
+                <span style="font-size:0.85rem;">{{ adminName }}</span>
+                <i class="fas fa-sign-out-alt"></i>
             </div>
         </div>
 
@@ -526,459 +491,312 @@
             <!-- DASHBOARD -->
             <div v-if="currentSection === 'dashboard'">
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        <div class="stat-title">Total Staff</div>
-                        <div class="stat-number">{{ staffList.length }}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-user-check"></i></div>
-                        <div class="stat-title">Active Staff</div>
-                        <div class="stat-number">{{ activeStaffCount }}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
-                        <div class="stat-title">Tickets Sold</div>
-                        <div class="stat-number">1,284</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-rand-sign"></i></div>
-                        <div class="stat-title">Revenue (MTD)</div>
-                        <div class="stat-number">R 48,250</div>
-                    </div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-store"></i></div><div class="stat-title">Total Tenants</div><div class="stat-number">{{ tenants.length }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-title">Active Tenants</div><div class="stat-number">{{ activeTenantsCount }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-title">Total Staff</div><div class="stat-number">{{ totalStaffCount }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-title">Platform Revenue</div><div class="stat-number">R 142,800</div></div>
                 </div>
-                <div class="section-header">
-                    <h2>Recent Staff Activity</h2>
-                    <button class="btn-outline" @click="currentSection = 'staff'">Manage Staff <i class="fas fa-arrow-right"></i></button>
-                </div>
+                <div class="section-header"><h2>Recent Tenants</h2><button class="btn-outline" @click="currentSection = 'tenants'">View All</button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Status</th></tr></thead>
+                        <thead><tr><th>Business Name</th><th>Owner</th><th>Username</th><th>Status</th></tr></thead>
                         <tbody>
-                            <tr v-for="staff in recentStaff" :key="staff.id">
-                                <td>{{ staff.name }}</td>
-                                <td><span class="role-badge">{{ staff.role }}</span></td>
-                                <td>{{ staff.username }}</td>
-                                <td><span class="status-badge" :class="staff.status === 'Active' ? 'status-active' : 'status-inactive'">{{ staff.status }}</span></td>
+                            <tr v-for="tenant in recentTenants" :key="tenant.id">
+                                <td><strong>{{ tenant.businessName }}</strong></td>
+                                <td>{{ tenant.ownerName }}</td>
+                                <td><span class="credential-cell">{{ tenant.username }}</span></td>
+                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
                             </tr>
-                            <tr v-if="recentStaff.length === 0"><td colspan="4" style="text-align:center; color:#999;">No staff members yet</td></tr>
+                            <tr v-if="tenants.length === 0"><td colspan="4" style="text-align:center;">No tenants yet. Click "Create Tenant" to add one.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- STAFF MANAGEMENT -->
-            <div v-if="currentSection === 'staff'">
-                <div class="section-header">
-                    <h2><i class="fas fa-users"></i> Staff Management</h2>
-                    <button class="btn-primary" @click="openCreateStaffModal"><i class="fas fa-plus"></i> Add Staff</button>
-                </div>
+            <!-- TENANTS MANAGEMENT -->
+            <div v-if="currentSection === 'tenants'">
+                <div class="section-header"><h2>All Tenants</h2><button class="btn-primary" @click="openCreateTenantModal"><i class="fas fa-plus"></i> Create Tenant</button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th><th>Role</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody>
-                            <tr v-for="staff in staffList" :key="staff.id">
-                                <td><strong>{{ staff.name }}</strong></td>
-                                <td><span class="role-badge">{{ staff.role }}</span></td>
-                                <td><span class="credential-cell">{{ staff.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.username)"></i></span></td>
-                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.password)"></i></span></td>
-                                <td><span class="status-badge" :class="staff.status === 'Active' ? 'status-active' : 'status-inactive'">{{ staff.status }}</span></td>
-                                <td>
-                                    <div class="action-icons">
-                                        <i class="fas fa-edit" @click="editStaff(staff)" title="Edit"></i>
-                                        <i class="fas fa-key" @click="resetStaffPassword(staff)" title="Reset Password" style="color:#f59e0b;"></i>
-                                        <i class="fas fa-toggle-on" v-if="staff.status === 'Active'" @click="toggleStaffStatus(staff.id)" style="color:#E30613;" title="Deactivate"></i>
-                                        <i class="fas fa-toggle-off" v-else @click="toggleStaffStatus(staff.id)" style="color:#10b981;" title="Activate"></i>
-                                        <i class="fas fa-trash-alt" @click="openDeleteStaffModal(staff.id)" style="color:#dc2626;" title="Delete"></i>
-                                    </div>
-                                </td>
+                            <tr v-for="tenant in tenants" :key="tenant.id">
+                                <td><strong>{{ tenant.businessName }}</strong></td>
+                                <td>{{ tenant.ownerName }}</td>
+                                <td>{{ tenant.phone }}</td>
+                                <td><span class="credential-cell">{{ tenant.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.username)"></i></span></td>
+                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.password)"></i></span></td>
+                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
+                                <td><div class="action-icons"><i class="fas fa-eye" @click="viewTenant(tenant)"></i><i class="fas fa-ban" v-if="tenant.status === 'Active'" @click="suspendTenant(tenant.id)" style="color:#E30613;"></i><i class="fas fa-check-circle" v-else @click="activateTenant(tenant.id)" style="color:#10b981;"></i><i class="fas fa-key" @click="resetTenantPassword(tenant)" style="color:#f59e0b;"></i></div></td>
                             </tr>
-                            <tr v-if="staffList.length === 0"><td colspan="6" style="text-align:center; padding:40px; color:#999;">No staff members. Click "Add Staff" to create one.</td></tr>
+                            <tr v-if="tenants.length === 0"><td colspan="7" style="text-align:center; padding:40px;">No tenants. Click "Create Tenant" to add your first venue.</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="settings-panel" style="margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 20px;">
-                    <p style="font-size: 0.75rem; color: #64748b;"><i class="fas fa-info-circle"></i> Staff credentials work on the login page. Share username and password with your staff members.</p>
-                </div>
             </div>
 
-            <!-- MODULES (Read-only from Super Admin) -->
+            <!-- MODULES CONFIGURATION -->
             <div v-if="currentSection === 'modules'">
-                <div class="section-header">
-                    <h2><i class="fas fa-puzzle-piece"></i> Available Modules</h2>
-                    <p style="color:#64748b; font-size:0.75rem;">Modules configured by Super Admin</p>
+                <div class="section-header"><h2>Module Configuration</h2><p style="color:#64748b;">Enable/disable features per tenant</p></div>
+                <div class="tenant-selector">
+                    <label><i class="fas fa-building"></i> Select Tenant:</label>
+                    <select v-model="selectedTenantId" class="tenant-dropdown" @change="loadTenantModules">
+                        <option v-for="tenant in tenants" :key="tenant.id" :value="tenant.id">{{ tenant.businessName }} ({{ tenant.status }})</option>
+                    </select>
                 </div>
-                <div class="modules-grid">
-                    <div class="module-card" v-for="module in tenantModules" :key="module.id">
-                        <div class="module-info">
-                            <h4><i :class="module.icon" style="margin-right: 6px; color:#E30613;"></i> {{ module.name }}</h4>
-                            <p>{{ module.description }}</p>
-                        </div>
-                        <div>
-                            <span v-if="module.enabled" style="color:#10b981;"><i class="fas fa-check-circle"></i> Active</span>
-                            <span v-else style="color:#94a3b8;"><i class="fas fa-ban"></i> Disabled</span>
-                        </div>
+                <div class="modules-grid" v-if="selectedTenant">
+                    <div class="module-card" v-for="module in currentTenantModules" :key="module.id">
+                        <div class="module-info"><h4><i :class="module.icon" style="margin-right:6px; color:#E30613;"></i> {{ module.name }}</h4><p>{{ module.description }}</p></div>
+                        <label class="toggle-switch"><input type="checkbox" v-model="module.enabled" @change="toggleModuleForTenant(module)"><span class="toggle-slider"></span></label>
                     </div>
                 </div>
-            </div>
-
-            <!-- REPORTS -->
-            <div v-if="currentSection === 'reports'">
-                <div class="section-header"><h2>Sales Reports</h2></div>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-title">Today's Sales</div><div class="stat-number">R 3,240</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-bar"></i></div><div class="stat-title">This Week</div><div class="stat-number">R 18,450</div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar"></i></div><div class="stat-title">This Month</div><div class="stat-number">R 48,250</div></div>
-                </div>
-                <div class="table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>Item</th><th>Amount</th></tr></thead><tbody><tr><td colspan="3" style="text-align:center;">Detailed reports coming soon</td></tr></tbody></table></div>
+                <div v-else class="table-wrapper" style="padding:40px; text-align:center;">Select a tenant to configure their modules</div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: Create/Edit Staff -->
-    <div class="modal-mask" :class="{ active: showStaffModal }">
+    <!-- Create Tenant Modal -->
+    <div class="modal-mask" :class="{ active: showTenantModal }">
         <div class="modal-container">
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-user-plus"></i> {{ isEditing ? 'Edit Staff' : 'Add New Staff' }}</h3>
-            <div class="form-group"><label>Full Name *</label><input class="form-control" v-model="staffForm.name" placeholder="e.g., John Doe"></div>
-            <div class="form-group"><label>Username *</label><input class="form-control" v-model="staffForm.username" placeholder="Login username"></div>
-            <div class="form-group"><label>Password *</label><input type="password" class="form-control" v-model="staffForm.password" placeholder="Login password"></div>
-            <div class="form-group"><label>Role *</label>
-                <select class="form-control" v-model="staffForm.role">
-                    <option value="cashier">Cashier</option>
-                    <option value="manager">Manager</option>
-                    <option value="bartender">Bartender</option>
-                    <option value="security">Security</option>
-                    <option value="cleaner">Cleaner</option>
-                </select>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-outline" @click="closeStaffModal">Cancel</button>
-                <button class="btn-primary" @click="saveStaff">{{ isEditing ? 'Update' : 'Create' }}</button>
+            <h3 style="margin-bottom: 20px;"><i class="fas fa-building"></i> Create New Tenant</h3>
+            <div class="form-group" style="margin-bottom:16px;"><label>Business Name *</label><input class="form-control" v-model="newTenant.businessName" placeholder="e.g., Skyline Lounge"></div>
+            <div class="form-group" style="margin-bottom:16px;"><label>Owner Name *</label><input class="form-control" v-model="newTenant.ownerName" placeholder="Full name"></div>
+            <div class="form-group" style="margin-bottom:16px;"><label>Phone *</label><input class="form-control" v-model="newTenant.phone" placeholder="Phone number"></div>
+            <div class="form-group" style="margin-bottom:16px;"><label>Username *</label><input class="form-control" v-model="newTenant.username" placeholder="Login username"></div>
+            <div class="form-group" style="margin-bottom:16px;"><label>Password *</label><input type="password" class="form-control" v-model="newTenant.password" placeholder="Login password"></div>
+            <div style="display:flex; gap:12px; margin-top:20px;">
+                <button class="btn-outline" @click="showTenantModal = false">Cancel</button>
+                <button class="btn-primary" @click="createTenant">Create Tenant</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: Reset Password -->
+    <!-- View Tenant Modal -->
+    <div class="modal-mask" :class="{ active: showViewModal }">
+        <div class="modal-container">
+            <h3><i class="fas fa-building"></i> Tenant Details</h3>
+            <div v-if="viewingTenant" style="margin-top:20px;">
+                <p><strong>Business:</strong> {{ viewingTenant.businessName }}</p>
+                <p><strong>Owner:</strong> {{ viewingTenant.ownerName }}</p>
+                <p><strong>Phone:</strong> {{ viewingTenant.phone }}</p>
+                <p><strong>Username:</strong> <span class="credential-cell">{{ viewingTenant.username }}</span></p>
+                <p><strong>Password:</strong> <span class="credential-cell">{{ viewingTenant.password }}</span></p>
+                <p><strong>Status:</strong> <span class="status-badge" :class="viewingTenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ viewingTenant.status }}</span></p>
+            </div>
+            <div style="display:flex; gap:12px; margin-top:24px;"><button class="btn-primary" @click="showViewModal = false">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
     <div class="modal-mask" :class="{ active: showResetModal }">
         <div class="modal-container">
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-key"></i> Reset Password</h3>
-            <p>Reset password for <strong>{{ resettingStaff?.name }}</strong></p>
-            <div class="form-group"><label>New Password</label><input type="password" class="form-control" v-model="newPassword" placeholder="Enter new password (min 4 characters)"></div>
-            <div class="modal-buttons">
+            <h3><i class="fas fa-key"></i> Reset Password</h3>
+            <p>New password for <strong>{{ resettingTenant?.businessName }}</strong></p>
+            <input type="password" class="form-control" v-model="newPassword" placeholder="New password" style="margin:16px 0;">
+            <div style="display:flex; gap:12px;">
                 <button class="btn-outline" @click="showResetModal = false">Cancel</button>
                 <button class="btn-primary" @click="confirmResetPassword">Reset</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Delete Staff Confirmation -->
-    <div class="modal-mask" :class="{ active: showDeleteModal }">
-        <div class="modal-container">
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i> Delete Staff Member</h3>
-            <p>Are you sure you want to delete <strong>{{ deletingStaffName }}</strong>?</p>
-            <p style="font-size: 0.75rem; color: #64748b; margin-top: 8px;">This action cannot be undone.</p>
-            <div class="modal-buttons">
-                <button class="btn-outline" @click="showDeleteModal = false">Cancel</button>
-                <button class="btn-danger" @click="confirmDeleteStaff">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Info Alert -->
-    <div class="modal-mask" :class="{ active: showInfoModal }">
-        <div class="modal-container" style="text-align: center;">
-            <i :class="infoIcon" style="font-size: 48px; margin-bottom: 16px;" :style="{ color: infoIconColor }"></i>
-            <h3 style="margin-bottom: 12px;">{{ infoTitle }}</h3>
-            <p style="line-height: 1.5; white-space: pre-line;">{{ infoMessage }}</p>
-            <div class="modal-buttons" style="justify-content: center;">
-                <button class="btn-primary" @click="showInfoModal = false">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Logout Confirmation -->
-    <div class="modal-mask" :class="{ active: showLogoutModal }">
-        <div class="modal-container">
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-sign-out-alt"></i> Logout</h3>
-            <div class="logout-warning">
-                <i class="fas fa-question-circle" style="font-size: 2rem; color: #E30613; margin-bottom: 12px; display: block;"></i>
-                <p>Are you sure you want to logout?</p>
-                <p style="font-size: 0.75rem; margin-top: 8px;">You'll need to login again to access your account.</p>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-outline" @click="showLogoutModal = false">Cancel</button>
-                <button class="btn-primary" @click="confirmLogout">Logout</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Storage Keys (matches login page and super admin)
     const STORAGE_KEYS = {
         TENANTS: 'qless_tenants',
         STAFF: 'qless_staff',
         TENANT_MODULES: 'qless_tenant_modules'
     };
 
+    const MASTER_MODULES = [
+        { id: 1, name: 'Tickets', description: 'Event ticketing & reservations', icon: 'fas fa-ticket-alt' },
+        { id: 2, name: 'Queue Management', description: 'Smart virtual queuing system', icon: 'fas fa-hourglass-half' },
+        { id: 3, name: 'Self-Serve Kiosk', description: 'Food & beverage ordering kiosk', icon: 'fas fa-clipboard-list' },
+        { id: 4, name: 'Virtual Booze Lockers', description: 'Secure bottle storage', icon: 'fas fa-lock' },
+        { id: 5, name: 'Shisha System', description: 'Hookah management', icon: 'fas fa-smoking' },
+        { id: 6, name: 'VVIP Management', description: 'Exclusive VIP accounts & tabs', icon: 'fas fa-crown' },
+        { id: 7, name: 'Staff Management', description: 'Employee scheduling', icon: 'fas fa-users-cog' },
+        { id: 8, name: 'Inventory Control', description: 'Stock & supply chain', icon: 'fas fa-boxes' }
+    ];
+
     new Vue({
         el: '#app',
         data: {
             sidebarOpen: false,
             currentSection: 'dashboard',
+            adminName: 'Super Admin',
+            tenants: [],
+            tenantModules: {},
+            selectedTenantId: null,
+            showTenantModal: false,
+            showViewModal: false,
+            showResetModal: false,
+            viewingTenant: null,
+            resettingTenant: null,
+            newPassword: '',
+            newTenant: { businessName: '', ownerName: '', phone: '', username: '', password: '' },
             navItems: [
                 { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
-                { id: 'staff', label: 'Staff Management', icon: 'fas fa-users' },
-                { id: 'modules', label: 'Modules', icon: 'fas fa-puzzle-piece' },
-                { id: 'reports', label: 'Reports', icon: 'fas fa-chart-line' }
-            ],
-            tenantId: null,
-            tenantName: 'Loading...',
-            adminName: 'Tenant Admin',
-            staffList: [],
-            tenantModules: [],
-            // Modal states
-            showStaffModal: false,
-            showResetModal: false,
-            showInfoModal: false,
-            showDeleteModal: false,
-            showLogoutModal: false,
-            isEditing: false,
-            editingStaffId: null,
-            staffForm: { name: '', username: '', password: '', role: 'cashier' },
-            resettingStaff: null,
-            newPassword: '',
-            deletingStaffId: null,
-            deletingStaffName: '',
-            infoTitle: '',
-            infoMessage: '',
-            infoIcon: 'fas fa-info-circle',
-            infoIconColor: '#E30613'
+                { id: 'tenants', label: 'Tenants', icon: 'fas fa-building' },
+                { id: 'modules', label: 'Modules', icon: 'fas fa-puzzle-piece' }
+            ]
         },
         computed: {
             currentSectionTitle() {
                 const item = this.navItems.find(i => i.id === this.currentSection);
                 return item ? item.label : 'Dashboard';
             },
-            activeStaffCount() {
-                return this.staffList.filter(s => s.status === 'Active').length;
+            activeTenantsCount() {
+                return this.tenants.filter(t => t.status === 'Active').length;
             },
-            recentStaff() {
-                return this.staffList.slice(0, 5);
+            totalStaffCount() {
+                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
+                return allStaff.length;
+            },
+            recentTenants() {
+                return this.tenants.slice(0, 5);
+            },
+            currentTenantModules() {
+                if (!this.selectedTenantId) return [];
+                if (!this.tenantModules[this.selectedTenantId]) {
+                    this.tenantModules[this.selectedTenantId] = MASTER_MODULES.map(m => ({ ...m, enabled: false }));
+                }
+                return this.tenantModules[this.selectedTenantId];
             }
         },
         methods: {
-            closeSidebarOnMobile() {
-                if (window.innerWidth <= 768) this.sidebarOpen = false;
-            },
-            showAlert(title, message, icon = 'fas fa-info-circle', iconColor = '#E30613') {
-                this.infoTitle = title;
-                this.infoMessage = message;
-                this.infoIcon = icon;
-                this.infoIconColor = iconColor;
-                this.showInfoModal = true;
-            },
+            closeSidebar() { if (window.innerWidth <= 768) this.sidebarOpen = false; },
             copyToClipboard(text) {
                 navigator.clipboard.writeText(text);
-                this.showAlert('Copied!', 'Text copied to clipboard', 'fas fa-check-circle', '#10b981');
+                alert('Copied to clipboard!');
             },
-            
-            // Load tenant data from session and storage
-            loadTenantData() {
-                const tenantId = sessionStorage.getItem('qless_tenant_id');
-                const tenantName = sessionStorage.getItem('qless_tenant_name');
-                const adminUser = sessionStorage.getItem('qless_user_name');
-                
-                if (!tenantId) {
-                    this.showAlert('Session Error', 'No tenant session found. Please log in again.', 'fas fa-exclamation-triangle', '#dc2626');
-                    setTimeout(() => { window.location.href = 'login.html'; }, 2000);
-                    return;
-                }
-                
-                this.tenantId = parseInt(tenantId);
-                this.tenantName = tenantName || 'Venue';
-                this.adminName = adminUser || 'Tenant Admin';
-                
-                this.loadStaff();
-                this.loadModules();
-            },
-            
-            loadStaff() {
-                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
-                this.staffList = allStaff.filter(s => s.tenantId === this.tenantId);
-            },
-            
-            saveStaffToStorage() {
-                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
-                const otherStaff = allStaff.filter(s => s.tenantId !== this.tenantId);
-                const updatedStaff = [...otherStaff, ...this.staffList];
-                localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify(updatedStaff));
-            },
-            
-            loadModules() {
-                const allModules = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANT_MODULES) || '{}');
-                this.tenantModules = allModules[this.tenantId] || [];
-                if (this.tenantModules.length === 0) {
-                    this.tenantModules = [
-                        { id: 1, name: 'Tickets', description: 'Event ticketing & reservations', icon: 'fas fa-ticket-alt', enabled: true },
-                        { id: 2, name: 'Queue Management', description: 'Smart virtual queuing', icon: 'fas fa-hourglass-half', enabled: true },
-                        { id: 3, name: 'Self-Serve Kiosk', description: 'Food & beverage ordering', icon: 'fas fa-clipboard-list', enabled: false },
-                        { id: 4, name: 'Virtual Booze Lockers', description: 'Secure bottle storage', icon: 'fas fa-lock', enabled: true },
-                        { id: 5, name: 'Shisha System', description: 'Hookah management', icon: 'fas fa-smoking', enabled: false },
-                        { id: 6, name: 'VVIP Management', description: 'Exclusive VIP accounts', icon: 'fas fa-crown', enabled: true }
-                    ];
-                }
-            },
-            
-            openCreateStaffModal() {
-                this.isEditing = false;
-                this.editingStaffId = null;
-                this.staffForm = { name: '', username: '', password: '', role: 'cashier' };
-                this.showStaffModal = true;
-            },
-            
-            editStaff(staff) {
-                this.isEditing = true;
-                this.editingStaffId = staff.id;
-                this.staffForm = {
-                    name: staff.name,
-                    username: staff.username,
-                    password: staff.password,
-                    role: staff.role
-                };
-                this.showStaffModal = true;
-            },
-            
-            saveStaff() {
-                if (!this.staffForm.name || !this.staffForm.username || !this.staffForm.password) {
-                    this.showAlert('Missing Fields', 'Please fill all required fields', 'fas fa-exclamation-triangle', '#dc2626');
-                    return;
-                }
-                
-                if (this.staffForm.password.length < 4) {
-                    this.showAlert('Invalid Password', 'Password must be at least 4 characters', 'fas fa-exclamation-triangle', '#dc2626');
-                    return;
-                }
-                
-                const existingStaff = this.staffList.find(s => s.username === this.staffForm.username && s.id !== this.editingStaffId);
-                if (existingStaff) {
-                    this.showAlert('Duplicate Username', 'A staff member with this username already exists', 'fas fa-exclamation-triangle', '#dc2626');
-                    return;
-                }
-                
-                if (this.isEditing && this.editingStaffId) {
-                    const index = this.staffList.findIndex(s => s.id === this.editingStaffId);
-                    if (index !== -1) {
-                        this.staffList[index] = {
-                            ...this.staffList[index],
-                            name: this.staffForm.name,
-                            username: this.staffForm.username,
-                            password: this.staffForm.password,
-                            role: this.staffForm.role
-                        };
-                        this.showAlert('Updated', `Staff member ${this.staffForm.name} has been updated`, 'fas fa-check-circle', '#10b981');
-                    }
+            loadData() {
+                const tenantsStr = localStorage.getItem(STORAGE_KEYS.TENANTS);
+                if (tenantsStr) {
+                    this.tenants = JSON.parse(tenantsStr);
                 } else {
-                    const newStaff = {
-                        id: Date.now(),
-                        tenantId: this.tenantId,
-                        name: this.staffForm.name,
-                        username: this.staffForm.username,
-                        password: this.staffForm.password,
-                        role: this.staffForm.role,
-                        status: 'Active',
-                        createdAt: new Date().toISOString()
-                    };
-                    this.staffList.push(newStaff);
-                    this.showAlert('Staff Created', `${newStaff.name} has been added.\n\nUsername: ${newStaff.username}\nPassword: ${newStaff.password}`, 'fas fa-check-circle', '#10b981');
+                    this.tenants = [
+                        { id: 1, businessName: 'Skyline Lounge', ownerName: 'Thabo Nkosi', phone: '0821112233', username: 'skyline_admin', password: 'skyline123', status: 'Active' },
+                        { id: 2, businessName: 'Cape Tavern', ownerName: 'Lerato Dlamini', phone: '0834455667', username: 'capetavern', password: 'tavern456', status: 'Active' },
+                        { id: 3, businessName: 'Gold Reef Venue', ownerName: 'Sipho Mbele', phone: '0719988776', username: 'goldreef', password: 'reef789', status: 'Suspended' }
+                    ];
+                    localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(this.tenants));
+                }
+
+                const modulesStr = localStorage.getItem(STORAGE_KEYS.TENANT_MODULES);
+                if (modulesStr) {
+                    this.tenantModules = JSON.parse(modulesStr);
                 }
                 
-                this.saveStaffToStorage();
-                this.closeStaffModal();
-            },
-            
-            closeStaffModal() {
-                this.showStaffModal = false;
-                this.isEditing = false;
-                this.editingStaffId = null;
-                this.staffForm = { name: '', username: '', password: '', role: 'cashier' };
-            },
-            
-            toggleStaffStatus(staffId) {
-                const staff = this.staffList.find(s => s.id === staffId);
-                if (staff) {
-                    const newStatus = staff.status === 'Active' ? 'Inactive' : 'Active';
-                    staff.status = newStatus;
-                    this.saveStaffToStorage();
-                    this.showAlert('Status Updated', `${staff.name} is now ${newStatus}`, 'fas fa-check-circle', '#10b981');
+                if (this.tenants.length > 0 && !this.selectedTenantId) {
+                    this.selectedTenantId = this.tenants[0].id;
                 }
             },
-            
-            openDeleteStaffModal(staffId) {
-                const staff = this.staffList.find(s => s.id === staffId);
-                if (staff) {
-                    this.deletingStaffId = staffId;
-                    this.deletingStaffName = staff.name;
-                    this.showDeleteModal = true;
+            saveTenants() {
+                localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(this.tenants));
+            },
+            saveModules() {
+                localStorage.setItem(STORAGE_KEYS.TENANT_MODULES, JSON.stringify(this.tenantModules));
+            },
+            openCreateTenantModal() {
+                this.newTenant = { businessName: '', ownerName: '', phone: '', username: '', password: '' };
+                this.showTenantModal = true;
+            },
+            createTenant() {
+                if (!this.newTenant.businessName || !this.newTenant.ownerName || !this.newTenant.username || !this.newTenant.password) {
+                    alert('Please fill all required fields');
+                    return;
+                }
+                const newId = this.tenants.length > 0 ? Math.max(...this.tenants.map(t => t.id)) + 1 : 1;
+                const newTenantObj = {
+                    id: newId,
+                    businessName: this.newTenant.businessName,
+                    ownerName: this.newTenant.ownerName,
+                    phone: this.newTenant.phone || 'N/A',
+                    username: this.newTenant.username,
+                    password: this.newTenant.password,
+                    status: 'Active'
+                };
+                this.tenants.push(newTenantObj);
+                this.tenantModules[newId] = MASTER_MODULES.map(m => ({ ...m, enabled: false }));
+                this.saveTenants();
+                this.saveModules();
+                this.showTenantModal = false;
+                alert(`Tenant "${this.newTenant.businessName}" created!\nUsername: ${this.newTenant.username}\nPassword: ${this.newTenant.password}`);
+            },
+            suspendTenant(id) {
+                const tenant = this.tenants.find(t => t.id === id);
+                if (tenant && confirm(`Suspend ${tenant.businessName}?`)) {
+                    tenant.status = 'Suspended';
+                    this.saveTenants();
+                    alert(`${tenant.businessName} suspended`);
                 }
             },
-            
-            confirmDeleteStaff() {
-                this.staffList = this.staffList.filter(s => s.id !== this.deletingStaffId);
-                this.saveStaffToStorage();
-                this.showDeleteModal = false;
-                this.showAlert('Deleted', 'Staff member has been removed successfully', 'fas fa-check-circle', '#10b981');
-                this.deletingStaffId = null;
-                this.deletingStaffName = '';
+            activateTenant(id) {
+                const tenant = this.tenants.find(t => t.id === id);
+                if (tenant) {
+                    tenant.status = 'Active';
+                    this.saveTenants();
+                    alert(`${tenant.businessName} activated`);
+                }
             },
-            
-            resetStaffPassword(staff) {
-                this.resettingStaff = staff;
+            viewTenant(tenant) {
+                this.viewingTenant = tenant;
+                this.showViewModal = true;
+            },
+            resetTenantPassword(tenant) {
+                this.resettingTenant = tenant;
                 this.newPassword = '';
                 this.showResetModal = true;
             },
-            
             confirmResetPassword() {
                 if (!this.newPassword || this.newPassword.length < 4) {
-                    this.showAlert('Invalid Password', 'Password must be at least 4 characters', 'fas fa-exclamation-triangle', '#dc2626');
+                    alert('Password must be at least 4 characters');
                     return;
                 }
-                
-                if (this.resettingStaff) {
-                    const staff = this.staffList.find(s => s.id === this.resettingStaff.id);
-                    if (staff) {
-                        staff.password = this.newPassword;
-                        this.saveStaffToStorage();
-                        this.showAlert('Password Reset', `New password for ${staff.name}: ${this.newPassword}`, 'fas fa-key', '#10b981');
-                    }
+                if (this.resettingTenant) {
+                    this.resettingTenant.password = this.newPassword;
+                    this.saveTenants();
+                    alert(`Password reset for ${this.resettingTenant.businessName}: ${this.newPassword}`);
+                    this.showResetModal = false;
+                    this.resettingTenant = null;
                 }
-                this.showResetModal = false;
-                this.resettingStaff = null;
-                this.newPassword = '';
             },
-            
-            openLogoutModal() {
-                this.showLogoutModal = true;
+            loadTenantModules() {
+                this.$forceUpdate();
             },
-            
-            confirmLogout() {
+            toggleModuleForTenant(module) {
+                const tenantId = this.selectedTenantId;
+                if (!tenantId) return;
+                const index = this.tenantModules[tenantId].findIndex(m => m.id === module.id);
+                if (index !== -1) {
+                    this.tenantModules[tenantId][index].enabled = module.enabled;
+                }
+                this.saveModules();
+                const tenant = this.tenants.find(t => t.id === tenantId);
+                alert(`${tenant?.businessName}: ${module.name} is now ${module.enabled ? 'ENABLED' : 'DISABLED'}`);
+            },
+            logout() {
                 sessionStorage.clear();
-                this.showLogoutModal = false;
                 window.location.href = 'login.html';
             }
         },
         mounted() {
-            this.loadTenantData();
-            
             const isLoggedIn = sessionStorage.getItem('qless_logged_in');
             const role = sessionStorage.getItem('qless_user_role');
-            if (!isLoggedIn || role !== 'tenant_administrator') {
+            const userName = sessionStorage.getItem('qless_user_name');
+            
+            if (!isLoggedIn || role !== 'super_administrator') {
                 window.location.href = 'login.html';
+                return;
             }
+            
+            this.adminName = userName || 'Super Admin';
+            this.loadData();
+            
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) this.sidebarOpen = false;
+            });
         }
     });
 </script>
