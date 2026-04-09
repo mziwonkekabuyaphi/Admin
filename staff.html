@@ -516,8 +516,8 @@
             sidebarOpen: false,
             currentSection: 'dashboard',
             tenantId: null,
-            tenantName: '',
-            staffName: '',
+            tenantName: 'Loading...',
+            staffName: 'Staff Member',
             staffRole: '',
             branding: { primaryColor: '#E30613', logoUrl: '' },
             tenantModules: [],
@@ -571,17 +571,34 @@
             staffInitial() { return this.staffName ? this.staffName.charAt(0).toUpperCase() : 'S'; },
             cartTotal() { return this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0); },
             dynamicMenu() {
-                const baseMenu = [
-                    { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt', enabled: true },
-                    { id: 'tickets', label: 'Ticket Scanner', icon: 'fas fa-qrcode', enabled: this.isModuleEnabled('tickets') },
-                    { id: 'queue', label: 'Queue', icon: 'fas fa-hourglass-half', enabled: this.isModuleEnabled('queue') },
-                    { id: 'orders', label: 'Orders', icon: 'fas fa-clipboard-list', enabled: this.isModuleEnabled('orders') },
-                    { id: 'pos', label: 'POS / Checkout', icon: 'fas fa-cash-register', enabled: this.isModuleEnabled('pos') },
-                    { id: 'shisha', label: 'Shisha', icon: 'fas fa-smoking', enabled: this.isModuleEnabled('shisha') },
-                    { id: 'vvip', label: 'VVIP', icon: 'fas fa-crown', enabled: this.isModuleEnabled('vvip') },
-                    { id: 'lockers', label: 'Lockers', icon: 'fas fa-lock', enabled: this.isModuleEnabled('lockers') }
+                const menu = [
+                    { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt', enabled: true }
                 ];
-                return baseMenu;
+                
+                // Add modules based on Super Admin settings (via tenantModules)
+                if (this.isModuleEnabled('tickets')) {
+                    menu.push({ id: 'tickets', label: 'Ticket Scanner', icon: 'fas fa-qrcode', enabled: true });
+                }
+                if (this.isModuleEnabled('queue')) {
+                    menu.push({ id: 'queue', label: 'Queue', icon: 'fas fa-hourglass-half', enabled: true });
+                }
+                if (this.isModuleEnabled('orders')) {
+                    menu.push({ id: 'orders', label: 'Orders', icon: 'fas fa-clipboard-list', enabled: true });
+                }
+                if (this.isModuleEnabled('pos')) {
+                    menu.push({ id: 'pos', label: 'POS / Checkout', icon: 'fas fa-cash-register', enabled: true });
+                }
+                if (this.isModuleEnabled('shisha')) {
+                    menu.push({ id: 'shisha', label: 'Shisha', icon: 'fas fa-smoking', enabled: true });
+                }
+                if (this.isModuleEnabled('vvip')) {
+                    menu.push({ id: 'vvip', label: 'VVIP', icon: 'fas fa-crown', enabled: true });
+                }
+                if (this.isModuleEnabled('lockers')) {
+                    menu.push({ id: 'lockers', label: 'Lockers', icon: 'fas fa-lock', enabled: true });
+                }
+                
+                return menu;
             },
             currentSectionTitle() {
                 const item = this.dynamicMenu.find(i => i.id === this.currentSection);
@@ -590,7 +607,9 @@
         },
         methods: {
             closeSidebar() { if(window.innerWidth <= 768) this.sidebarOpen = false; },
+            
             isModuleEnabled(moduleName) {
+                // Map frontend module names to backend module names from Super Admin
                 const moduleMap = {
                     'tickets': 'Tickets',
                     'queue': 'Queue Management',
@@ -604,11 +623,14 @@
                 const module = this.tenantModules.find(m => m.name === moduleKey);
                 return module ? module.enabled : false;
             },
+            
             loadStaffData() {
                 const tenantId = sessionStorage.getItem('qless_tenant_id');
                 const staffUsername = sessionStorage.getItem('qless_username');
                 const staffDisplayName = sessionStorage.getItem('qless_user_name');
                 const staffRole = sessionStorage.getItem('qless_staff_role');
+                
+                console.log('Loading staff data:', { tenantId, staffUsername, staffDisplayName, staffRole });
                 
                 if (!tenantId) { 
                     alert('Session expired. Please login again.'); 
@@ -620,18 +642,26 @@
                 this.staffName = staffDisplayName || 'Staff Member';
                 this.staffRole = staffRole || 'staff';
                 
-                // Load tenant name
+                // Load tenant name from tenants list
                 const tenants = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANTS) || '[]');
                 const tenant = tenants.find(t => t.id === this.tenantId);
                 this.tenantName = tenant ? tenant.businessName : 'Venue';
                 
+                console.log('Tenant found:', tenant);
+                console.log('Tenant name set to:', this.tenantName);
+                
                 this.loadModules();
                 this.loadBranding();
             },
+            
             loadModules() {
                 const allModules = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANT_MODULES) || '{}');
-                this.tenantModules = allModules[this.tenantId] || [];
-                if (this.tenantModules.length === 0) {
+                const modules = allModules[this.tenantId] || [];
+                
+                console.log('Loaded modules for tenant', this.tenantId, ':', modules);
+                
+                if (modules.length === 0) {
+                    // Default modules if none configured
                     this.tenantModules = [
                         { id: 1, name: 'Tickets', enabled: true },
                         { id: 2, name: 'Queue Management', enabled: true },
@@ -640,8 +670,13 @@
                         { id: 5, name: 'Shisha System', enabled: false },
                         { id: 6, name: 'VVIP Management', enabled: true }
                     ];
+                } else {
+                    this.tenantModules = modules;
                 }
+                
+                console.log('Final tenantModules:', this.tenantModules);
             },
+            
             loadBranding() {
                 const saved = localStorage.getItem(`qless_tenant_branding_${this.tenantId}`);
                 if (saved) {
@@ -649,6 +684,7 @@
                     this.branding = data.branding || { primaryColor: '#E30613', logoUrl: '' };
                 }
             },
+            
             // Ticket Scanner
             validateTicket() {
                 if (!this.scanCode) {
@@ -670,6 +706,7 @@
                 this.scanCode = '';
                 if (isValid) this.scannedToday++;
             },
+            
             // Queue Management
             callNext() {
                 if (this.queueList.length) {
@@ -681,15 +718,18 @@
                     alert('No customers in queue');
                 }
             },
+            
             callCustomer(id) {
                 const customer = this.queueList.find(c => c.id === id);
                 if (customer) alert(`Calling ${customer.name} to counter`);
             },
+            
             // Orders
             updateOrderStatus(orderId, newStatus) {
                 const order = this.orders.find(o => o.id === orderId);
                 if (order) order.status = newStatus;
             },
+            
             // POS
             addToCart(product) {
                 const existing = this.cart.find(item => item.id === product.id);
@@ -700,9 +740,11 @@
                 }
                 alert(`${product.name} added to cart`);
             },
+            
             removeFromCart(index) {
                 this.cart.splice(index, 1);
             },
+            
             checkout() {
                 if (this.cart.length === 0) {
                     alert('Cart is empty');
@@ -713,6 +755,7 @@
                 this.cart = [];
                 this.todaySales += total;
             },
+            
             // Shisha
             startShishaSession() {
                 const newId = Math.max(...this.shishaSessions.map(s => s.id), 0) + 1;
@@ -724,18 +767,22 @@
                 });
                 alert('New shisha session started');
             },
+            
             endShishaSession(id) {
                 this.shishaSessions = this.shishaSessions.filter(s => s.id !== id);
                 alert('Shisha session ended');
             },
+            
             // VVIP
             addToTab(tabId) {
                 alert(`Add item to VVIP tab ${tabId}`);
             },
+            
             // Lockers
             markUsed(id) {
                 alert(`Locker item ${id} marked as used`);
             },
+            
             logout() {
                 sessionStorage.clear();
                 window.location.href = 'login.html';
@@ -744,6 +791,8 @@
         mounted() {
             const isLoggedIn = sessionStorage.getItem('qless_logged_in');
             const role = sessionStorage.getItem('qless_user_role');
+            
+            console.log('Auth check:', { isLoggedIn, role });
             
             if (!isLoggedIn || role !== 'staff') { 
                 window.location.href = 'login.html'; 
