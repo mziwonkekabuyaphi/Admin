@@ -2,616 +2,656 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>QLess Staff | Operations Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Rands | Tenant Admin Dashboard</title>
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Vue.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #f1f5f9;
-            min-height: 100vh;
-            padding: 0;
-            margin: 0;
+            background: #f5f7fb;
+            overflow-x: hidden;
         }
 
-        /* Main container */
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: #f8fafc;
+        /* ========== SIDEBAR STYLES ========== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 270px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            border-right: 1px solid #edf2f7;
         }
 
-        /* Header */
-        .staff-header {
-            background: white;
-            padding: 16px 24px;
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid #eff3f8;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            flex-wrap: wrap;
             gap: 12px;
         }
-        .header-left h2 {
-            font-size: 1.3rem;
+
+        .tenant-logo {
+            width: 42px;
+            height: 42px;
+            background: #E30613;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .tenant-info h3 {
+            font-size: 1rem;
             font-weight: 700;
             color: #1e293b;
         }
-        .header-left p {
+
+        .tenant-info p {
             font-size: 0.7rem;
             color: #6c7a8e;
-            margin-top: 2px;
         }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            margin: 4px 12px;
+            border-radius: 12px;
+            color: #4a5568;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            width: 22px;
+            font-size: 1.1rem;
+        }
+
+        .nav-item:hover {
+            background: #fff0f0;
+            color: #E30613;
+        }
+
+        .nav-item.active {
+            background: #E30613;
+            color: white;
+            box-shadow: 0 4px 10px rgba(227, 6, 19, 0.2);
+        }
+
+        .nav-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 270px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: white;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #edf2f7;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .header-left h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
         .header-right {
             display: flex;
             align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            gap: 24px;
         }
-        .staff-badge {
-            background: #f1f5f9;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+
+        .badge-dot {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            width: 10px;
+            height: 10px;
+            background: #E30613;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .profile-dropdown {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 40px;
+            background: #f8fafd;
         }
-        .staff-badge i {
-            color: #E30613;
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #E30613, #b0020e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
         }
-        .logout-btn {
-            background: none;
-            border: 1px solid #e2e8f0;
-            padding: 8px 20px;
+
+        .dashboard-container {
+            padding: 28px 32px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #edf2f7;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -12px rgba(0,0,0,0.1); }
+        .stat-icon { width: 48px; height: 48px; background: #fff0f0; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #E30613; font-size: 1.4rem; margin-bottom: 16px; }
+        .stat-title { font-size: 0.75rem; font-weight: 500; color: #6c7a8e; text-transform: uppercase; }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: #1e293b; margin-top: 6px; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 32px 0 20px 0;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: #E30613;
+            color: white;
+            border: none;
+            padding: 10px 20px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .logout-btn:hover {
-            background: #fee2e2;
-            border-color: #E30613;
-        }
-
-        /* Module Tabs (Large Touch Buttons) */
-        .module-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: 20px 24px;
-            background: white;
-            border-bottom: 1px solid #eef2f8;
-        }
-        .module-btn {
-            flex: 1;
-            min-width: 100px;
-            background: #f8fafd;
+        .btn-outline {
+            background: transparent;
             border: 1px solid #e2e8f0;
-            padding: 14px 8px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #334155;
-        }
-        .module-btn i {
-            font-size: 1.2rem;
-        }
-        .module-btn.active {
-            background: #E30613;
-            color: white;
-            border-color: #E30613;
-            box-shadow: 0 6px 14px rgba(227,6,19,0.25);
-        }
-        .module-btn:active {
-            transform: scale(0.96);
-        }
-
-        /* Main Content Area */
-        .module-content {
-            padding: 24px;
-        }
-
-        /* ========== QUEUE MODULE ========== */
-        .queue-hero {
-            background: linear-gradient(135deg, #E30613, #b0020e);
-            border-radius: 48px;
-            padding: 32px;
-            text-align: center;
-            margin-bottom: 32px;
-            color: white;
-        }
-        .current-number {
-            font-size: 5rem;
-            font-weight: 800;
-            letter-spacing: 4px;
-            margin: 12px 0;
-        }
-        .queue-number-label {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        .queue-action-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: center;
-            margin-top: 24px;
-        }
-        .big-action-btn {
-            flex: 1;
-            min-width: 140px;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.4);
-            padding: 18px 12px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 1rem;
-            color: white;
-            cursor: pointer;
-            transition: 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        .big-action-btn:active {
-            transform: scale(0.96);
-            background: rgba(255,255,255,0.3);
-        }
-        .queue-list-card {
-            background: white;
-            border-radius: 32px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        }
-        .queue-list-title {
-            font-weight: 700;
-            margin-bottom: 16px;
-            font-size: 1.1rem;
-        }
-        .queue-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid #f0f4fa;
-        }
-        .queue-item:last-child {
-            border-bottom: none;
-        }
-        .queue-position {
-            font-weight: 800;
-            font-size: 1.1rem;
-            background: #f1f5f9;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 30px;
-        }
-        .queue-name {
-            flex: 1;
-            margin-left: 16px;
-            font-weight: 500;
-        }
-        .small-action {
-            background: none;
-            border: none;
             padding: 8px 16px;
             border-radius: 40px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
         }
-        .small-serve {
-            background: #10b981;
+        .btn-danger {
+            background: #dc2626;
             color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            cursor: pointer;
         }
-
-        /* Scanner Module */
-        .scanner-area {
-            background: #1e293b;
-            border-radius: 48px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 24px;
-            color: white;
-        }
-        .camera-placeholder {
-            background: #0f172a;
-            border-radius: 32px;
-            padding: 60px 20px;
-            margin: 16px 0;
-            border: 2px dashed #475569;
-        }
-        .scan-result {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 60px;
-            font-weight: 700;
-        }
-        .scan-valid {
-            background: #10b981;
-        }
-        .scan-invalid {
-            background: #E30613;
-        }
-
-        /* Orders, Shisha, VVIP shared styles */
-        .order-card, .session-card, .tab-card {
+        .table-wrapper {
+            overflow-x: auto;
             background: white;
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border-radius: 24px;
             border: 1px solid #edf2f7;
         }
-        .order-status {
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
         }
-        .status-pending { background: #fff3e0; color: #f59e0b; }
-        .status-preparing { background: #e0f2fe; color: #0ea5e9; }
-        .status-ready { background: #d1fae5; color: #10b981; }
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .action-touch {
-            padding: 12px 24px;
-            border-radius: 60px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
+        .data-table th, .data-table td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
             font-size: 0.85rem;
-            transition: 0.1s;
         }
-        .action-touch:active { transform: scale(0.96); }
-        .btn-prepare { background: #0ea5e9; color: white; }
-        .btn-ready { background: #10b981; color: white; }
-        .btn-complete { background: #E30613; color: white; }
-        .btn-start { background: #E30613; color: white; }
-        .btn-end { background: #64748b; color: white; }
-        .btn-add { background: #f59e0b; color: white; }
-        .btn-close { background: #E30613; color: white; }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-active { background: #e6f7e6; color: #10b981; }
+        .status-warning { background: #fff3e0; color: #f59e0b; }
+        .status-success { background: #e0f2fe; color: #0ea5e9; }
+        
+        .queue-list { background: white; border-radius: 24px; border: 1px solid #edf2f7; overflow: hidden; }
+        .queue-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f1f5f9; }
+        .queue-actions button { margin-left: 8px; padding: 6px 14px; border-radius: 30px; border: none; cursor: pointer; font-weight: 500; }
+        .btn-call { background: #E30613; color: white; }
+        .btn-skip { background: #f1f5f9; color: #4a5568; }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .module-btn { min-width: 70px; font-size: 0.75rem; padding: 12px 6px; }
-            .current-number { font-size: 3rem; }
-            .big-action-btn { padding: 14px 8px; font-size: 0.85rem; }
-            .module-content { padding: 16px; }
-            .order-card, .session-card, .tab-card { flex-direction: column; align-items: stretch; text-align: center; }
-            .btn-group { justify-content: center; }
+        .item-card { background: white; border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid #edf2f7; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .badge { font-size: 0.7rem; padding: 4px 12px; border-radius: 30px; background: #f1f5f9; }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
         }
-        @media (min-width: 1024px) {
-            .big-action-btn { font-size: 1.2rem; padding: 20px 16px; }
+        .modal-mask {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;
+            visibility: hidden; opacity: 0; transition: 0.2s;
+        }
+        .modal-mask.active { visibility: visible; opacity: 1; }
+        .modal-container { background: white; width: 90%; max-width: 500px; border-radius: 32px; padding: 28px; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .dashboard-container { padding: 20px; }
+            .menu-toggle { display: block; margin-right: 16px; font-size: 1.3rem; cursor: pointer; }
+        }
+        @media (min-width: 769px) { .menu-toggle { display: none; } }
+
+        .credential-cell {
+            font-family: monospace;
+            font-size: 0.7rem;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+        .copy-icon {
+            margin-left: 6px;
+            cursor: pointer;
+            color: #64748b;
         }
     </style>
 </head>
 <body>
-<div id="staffApp">
-    <div class="app-container">
-        <!-- Header -->
-        <div class="staff-header">
-            <div class="header-left">
-                <h2>QLess Staff Operations</h2>
-                <p>{{ tenantName }} • Fast task management</p>
+<div id="app">
+    <aside class="sidebar" :class="{ open: sidebarOpen }">
+        <div class="sidebar-header">
+            <div class="tenant-logo" :style="{ backgroundColor: branding.primaryColor }">{{ tenantInitial }}</div>
+            <div class="tenant-info">
+                <h3>{{ tenantName }}</h3>
+                <p>Venue Dashboard</p>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <div v-for="item in dynamicMenu" :key="item.id" class="nav-item" :class="{ active: currentSection === item.id, disabled: !item.enabled }" @click="item.enabled && (currentSection = item.id, closeSidebar())">
+                <i :class="item.icon"></i>
+                <span>{{ item.label }}</span>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="menu-toggle" @click="sidebarOpen = !sidebarOpen"><i class="fas fa-bars"></i></div>
+                <div class="header-left"><h3>{{ currentSectionTitle }}</h3></div>
             </div>
             <div class="header-right">
-                <div class="staff-badge"><i class="fas fa-user-circle"></i> {{ staffName }} ({{ staffRole }})</div>
-                <button class="logout-btn" @click="logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <div class="notification-icon"><i class="far fa-bell"></i><span class="badge-dot"></span></div>
+                <div class="profile-dropdown" @click="logout"><div class="avatar">TA</div><span style="font-size:0.85rem;">{{ adminName }}</span><i class="fas fa-sign-out-alt"></i></div>
             </div>
         </div>
 
-        <!-- Module Tabs (Dynamically controlled by enabled modules) -->
-        <div class="module-tabs">
-            <button v-for="mod in enabledModules" :key="mod.id" class="module-btn" :class="{ active: currentModule === mod.id }" @click="switchModule(mod.id)">
-                <i :class="mod.icon"></i> {{ mod.label }}
-            </button>
-        </div>
+        <div class="dashboard-container">
+            <!-- DASHBOARD -->
+            <div v-if="currentSection === 'dashboard'">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-title">Today's Sales</div><div class="stat-number">R {{ todaySales }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-title">Active Queue</div><div class="stat-number">{{ activeQueueCount }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-shopping-cart"></i></div><div class="stat-title">Active Orders</div><div class="stat-number">{{ activeOrdersCount }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-smoking"></i></div><div class="stat-title">Shisha Sessions</div><div class="stat-number">{{ activeShishaSessions }}</div></div>
+                </div>
+                <div class="section-header"><h2>Sales Overview</h2></div>
+                <div style="background: white; border-radius: 28px; padding: 20px; margin-bottom: 24px;"><canvas id="salesChart" width="400" height="200" style="max-height: 200px; width:100%"></canvas></div>
+            </div>
 
-        <!-- ========== QUEUE MODULE ========== -->
-        <div v-if="currentModule === 'queue'" class="module-content">
-            <div class="queue-hero">
-                <div class="queue-number-label">CURRENT SERVING</div>
-                <div class="current-number">{{ currentServingNumber || '—' }}</div>
-                <div class="queue-action-group">
-                    <button class="big-action-btn" @click="callNext"><i class="fas fa-arrow-right"></i> Call Next</button>
-                    <button class="big-action-btn" @click="skipCurrent"><i class="fas fa-step-forward"></i> Skip</button>
-                    <button class="big-action-btn" @click="markServed"><i class="fas fa-check-circle"></i> Mark Served</button>
-                </div>
+            <!-- EVENTS MODULE -->
+            <div v-if="currentSection === 'events' && isModuleEnabled('events')">
+                <div class="section-header"><h2>Events</h2><button class="btn-primary" @click="openCreateEvent"><i class="fas fa-plus"></i> Create Event</button></div>
+                <div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Date</th><th>Status</th><th>Tickets Sold</th><th>Actions</th></tr></thead><tbody><tr v-for="event in events" :key="event.id"><td>{{ event.name }}</td><td>{{ event.date }}</td><td><span class="status-badge" :class="event.status === 'Live' ? 'status-active' : 'status-warning'">{{ event.status }}</span></td><td>{{ event.sold }}/{{ event.capacity }}</td><td><i class="fas fa-eye" style="margin-right:8px; cursor:pointer;"></i><i class="fas fa-edit" style="cursor:pointer;"></i></td></tr></tbody></table></div>
             </div>
-            <div class="queue-list-card">
-                <div class="queue-list-title"><i class="fas fa-users"></i> Next in Line</div>
-                <div v-for="(customer, idx) in queueList" :key="customer.id" class="queue-item">
-                    <div class="queue-position">{{ customer.position }}</div>
-                    <div class="queue-name">{{ customer.name }}</div>
-                    <button class="small-action small-serve" @click="serveCustomer(customer.id)"><i class="fas fa-check"></i> Serve</button>
-                </div>
-                <div v-if="queueList.length === 0" style="text-align:center; padding:20px; color:#94a3b8;">Queue is empty</div>
-            </div>
-        </div>
 
-        <!-- ========== SCANNER MODULE ========== -->
-        <div v-if="currentModule === 'scanner'" class="module-content">
-            <div class="scanner-area">
-                <i class="fas fa-camera" style="font-size: 2.5rem; opacity:0.8;"></i>
-                <div class="camera-placeholder">
-                    <i class="fas fa-qrcode" style="font-size: 3rem; color:#94a3b8;"></i>
-                    <p style="margin-top:12px;">Camera preview area<br>Tap to scan ticket</p>
-                    <button class="big-action-btn" style="margin-top:16px; background:#E30613;" @click="simulateScan">Simulate Scan</button>
-                </div>
-                <div v-if="lastScanResult" class="scan-result" :class="lastScanValid ? 'scan-valid' : 'scan-invalid'">
-                    <i :class="lastScanValid ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i> {{ lastScanMessage }}
+            <!-- STAFF MANAGEMENT (CREATES LOGIN CREDENTIALS) -->
+            <div v-if="currentSection === 'staff'">
+                <div class="section-header"><h2>Staff Management</h2><button class="btn-primary" @click="openAddStaffModal"><i class="fas fa-user-plus"></i> Add Staff</button></div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            <tr v-for="staff in staffList" :key="staff.id">
+                                <td><strong>{{ staff.name }}</strong></td>
+                                <td><span class="badge">{{ staff.role }}</span></td>
+                                <td><span class="credential-cell">{{ staff.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.username)"></i></span></td>
+                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.password)"></i></span></td>
+                                <td><span class="status-badge" :class="staff.status === 'Active' ? 'status-active' : 'status-warning'">{{ staff.status }}</span></td>
+                                <td><i class="fas fa-edit" @click="editStaff(staff)" style="cursor:pointer; margin-right:8px;"></i><i class="fas fa-key" @click="resetStaffPassword(staff)" style="cursor:pointer; margin-right:8px; color:#f59e0b;"></i><i class="fas fa-toggle-on" v-if="staff.status === 'Active'" @click="toggleStaffStatus(staff.id, 'Inactive')" style="cursor:pointer;"></i><i class="fas fa-toggle-off" v-else @click="toggleStaffStatus(staff.id, 'Active')" style="cursor:pointer;"></i></td>
+                            </tr>
+                            <tr v-if="staffList.length === 0"><td colspan="6" style="text-align:center;">No staff members. Click "Add Staff" to create.</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="queue-list-card">
-                <div class="queue-list-title"><i class="fas fa-history"></i> Recent Scans</div>
-                <div v-for="scan in recentScans" :key="scan.id" class="queue-item">
-                    <div><strong>{{ scan.ticketId }}</strong></div>
-                    <div><span class="status-badge" :class="scan.valid ? 'status-active' : 'status-warning'">{{ scan.valid ? 'Valid' : 'Invalid' }}</span> {{ scan.time }}</div>
-                </div>
-            </div>
-        </div>
 
-        <!-- ========== ORDERS MODULE ========== -->
-        <div v-if="currentModule === 'orders'" class="module-content">
-            <div v-for="order in orders" :key="order.id" class="order-card">
-                <div style="min-width: 100px;"><strong>#{{ order.id }}</strong><div class="order-status" :class="getOrderStatusClass(order.status)">{{ order.status }}</div></div>
-                <div style="flex:1;"><span style="font-size:0.85rem;">{{ order.items }}</span></div>
-                <div class="btn-group">
-                    <button v-if="order.status === 'pending'" class="action-touch btn-prepare" @click="updateOrderStatus(order.id, 'preparing')"><i class="fas fa-utensils"></i> Preparing</button>
-                    <button v-if="order.status === 'preparing'" class="action-touch btn-ready" @click="updateOrderStatus(order.id, 'ready')"><i class="fas fa-check-circle"></i> Ready</button>
-                    <button v-if="order.status === 'ready'" class="action-touch btn-complete" @click="updateOrderStatus(order.id, 'completed')"><i class="fas fa-flag-checkered"></i> Complete</button>
-                </div>
-            </div>
+            <!-- Other Modules (Placeholders) -->
+            <div v-if="currentSection === 'tickets' && isModuleEnabled('tickets')"><div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-ticket-alt"></i></div><div class="stat-title">Total Tickets Sold</div><div class="stat-number">1,284</div></div></div><button class="btn-primary" @click="openScannerModal"><i class="fas fa-camera"></i> Open Scanner</button></div>
+            <div v-if="currentSection === 'queue' && isModuleEnabled('queue')"><div class="section-header"><h2>Live Queue</h2><div><button class="btn-outline" @click="callNext">Call Next</button></div></div><div class="queue-list"><div v-for="(customer, idx) in queueList" :key="customer.id" class="queue-item"><div><strong>#{{ customer.position }}</strong> - {{ customer.name }}</div><div><button class="btn-call" @click="callCustomer(customer.id)">Call</button></div></div></div></div>
+            <div v-if="currentSection === 'orders' && isModuleEnabled('orders')"><div class="section-header"><h2>Active Orders</h2></div><div v-for="order in orders" :key="order.id" class="item-card"><div><strong>Order #{{ order.id }}</strong><div class="badge">{{ order.items }}</div></div><div><span class="status-badge" :class="order.status === 'pending' ? 'status-warning' : 'status-active'">{{ order.status }}</span></div></div></div>
+            <div v-if="currentSection === 'shisha' && isModuleEnabled('shisha')"><div class="section-header"><h2>Shisha Sessions</h2><button class="btn-primary" @click="startShishaSession"><i class="fas fa-plus"></i> Start Session</button></div><div v-for="session in shishaSessions" :key="session.id" class="item-card"><div><strong>Table {{ session.table }}</strong> - {{ session.customer }}</div><button class="btn-outline" @click="endShishaSession(session.id)">End Session</button></div></div>
+            <div v-if="currentSection === 'vvip' && isModuleEnabled('vvip')"><div class="section-header"><h2>VVIP Tabs</h2><button class="btn-primary" @click="addVvipItem"><i class="fas fa-plus"></i> Add Item</button></div><div v-for="tab in vvipTabs" :key="tab.id" class="item-card"><div><strong>{{ tab.customer }}</strong><div>Balance: R{{ tab.balance }}</div></div><button class="btn-outline" @click="closeTab(tab.id)">Close Tab</button></div></div>
+            <div v-if="currentSection === 'lockers' && isModuleEnabled('lockers')"><div class="section-header"><h2>Lockers</h2><button class="btn-primary" @click="addLockerItem"><i class="fas fa-plus"></i> Add Item</button></div><div v-for="locker in lockers" :key="locker.id" class="item-card"><div><strong>{{ locker.itemName }}</strong> - Qty: {{ locker.qty }}</div><button class="btn-outline" @click="markUsed(locker.id)">Mark Used</button></div></div>
+            <div v-if="currentSection === 'settings'"><div class="section-header"><h2>Branding & Settings</h2></div><div class="settings-panel" style="background:white; border-radius:28px; padding:24px;"><div class="form-group"><label>Tenant Name</label><input class="form-control" v-model="tenantName" @blur="saveTenantName"></div><div class="form-group"><label>Primary Color</label><input type="color" v-model="branding.primaryColor" class="form-control" style="width:80px;" @change="saveBranding"></div><button class="btn-primary" @click="saveBranding">Save Changes</button></div></div>
         </div>
+    </div>
 
-        <!-- ========== SHISHA MODULE ========== -->
-        <div v-if="currentModule === 'shisha'" class="module-content">
-            <div style="margin-bottom: 20px;"><button class="big-action-btn" style="background:#E30613; color:white; width:100%;" @click="startShishaSession"><i class="fas fa-plus-circle"></i> Start New Session</button></div>
-            <div v-for="session in shishaSessions" :key="session.id" class="session-card">
-                <div><strong>Table {{ session.table }}</strong><div>Customer: {{ session.customer }}</div><div>Started: {{ session.timeStart }}</div></div>
-                <button class="action-touch btn-end" @click="endShishaSession(session.id)"><i class="fas fa-stop-circle"></i> End Session</button>
+    <!-- Add Staff Modal -->
+    <div class="modal-mask" :class="{ active: showStaffModal }">
+        <div class="modal-container">
+            <h3 style="margin-bottom: 20px;"><i class="fas fa-user-plus"></i> {{ isEditingStaff ? 'Edit Staff' : 'Add Staff' }}</h3>
+            <div class="form-group"><label>Full Name</label><input class="form-control" v-model="staffForm.name" placeholder="Full name"></div>
+            <div class="form-group"><label>Username (Login)</label><input class="form-control" v-model="staffForm.username" placeholder="Username"></div>
+            <div class="form-group"><label>Password</label><input type="password" class="form-control" v-model="staffForm.password" placeholder="Password"></div>
+            <div class="form-group"><label>Role</label><select class="form-control" v-model="staffForm.role"><option value="cashier">Cashier</option><option value="manager">Manager</option><option value="bartender">Bartender</option><option value="security">Security</option></select></div>
+            <div class="modal-buttons" style="display:flex; gap:12px; margin-top:20px;">
+                <button class="btn-outline" @click="showStaffModal = false">Cancel</button>
+                <button class="btn-primary" @click="saveStaff">{{ isEditingStaff ? 'Update' : 'Create' }}</button>
             </div>
-            <div v-if="shishaSessions.length === 0" style="text-align:center; padding:40px; background:white; border-radius:32px;">No active shisha sessions</div>
         </div>
+    </div>
 
-        <!-- ========== VVIP TABS MODULE ========== -->
-        <div v-if="currentModule === 'vvip'" class="module-content">
-            <div style="margin-bottom: 20px;"><button class="big-action-btn" style="background:#E30613; color:white; width:100%;" @click="addVvipItem"><i class="fas fa-plus"></i> Add Item to Tab</button></div>
-            <div v-for="tab in vvipTabs" :key="tab.id" class="tab-card">
-                <div><strong>{{ tab.customer }}</strong><div>Balance: R{{ tab.balance }} | Limit: R{{ tab.limit }}</div></div>
-                <div class="btn-group">
-                    <button class="action-touch btn-add" @click="addToTab(tab.id)"><i class="fas fa-cart-plus"></i> Add Item</button>
-                    <button class="action-touch btn-close" @click="closeVvipTab(tab.id)"><i class="fas fa-times-circle"></i> Close Tab</button>
-                </div>
+    <!-- Reset Password Modal -->
+    <div class="modal-mask" :class="{ active: showResetModal }">
+        <div class="modal-container">
+            <h3><i class="fas fa-key"></i> Reset Password</h3>
+            <p>New password for <strong>{{ resettingStaff?.name }}</strong></p>
+            <input type="password" class="form-control" v-model="newPassword" placeholder="New password" style="margin:16px 0;">
+            <div style="display:flex; gap:12px;">
+                <button class="btn-outline" @click="showResetModal = false">Cancel</button>
+                <button class="btn-primary" @click="confirmResetPassword">Reset</button>
             </div>
         </div>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div class="modal-mask" :class="{ active: scannerModal }">
+        <div class="modal-container"><h3>Ticket Scanner</h3><input v-model="scanCode" placeholder="Ticket ID" class="form-control" style="margin:16px 0;"><button class="btn-primary" @click="simulateScan">Validate</button><button class="btn-outline" style="margin-left:8px;" @click="scannerModal=false">Close</button></div>
     </div>
 </div>
 
 <script>
+    const STORAGE_KEYS = {
+        TENANTS: 'qless_tenants',
+        STAFF: 'qless_staff',
+        TENANT_MODULES: 'qless_tenant_modules'
+    };
+
     new Vue({
-        el: '#staffApp',
+        el: '#app',
         data: {
-            tenantName: 'Club A · VIP Lounge',
-            staffName: 'James M.',
-            staffRole: 'Queue Manager',
-            currentModule: 'queue',   // default
-            // Dynamic modules (simulate enabled by super admin)
-            enabledModules: [
-                { id: 'queue', label: 'Queue', icon: 'fas fa-hourglass-half' },
-                { id: 'scanner', label: 'Scanner', icon: 'fas fa-qrcode' },
-                { id: 'orders', label: 'Orders', icon: 'fas fa-clipboard-list' },
-                { id: 'shisha', label: 'Shisha', icon: 'fas fa-smoking' },
-                { id: 'vvip', label: 'VVIP Tabs', icon: 'fas fa-crown' }
-            ],
-            // Queue Data
-            currentServingNumber: 'A24',
-            queueList: [
-                { id: 1, name: 'Thabo Nkosi', position: 1, status: 'waiting' },
-                { id: 2, name: 'Lerato Dube', position: 2, status: 'waiting' },
-                { id: 3, name: 'Sipho Mokoena', position: 3, status: 'waiting' },
-                { id: 4, name: 'Zanele Mbatha', position: 4, status: 'waiting' }
-            ],
-            // Scanner Data
-            lastScanResult: false,
-            lastScanValid: false,
-            lastScanMessage: '',
-            recentScans: [
-                { id: 1, ticketId: 'TKT-001234', valid: true, time: '10:32 AM' },
-                { id: 2, ticketId: 'TKT-001235', valid: false, time: '10:15 AM' },
-                { id: 3, ticketId: 'TKT-001236', valid: true, time: '09:58 AM' }
-            ],
-            // Orders Data
-            orders: [
-                { id: 'ORD-101', items: '2x Burger, 1x Fries, 2x Soda', status: 'pending' },
-                { id: 'ORD-102', items: 'Pizza Margherita, Beer', status: 'preparing' },
-                { id: 'ORD-103', items: 'Wings Platter, Cocktail', status: 'ready' },
-                { id: 'ORD-104', items: 'Steak & Chips, Wine', status: 'pending' }
-            ],
-            // Shisha Sessions
-            shishaSessions: [
-                { id: 1, table: '5', customer: 'VIP Group', timeStart: '09:30' },
-                { id: 2, table: '8', customer: 'Lounge B', timeStart: '10:15' }
-            ],
-            // VVIP Tabs
-            vvipTabs: [
-                { id: 1, customer: 'Mr. Khumalo', balance: 1250, limit: 5000 },
-                { id: 2, customer: 'Ms. Ndlovu', balance: 350, limit: 2000 },
-                { id: 3, customer: 'The Royce Family', balance: 3400, limit: 10000 }
-            ]
+            sidebarOpen: false,
+            currentSection: 'dashboard',
+            tenantId: null,
+            tenantName: '',
+            adminName: 'Tenant Admin',
+            branding: { primaryColor: '#E30613', logoUrl: '' },
+            tenantModules: [],
+            staffList: [],
+            // Dashboard data
+            todaySales: 12450,
+            activeQueueCount: 8,
+            activeOrdersCount: 5,
+            activeShishaSessions: 3,
+            events: [{ id:1, name:'Beach Party', date:'2025-06-15', status:'Live', sold:245, capacity:500 }],
+            queueList: [{ id:1, name:'John Doe', position:1, status:'waiting'},{ id:2, name:'Alice Smith', position:2, status:'waiting'}],
+            orders: [{ id:101, items:'2x Burger', status:'pending'},{ id:102, items:'Pizza', status:'preparing'}],
+            shishaSessions: [{ id:1, table:'5', customer:'VIP Group', timeStart:'09:30'}],
+            vvipTabs: [{ id:1, customer:'Mr. Khumalo', balance:1250, limit:5000}],
+            lockers: [{ id:1, itemName:'Johnnie Walker', qty:2, status:'Available'}],
+            scannerModal: false,
+            scanCode: '',
+            showStaffModal: false,
+            showResetModal: false,
+            isEditingStaff: false,
+            editingStaffId: null,
+            staffForm: { name: '', username: '', password: '', role: 'cashier' },
+            resettingStaff: null,
+            newPassword: '',
+            chartInstance: null
+        },
+        computed: {
+            tenantInitial() { return this.tenantName ? this.tenantName.charAt(0).toUpperCase() : 'R'; },
+            dynamicMenu() {
+                const baseMenu = [
+                    { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt', enabled: true },
+                    { id: 'events', label: 'Events', icon: 'fas fa-calendar-alt', enabled: this.isModuleEnabled('events') },
+                    { id: 'tickets', label: 'Tickets', icon: 'fas fa-qrcode', enabled: this.isModuleEnabled('tickets') },
+                    { id: 'queue', label: 'Queue', icon: 'fas fa-hourglass-half', enabled: this.isModuleEnabled('queue') },
+                    { id: 'orders', label: 'Orders', icon: 'fas fa-clipboard-list', enabled: this.isModuleEnabled('orders') },
+                    { id: 'shisha', label: 'Shisha', icon: 'fas fa-smoking', enabled: this.isModuleEnabled('shisha') },
+                    { id: 'vvip', label: 'VVIP', icon: 'fas fa-crown', enabled: this.isModuleEnabled('vvip') },
+                    { id: 'lockers', label: 'Lockers', icon: 'fas fa-lock', enabled: this.isModuleEnabled('lockers') },
+                    { id: 'staff', label: 'Staff', icon: 'fas fa-users', enabled: true },
+                    { id: 'settings', label: 'Settings', icon: 'fas fa-cog', enabled: true }
+                ];
+                return baseMenu;
+            },
+            currentSectionTitle() {
+                const item = this.dynamicMenu.find(i => i.id === this.currentSection);
+                return item ? item.label : 'Dashboard';
+            }
         },
         methods: {
-            switchModule(moduleId) {
-                this.currentModule = moduleId;
-                // Simulate haptic feedback for touch
-                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(10);
+            closeSidebar() { if(window.innerWidth <= 768) this.sidebarOpen = false; },
+            isModuleEnabled(moduleName) {
+                const module = this.tenantModules.find(m => m.name.toLowerCase().includes(moduleName.toLowerCase()) || 
+                    (moduleName === 'events' && m.name === 'Tickets') ||
+                    (moduleName === 'queue' && m.name === 'Queue Management') ||
+                    (moduleName === 'orders' && m.name === 'Self-Serve Kiosk') ||
+                    (moduleName === 'shisha' && m.name === 'Shisha System') ||
+                    (moduleName === 'vvip' && m.name === 'VVIP Management') ||
+                    (moduleName === 'lockers' && m.name === 'Virtual Booze Lockers'));
+                return module ? module.enabled : false;
             },
-            // QUEUE ACTIONS
-            callNext() {
-                if (this.queueList.length > 0) {
-                    const next = this.queueList[0];
-                    this.currentServingNumber = `A${next.position}`;
-                    this.showToast(`📢 Calling customer: ${next.name}`);
-                    // Auto-remove? we'll keep for demo, but mark served later
+            copyToClipboard(text) {
+                navigator.clipboard.writeText(text);
+                alert('Copied to clipboard!');
+            },
+            loadTenantData() {
+                const tenantId = sessionStorage.getItem('qless_tenant_id');
+                const tenantName = sessionStorage.getItem('qless_tenant_name');
+                const adminUser = sessionStorage.getItem('qless_user_name');
+                if (!tenantId) { alert('Session expired. Please login again.'); window.location.href = 'login.html'; return; }
+                this.tenantId = parseInt(tenantId);
+                this.tenantName = tenantName || 'Venue';
+                this.adminName = adminUser || 'Tenant Admin';
+                this.loadStaff();
+                this.loadModules();
+                this.loadBranding();
+            },
+            loadStaff() {
+                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
+                this.staffList = allStaff.filter(s => s.tenantId === this.tenantId);
+            },
+            saveStaffToStorage() {
+                const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]');
+                const otherStaff = allStaff.filter(s => s.tenantId !== this.tenantId);
+                localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify([...otherStaff, ...this.staffList]));
+            },
+            loadModules() {
+                const allModules = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANT_MODULES) || '{}');
+                this.tenantModules = allModules[this.tenantId] || [];
+                if (this.tenantModules.length === 0) {
+                    this.tenantModules = [
+                        { id: 1, name: 'Tickets', enabled: true }, { id: 2, name: 'Queue Management', enabled: true },
+                        { id: 3, name: 'Self-Serve Kiosk', enabled: false }, { id: 4, name: 'Virtual Booze Lockers', enabled: true },
+                        { id: 5, name: 'Shisha System', enabled: false }, { id: 6, name: 'VVIP Management', enabled: true }
+                    ];
+                }
+            },
+            loadBranding() {
+                const saved = localStorage.getItem(`qless_tenant_branding_${this.tenantId}`);
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.tenantName = data.tenantName || this.tenantName;
+                    this.branding = data.branding || { primaryColor: '#E30613', logoUrl: '' };
+                }
+            },
+            saveBranding() {
+                const data = { tenantName: this.tenantName, branding: this.branding };
+                localStorage.setItem(`qless_tenant_branding_${this.tenantId}`, JSON.stringify(data));
+                // Also update tenant in tenants list
+                const tenants = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANTS) || '[]');
+                const tenant = tenants.find(t => t.id === this.tenantId);
+                if (tenant) tenant.businessName = this.tenantName;
+                localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(tenants));
+                alert('Branding saved!');
+            },
+            saveTenantName() { this.saveBranding(); },
+            openAddStaffModal() {
+                this.isEditingStaff = false;
+                this.editingStaffId = null;
+                this.staffForm = { name: '', username: '', password: '', role: 'cashier' };
+                this.showStaffModal = true;
+            },
+            editStaff(staff) {
+                this.isEditingStaff = true;
+                this.editingStaffId = staff.id;
+                this.staffForm = { name: staff.name, username: staff.username, password: staff.password, role: staff.role };
+                this.showStaffModal = true;
+            },
+            saveStaff() {
+                if (!this.staffForm.name || !this.staffForm.username || !this.staffForm.password) {
+                    alert('Please fill all fields');
+                    return;
+                }
+                const existing = this.staffList.find(s => s.username === this.staffForm.username && s.id !== this.editingStaffId);
+                if (existing) { alert('Username already exists'); return; }
+                if (this.isEditingStaff && this.editingStaffId) {
+                    const index = this.staffList.findIndex(s => s.id === this.editingStaffId);
+                    if (index !== -1) {
+                        this.staffList[index] = { ...this.staffList[index], ...this.staffForm };
+                        alert('Staff updated!');
+                    }
                 } else {
-                    this.showToast("Queue is empty", "warning");
+                    const newStaff = {
+                        id: Date.now(),
+                        tenantId: this.tenantId,
+                        name: this.staffForm.name,
+                        username: this.staffForm.username,
+                        password: this.staffForm.password,
+                        role: this.staffForm.role,
+                        status: 'Active',
+                        createdAt: new Date().toISOString()
+                    };
+                    this.staffList.push(newStaff);
+                    alert(`Staff created!\nUsername: ${newStaff.username}\nPassword: ${newStaff.password}`);
                 }
+                this.saveStaffToStorage();
+                this.showStaffModal = false;
             },
-            skipCurrent() {
-                if (this.queueList.length > 0) {
-                    const skipped = this.queueList.shift();
-                    this.showToast(`⏩ Skipped ${skipped.name}`, "warning");
-                    this.reorderPositions();
-                    if (this.queueList.length > 0) this.currentServingNumber = `A${this.queueList[0].position}`;
-                    else this.currentServingNumber = '—';
-                }
+            toggleStaffStatus(id, newStatus) {
+                const staff = this.staffList.find(s => s.id === id);
+                if (staff) staff.status = newStatus;
+                this.saveStaffToStorage();
             },
-            markServed() {
-                if (this.queueList.length > 0) {
-                    const served = this.queueList.shift();
-                    this.showToast(`✅ ${served.name} marked as SERVED`, "success");
-                    this.reorderPositions();
-                    if (this.queueList.length > 0) this.currentServingNumber = `A${this.queueList[0].position}`;
-                    else this.currentServingNumber = '—';
-                } else {
-                    this.showToast("No one to serve", "warning");
-                }
+            resetStaffPassword(staff) {
+                this.resettingStaff = staff;
+                this.newPassword = '';
+                this.showResetModal = true;
             },
-            serveCustomer(customerId) {
-                this.queueList = this.queueList.filter(c => c.id !== customerId);
-                this.reorderPositions();
-                this.showToast(`🎫 Customer served`, "success");
-                if (this.queueList.length > 0) this.currentServingNumber = `A${this.queueList[0].position}`;
-                else this.currentServingNumber = '—';
-            },
-            reorderPositions() {
-                this.queueList.forEach((c, idx) => { c.position = idx + 1; });
-            },
-            // SCANNER
-            simulateScan() {
-                // Random valid/invalid for demo
-                const isValid = Math.random() > 0.3;
-                const fakeId = `TKT-${Math.floor(Math.random() * 100000)}`;
-                this.lastScanValid = isValid;
-                this.lastScanMessage = isValid ? `Ticket ${fakeId} is VALID` : `Ticket ${fakeId} is INVALID or already used`;
-                this.lastScanResult = true;
-                this.recentScans.unshift({
-                    id: Date.now(),
-                    ticketId: fakeId,
-                    valid: isValid,
-                    time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
-                });
-                if (this.recentScans.length > 10) this.recentScans.pop();
-                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
-                setTimeout(() => { this.lastScanResult = false; }, 2000);
-            },
-            // ORDERS
-            updateOrderStatus(orderId, newStatus) {
-                const order = this.orders.find(o => o.id === orderId);
-                if (order) {
-                    order.status = newStatus;
-                    this.showToast(`Order ${orderId} status → ${newStatus}`, "success");
-                }
-            },
-            getOrderStatusClass(status) {
-                if (status === 'pending') return 'status-pending';
-                if (status === 'preparing') return 'status-preparing';
-                if (status === 'ready') return 'status-ready';
-                return 'status-pending';
-            },
-            // SHISHA
-            startShishaSession() {
-                const newId = this.shishaSessions.length + 1;
-                const tableNum = Math.floor(Math.random() * 20) + 1;
-                this.shishaSessions.push({
-                    id: newId,
-                    table: tableNum,
-                    customer: `Walk-in ${newId}`,
-                    timeStart: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
-                });
-                this.showToast(`🫧 New shisha session started at Table ${tableNum}`, "success");
-            },
-            endShishaSession(sessionId) {
-                this.shishaSessions = this.shishaSessions.filter(s => s.id !== sessionId);
-                this.showToast(`Shisha session ended`, "info");
-            },
-            // VVIP TABS
-            addVvipItem() {
-                this.showToast(`🧾 Open add item form (simulated)`, "info");
-            },
-            addToTab(tabId) {
-                const tab = this.vvipTabs.find(t => t.id === tabId);
-                if (tab) {
-                    const addAmount = 250;
-                    tab.balance += addAmount;
-                    this.showToast(`Added R${addAmount} to ${tab.customer}'s tab`, "success");
-                }
-            },
-            closeVvipTab(tabId) {
-                this.vvipTabs = this.vvipTabs.filter(t => t.id !== tabId);
-                this.showToast(`Tab closed successfully`, "success");
-            },
-            // Toast notification system
-            showToast(msg, type = 'info') {
-                let toast = document.createElement('div');
-                toast.innerText = msg;
-                toast.style.position = 'fixed';
-                toast.style.bottom = '30px';
-                toast.style.left = '50%';
-                toast.style.transform = 'translateX(-50%)';
-                toast.style.backgroundColor = type === 'success' ? '#10b981' : (type === 'warning' ? '#f59e0b' : '#1e293b');
-                toast.style.color = 'white';
-                toast.style.padding = '12px 24px';
-                toast.style.borderRadius = '60px';
-                toast.style.fontSize = '0.85rem';
-                toast.style.fontWeight = '600';
-                toast.style.zIndex = '2000';
-                toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-                toast.style.fontFamily = 'Inter, sans-serif';
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 2000);
+            confirmResetPassword() {
+                if (!this.newPassword || this.newPassword.length < 4) { alert('Password must be at least 4 characters'); return; }
+                const staff = this.staffList.find(s => s.id === this.resettingStaff.id);
+                if (staff) staff.password = this.newPassword;
+                this.saveStaffToStorage();
+                alert(`Password reset for ${staff.name}: ${this.newPassword}`);
+                this.showResetModal = false;
+                this.resettingStaff = null;
             },
             logout() {
-                alert("Logged out (demo) — redirect to login");
-                // window.location.href = '/login';
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            },
+            openCreateEvent() { alert('Create event feature'); },
+            openScannerModal() { this.scannerModal = true; },
+            simulateScan() { alert(`Ticket ${this.scanCode} validated`); this.scannerModal = false; },
+            callNext() { alert('Call next customer'); },
+            callCustomer(id) { alert(`Calling customer ${id}`); },
+            startShishaSession() { alert('Start shisha session'); },
+            endShishaSession(id) { this.shishaSessions = this.shishaSessions.filter(s => s.id !== id); this.activeShishaSessions = this.shishaSessions.length; },
+            addVvipItem() { alert('Add VVIP item'); },
+            closeTab(id) { this.vvipTabs = this.vvipTabs.filter(t => t.id !== id); },
+            addLockerItem() { alert('Add locker item'); },
+            markUsed(id) { alert(`Mark locker ${id} used`); },
+            initChart() {
+                const ctx = document.getElementById('salesChart')?.getContext('2d');
+                if(ctx && !this.chartInstance) {
+                    this.chartInstance = new Chart(ctx, { type: 'line', data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Sales (R)', data: [3200, 4800, 5100, 6700, 8900, 12400, 9800], borderColor: '#E30613', tension: 0.3, fill: false }] }, options: { responsive: true, maintainAspectRatio: true } });
+                }
             }
         },
         mounted() {
-            // Simulate real-time sync (optional)
-            console.log("Staff dashboard ready — touch optimized");
+            const isLoggedIn = sessionStorage.getItem('qless_logged_in');
+            const role = sessionStorage.getItem('qless_user_role');
+            if (!isLoggedIn || role !== 'tenant_administrator') { window.location.href = 'login.html'; return; }
+            this.loadTenantData();
+            this.initChart();
+            window.addEventListener('resize', () => { if(window.innerWidth > 768) this.sidebarOpen = false; });
         }
     });
 </script>
