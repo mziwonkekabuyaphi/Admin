@@ -149,6 +149,11 @@
             border-radius: 28px;
             padding: 20px;
             border: 1px solid #edf2f7;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
 
         .stat-icon {
@@ -205,7 +210,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            transition: transform 0.1s;
         }
+        .btn-primary:active { transform: scale(0.97); }
 
         .btn-outline {
             background: transparent;
@@ -214,7 +221,9 @@
             border-radius: 40px;
             font-weight: 500;
             cursor: pointer;
+            transition: background 0.2s;
         }
+        .btn-outline:hover { background: #f1f5f9; }
 
         .table-wrapper {
             overflow-x: auto;
@@ -234,6 +243,12 @@
             text-align: left;
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.85rem;
+        }
+
+        .data-table th {
+            background: #fafcff;
+            font-weight: 600;
+            color: #4a5568;
         }
 
         .status-badge {
@@ -268,6 +283,7 @@
             cursor: pointer;
             color: #64748b;
         }
+        .copy-icon:hover { color: #E30613; }
 
         .action-icons {
             display: flex;
@@ -275,10 +291,12 @@
             color: #94a3b8;
             cursor: pointer;
         }
+        .action-icons i:hover { color: #E30613; }
 
+        /* Modules Grid */
         .modules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 16px;
             margin-top: 16px;
         }
@@ -286,19 +304,23 @@
         .module-card {
             background: white;
             border-radius: 20px;
-            padding: 16px;
+            padding: 16px 20px;
             border: 1px solid #edf2f7;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: box-shadow 0.2s;
         }
+        .module-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
         .module-info h4 {
             font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
         .module-info p {
             font-size: 0.7rem;
             color: #6c7a8e;
@@ -307,16 +329,14 @@
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 48px;
-            height: 24px;
+            width: 52px;
+            height: 26px;
         }
-
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-
         .toggle-slider {
             position: absolute;
             cursor: pointer;
@@ -326,27 +346,24 @@
             bottom: 0;
             background-color: #cbd5e1;
             transition: 0.3s;
-            border-radius: 24px;
+            border-radius: 26px;
         }
-
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
+            height: 20px;
+            width: 20px;
             left: 3px;
             bottom: 3px;
             background-color: white;
             transition: 0.3s;
             border-radius: 50%;
         }
-
         input:checked + .toggle-slider {
             background-color: #E30613;
         }
-
         input:checked + .toggle-slider:before {
-            transform: translateX(24px);
+            transform: translateX(26px);
         }
 
         .tenant-selector {
@@ -369,7 +386,7 @@
             font-size: 0.85rem;
             background: white;
             cursor: pointer;
-            min-width: 200px;
+            min-width: 220px;
         }
 
         .form-control {
@@ -379,6 +396,17 @@
             border-radius: 40px;
             font-family: 'Inter', sans-serif;
             font-size: 0.85rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1e293b;
         }
 
         .modal-mask {
@@ -396,28 +424,23 @@
             opacity: 0;
             transition: 0.2s;
         }
-
         .modal-mask.active {
             visibility: visible;
             opacity: 1;
         }
-
         .modal-container {
             background: white;
             width: 90%;
             max-width: 500px;
             border-radius: 32px;
             padding: 28px;
+            animation: modalSlideIn 0.3s ease;
+        }
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .menu-toggle {
-            display: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #1e293b;
-        }
-
-        /* Settings Panel */
         .settings-panel {
             background: white;
             border-radius: 28px;
@@ -432,12 +455,18 @@
             gap: 12px;
             margin-top: 8px;
         }
-
         .preview-box {
             width: 40px;
             height: 40px;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #1e293b;
         }
 
         @media (max-width: 768px) {
@@ -466,6 +495,7 @@
 </head>
 <body>
 <div id="app">
+    <!-- Sidebar Navigation -->
     <aside class="sidebar" :class="{ open: sidebarOpen }">
         <div class="sidebar-header">
             <h2>Rands Venue OS</h2>
@@ -479,6 +509,7 @@
         </div>
     </aside>
 
+    <!-- Main Content -->
     <div class="main-content">
         <div class="top-header">
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -493,7 +524,7 @@
         </div>
 
         <div class="dashboard-container">
-            <!-- DASHBOARD -->
+            <!-- ==================== DASHBOARD SECTION ==================== -->
             <div v-if="currentSection === 'dashboard'">
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-store"></i></div><div class="stat-title">Total Tenants</div><div class="stat-number">{{ tenants.length }}</div></div>
@@ -501,7 +532,7 @@
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-title">Total Staff</div><div class="stat-number">{{ totalStaffCount }}</div></div>
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-title">Platform Revenue</div><div class="stat-number">R 142,800</div></div>
                 </div>
-                <div class="section-header"><h2>Recent Tenants</h2><button class="btn-outline" @click="currentSection = 'tenants'">View All</button></div>
+                <div class="section-header"><h2>Recent Tenants</h2><button class="btn-outline" @click="currentSection = 'tenants'">View All <i class="fas fa-arrow-right"></i></button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
                         <thead><tr><th>Business Name</th><th>Owner</th><th>Username</th><th>Status</th></tr></thead>
@@ -512,71 +543,80 @@
                                 <td><span class="credential-cell">{{ tenant.username }}</span></td>
                                 <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
                             </tr>
-                            <tr v-if="tenants.length === 0"><td colspan="4" style="text-align:center;">No tenants yet. Click "Create Tenant" to add one.<\/td><\/tr>
+                            <tr v-if="tenants.length === 0"><td colspan="4" style="text-align:center; padding:30px;">No tenants yet. Click "Create Tenant" to add one.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TENANTS MANAGEMENT -->
+            <!-- ==================== TENANTS SECTION ==================== -->
             <div v-if="currentSection === 'tenants'">
                 <div class="section-header"><h2>All Tenants</h2><button class="btn-primary" @click="openCreateTenantModal"><i class="fas fa-plus"></i> Create Tenant</button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead>
-                            <tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr>
-                        </thead>
+                        <thead><tr><th>Business</th><th>Owner</th><th>Phone</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody>
                             <tr v-for="tenant in tenants" :key="tenant.id">
-                                <td><strong>{{ tenant.businessName }}</strong><\/td>
-                                <td>{{ tenant.ownerName }}<\/td>
-                                <td>{{ tenant.phone }}<\/td>
-                                <td><span class="credential-cell">{{ tenant.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.username)"></i></span><\/td>
-                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.password)"></i></span><\/td>
-                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span><\/td>
-                                <td><div class="action-icons"><i class="fas fa-eye" @click="viewTenant(tenant)"></i><i class="fas fa-ban" v-if="tenant.status === 'Active'" @click="suspendTenant(tenant.id)" style="color:#E30613;"></i><i class="fas fa-check-circle" v-else @click="activateTenant(tenant.id)" style="color:#10b981;"></i><i class="fas fa-key" @click="resetTenantPassword(tenant)" style="color:#f59e0b;"></i></div><\/td>
-                            <\/tr>
-                            <tr v-if="tenants.length === 0"><td colspan="7" style="text-align:center; padding:40px;">No tenants. Click "Create Tenant" to add your first venue.<\/td><\/tr>
+                                <td><strong>{{ tenant.businessName }}</strong></td>
+                                <td>{{ tenant.ownerName }}</td>
+                                <td>{{ tenant.phone }}</td>
+                                <td><span class="credential-cell">{{ tenant.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.username)"></i></span></td>
+                                <td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(tenant.password)"></i></span></td>
+                                <td><span class="status-badge" :class="tenant.status === 'Active' ? 'status-active' : 'status-suspended'">{{ tenant.status }}</span></td>
+                                <td><div class="action-icons"><i class="fas fa-eye" @click="viewTenant(tenant)"></i><i class="fas fa-ban" v-if="tenant.status === 'Active'" @click="suspendTenant(tenant.id)" style="color:#E30613;"></i><i class="fas fa-check-circle" v-else @click="activateTenant(tenant.id)" style="color:#10b981;"></i><i class="fas fa-key" @click="resetTenantPassword(tenant)" style="color:#f59e0b;"></i></div></td>
+                            </tr>
+                            <tr v-if="tenants.length === 0"><td colspan="7" style="text-align:center; padding:40px;">No tenants. Click "Create Tenant" to add your first venue.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- MODULES CONFIGURATION (TOGGLES PER TENANT) -->
+            <!-- ==================== MODULES SECTION (WITH TOGGLES) ==================== -->
             <div v-if="currentSection === 'modules'">
-                <div class="section-header"><h2><i class="fas fa-puzzle-piece"></i> Module Configuration</h2><p style="color:#64748b;">Enable/disable features per tenant</p></div>
+                <div class="section-header">
+                    <h2><i class="fas fa-puzzle-piece"></i> Module Configuration</h2>
+                    <p style="color:#64748b; font-size:0.8rem;">Enable/disable features per tenant</p>
+                </div>
+                
+                <!-- Tenant Selector -->
                 <div class="tenant-selector">
-                    <label><i class="fas fa-building"></i> Select Tenant:</label>
+                    <label><i class="fas fa-building"></i> <strong>Select Tenant:</strong></label>
                     <select v-model="selectedTenantId" class="tenant-dropdown" @change="loadTenantModules">
                         <option v-for="tenant in tenants" :key="tenant.id" :value="tenant.id">{{ tenant.businessName }} ({{ tenant.status }})</option>
                     </select>
+                    <span v-if="selectedTenant" style="background:#f0fdf4; padding:6px 12px; border-radius:20px; font-size:0.7rem; color:#10b981;">
+                        <i class="fas fa-check-circle"></i> Editing: {{ selectedTenant.businessName }}
+                    </span>
                 </div>
+
+                <!-- Modules Grid with Toggles -->
                 <div class="modules-grid" v-if="selectedTenant">
                     <div class="module-card" v-for="module in currentTenantModules" :key="module.id">
-                        <div class="module-info"><h4><i :class="module.icon" style="margin-right:6px; color:#E30613;"></i> {{ module.name }}</h4><p>{{ module.description }}</p></div>
-                        <label class="toggle-switch"><input type="checkbox" v-model="module.enabled" @change="toggleModuleForTenant(module)"><span class="toggle-slider"></span></label>
+                        <div class="module-info">
+                            <h4><i :class="module.icon" style="margin-right:8px; color:#E30613;"></i> {{ module.name }}</h4>
+                            <p>{{ module.description }}</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" v-model="module.enabled" @change="toggleModuleForTenant(module)">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </div>
                 </div>
-                <div v-else class="table-wrapper" style="padding:40px; text-align:center;">Select a tenant to configure their modules</div>
+                <div v-else class="settings-panel" style="text-align:center; padding:40px;">
+                    <i class="fas fa-building" style="font-size:48px; color:#cbd5e1; margin-bottom:12px; display:block;"></i>
+                    <p>Select a tenant from the dropdown above to configure their modules</p>
+                </div>
             </div>
 
-            <!-- SETTINGS (White-label & System Settings) -->
+            <!-- ==================== SETTINGS SECTION ==================== -->
             <div v-if="currentSection === 'settings'">
                 <div class="section-header"><h2><i class="fas fa-cog"></i> System Settings</h2></div>
                 
-                <!-- White Label Settings -->
                 <div class="settings-panel">
                     <h3 style="margin-bottom: 16px;"><i class="fas fa-palette"></i> White Label & Branding</h3>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>System Name</label>
-                        <input type="text" class="form-control" v-model="systemSettings.systemName" placeholder="Rands Venue OS">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Logo URL</label>
-                        <input type="text" class="form-control" v-model="systemSettings.logoUrl" placeholder="https://example.com/logo.png">
-                        <div v-if="systemSettings.logoUrl" style="margin-top:8px;"><img :src="systemSettings.logoUrl" style="height:40px; border-radius:8px;" alt="logo preview"></div>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
+                    <div class="form-group"><label>System Name</label><input type="text" class="form-control" v-model="systemSettings.systemName"></div>
+                    <div class="form-group"><label>Logo URL</label><input type="text" class="form-control" v-model="systemSettings.logoUrl" placeholder="https://example.com/logo.png"></div>
+                    <div class="form-group">
                         <label>Primary Brand Color</label>
                         <div class="color-preview">
                             <input type="color" class="form-control" style="width:80px; padding:4px;" v-model="systemSettings.primaryColor">
@@ -584,64 +624,14 @@
                             <span>{{ systemSettings.primaryColor }}</span>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Secondary Color</label>
-                        <div class="color-preview">
-                            <input type="color" class="form-control" style="width:80px; padding:4px;" v-model="systemSettings.secondaryColor">
-                            <div class="preview-box" :style="{ backgroundColor: systemSettings.secondaryColor }"></div>
-                        </div>
-                    </div>
-                    <button class="btn-primary" @click="saveBranding">Save Branding</button>
+                    <button class="btn-primary" @click="saveBranding"><i class="fas fa-save"></i> Save Branding</button>
                 </div>
 
-                <!-- System Configuration -->
-                <div class="settings-panel" style="margin-top: 24px;">
+                <div class="settings-panel">
                     <h3 style="margin-bottom: 16px;"><i class="fas fa-globe"></i> System Configuration</h3>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Default Currency</label>
-                        <select class="form-control" v-model="systemSettings.currency">
-                            <option value="ZAR">South African Rand (ZAR)</option>
-                            <option value="USD">US Dollar (USD)</option>
-                            <option value="EUR">Euro (EUR)</option>
-                            <option value="GBP">British Pound (GBP)</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Date Format</label>
-                        <select class="form-control" v-model="systemSettings.dateFormat">
-                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>Time Zone</label>
-                        <select class="form-control" v-model="systemSettings.timezone">
-                            <option value="Africa/Johannesburg">Africa/Johannesburg (SAST)</option>
-                            <option value="Africa/Cairo">Africa/Cairo (CAT)</option>
-                            <option value="Europe/London">Europe/London (GMT)</option>
-                            <option value="America/New_York">America/New_York (EST)</option>
-                        </select>
-                    </div>
-                    <button class="btn-primary" @click="saveSystemConfig">Save Configuration</button>
-                </div>
-
-                <!-- Email Settings -->
-                <div class="settings-panel" style="margin-top: 24px;">
-                    <h3 style="margin-bottom: 16px;"><i class="fas fa-envelope"></i> Email Notifications</h3>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>SMTP Host</label>
-                        <input type="text" class="form-control" v-model="systemSettings.smtpHost" placeholder="smtp.gmail.com">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>SMTP Port</label>
-                        <input type="text" class="form-control" v-model="systemSettings.smtpPort" placeholder="587">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label>From Email</label>
-                        <input type="email" class="form-control" v-model="systemSettings.fromEmail" placeholder="noreply@randswallet.com">
-                    </div>
-                    <button class="btn-primary" @click="saveEmailSettings">Save Email Settings</button>
+                    <div class="form-group"><label>Default Currency</label><select class="form-control" v-model="systemSettings.currency"><option value="ZAR">South African Rand (ZAR)</option><option value="USD">US Dollar (USD)</option><option value="EUR">Euro (EUR)</option></select></div>
+                    <div class="form-group"><label>Date Format</label><select class="form-control" v-model="systemSettings.dateFormat"><option value="DD/MM/YYYY">DD/MM/YYYY</option><option value="MM/DD/YYYY">MM/DD/YYYY</option></select></div>
+                    <button class="btn-primary" @click="saveSystemConfig"><i class="fas fa-save"></i> Save Configuration</button>
                 </div>
             </div>
         </div>
@@ -651,11 +641,11 @@
     <div class="modal-mask" :class="{ active: showTenantModal }">
         <div class="modal-container">
             <h3 style="margin-bottom: 20px;"><i class="fas fa-building"></i> Create New Tenant</h3>
-            <div class="form-group" style="margin-bottom:16px;"><label>Business Name *</label><input class="form-control" v-model="newTenant.businessName" placeholder="e.g., Skyline Lounge"></div>
-            <div class="form-group" style="margin-bottom:16px;"><label>Owner Name *</label><input class="form-control" v-model="newTenant.ownerName" placeholder="Full name"></div>
-            <div class="form-group" style="margin-bottom:16px;"><label>Phone *</label><input class="form-control" v-model="newTenant.phone" placeholder="Phone number"></div>
-            <div class="form-group" style="margin-bottom:16px;"><label>Username *</label><input class="form-control" v-model="newTenant.username" placeholder="Login username"></div>
-            <div class="form-group" style="margin-bottom:16px;"><label>Password *</label><input type="password" class="form-control" v-model="newTenant.password" placeholder="Login password"></div>
+            <div class="form-group"><label>Business Name *</label><input class="form-control" v-model="newTenant.businessName" placeholder="e.g., Skyline Lounge"></div>
+            <div class="form-group"><label>Owner Name *</label><input class="form-control" v-model="newTenant.ownerName" placeholder="Full name"></div>
+            <div class="form-group"><label>Phone *</label><input class="form-control" v-model="newTenant.phone" placeholder="Phone number"></div>
+            <div class="form-group"><label>Username *</label><input class="form-control" v-model="newTenant.username" placeholder="Login username"></div>
+            <div class="form-group"><label>Password *</label><input type="password" class="form-control" v-model="newTenant.password" placeholder="Login password"></div>
             <div style="display:flex; gap:12px; margin-top:20px;">
                 <button class="btn-outline" @click="showTenantModal = false">Cancel</button>
                 <button class="btn-primary" @click="createTenant">Create Tenant</button>
@@ -684,7 +674,7 @@
         <div class="modal-container">
             <h3><i class="fas fa-key"></i> Reset Password</h3>
             <p>New password for <strong>{{ resettingTenant?.businessName }}</strong></p>
-            <input type="password" class="form-control" v-model="newPassword" placeholder="New password" style="margin:16px 0;">
+            <input type="password" class="form-control" v-model="newPassword" placeholder="New password (min 4 characters)" style="margin:16px 0;">
             <div style="display:flex; gap:12px;">
                 <button class="btn-outline" @click="showResetModal = false">Cancel</button>
                 <button class="btn-primary" @click="confirmResetPassword">Reset</button>
@@ -762,6 +752,9 @@
             recentTenants() {
                 return this.tenants.slice(0, 5);
             },
+            selectedTenant() {
+                return this.tenants.find(t => t.id === this.selectedTenantId);
+            },
             currentTenantModules() {
                 if (!this.selectedTenantId) return [];
                 if (!this.tenantModules[this.selectedTenantId]) {
@@ -803,15 +796,10 @@
                     this.selectedTenantId = this.tenants[0].id;
                 }
             },
-            saveTenants() {
-                localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(this.tenants));
-            },
-            saveModules() {
-                localStorage.setItem(STORAGE_KEYS.TENANT_MODULES, JSON.stringify(this.tenantModules));
-            },
-            saveSystemSettings() {
-                localStorage.setItem(STORAGE_KEYS.SYSTEM_SETTINGS, JSON.stringify(this.systemSettings));
-            },
+            saveTenants() { localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(this.tenants)); },
+            saveModules() { localStorage.setItem(STORAGE_KEYS.TENANT_MODULES, JSON.stringify(this.tenantModules)); },
+            saveSystemSettings() { localStorage.setItem(STORAGE_KEYS.SYSTEM_SETTINGS, JSON.stringify(this.systemSettings)); },
+            
             openCreateTenantModal() {
                 this.newTenant = { businessName: '', ownerName: '', phone: '', username: '', password: '' };
                 this.showTenantModal = true;
@@ -892,16 +880,11 @@
             },
             saveBranding() {
                 this.saveSystemSettings();
-                alert(`Branding saved! Primary color: ${this.systemSettings.primaryColor}`);
-                document.documentElement.style.setProperty('--primary-color', this.systemSettings.primaryColor);
+                alert(`Branding saved! System name: ${this.systemSettings.systemName}`);
             },
             saveSystemConfig() {
                 this.saveSystemSettings();
                 alert('System configuration saved successfully!');
-            },
-            saveEmailSettings() {
-                this.saveSystemSettings();
-                alert('Email settings saved successfully!');
             },
             logout() {
                 sessionStorage.clear();
