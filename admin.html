@@ -314,6 +314,16 @@
         }
         .copy-icon:hover { color: #E30613; }
 
+        /* Custom module badge */
+        .custom-badge {
+            background: #fef3c7;
+            color: #d97706;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); width: 260px; }
             .sidebar.open { transform: translateX(0); }
@@ -388,7 +398,7 @@
                 </div>
             </div>
 
-            <!-- STAFF MANAGEMENT (CREATE STAFF WITH LOGIN CREDENTIALS) -->
+            <!-- STAFF MANAGEMENT -->
             <div v-if="currentSection === 'staff'">
                 <div class="section-header">
                     <h2><i class="fas fa-users"></i> Staff Management</h2>
@@ -397,9 +407,7 @@
                 <div class="table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th>Name</th><th>Role</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th>
-                            </tr>
+                            <tr><th>Name</th><th>Role</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             <tr v-for="staff in staffList" :key="staff.id">
@@ -416,8 +424,8 @@
                                         <i class="fas fa-toggle-off" v-else @click="toggleStaffStatus(staff.id)" style="cursor:pointer; color:#94a3b8;" title="Activate"></i>
                                         <i class="fas fa-trash-alt" @click="deleteStaff(staff.id)" style="cursor:pointer; color:#dc2626;" title="Delete"></i>
                                     </div>
-                                </td>
-                            </tr>
+                                 </td>
+                             </tr>
                             <tr v-if="staffList.length === 0"><td colspan="6" style="text-align:center; padding:40px; color:#999;">No staff members. Click "Add Staff" to create one.</td></tr>
                         </tbody>
                     </table>
@@ -471,6 +479,22 @@
                 <div v-for="locker in lockers" :key="locker.id" class="item-card"><div><strong>{{ locker.itemName }}</strong> - Qty: {{ locker.qty }}<div>Status: {{ locker.status }}</div></div><button class="btn-outline" @click="markUsed(locker.id)">Mark Used</button></div>
             </div>
 
+            <!-- CUSTOM MODULES - DYNAMIC FALLBACK VIEW -->
+            <div v-for="customMod in enabledCustomModules" :key="customMod.id" v-if="currentSection === customMod.sectionId">
+                <div class="section-header">
+                    <h2><i :class="customMod.icon"></i> {{ customMod.name }}</h2>
+                    <span class="custom-badge"><i class="fas fa-magic"></i> Custom Module</span>
+                </div>
+                <div class="settings-panel" style="text-align:center; padding:60px;">
+                    <i :class="customMod.icon" style="font-size:48px; color:#E30613; margin-bottom:16px; display:block;"></i>
+                    <h3>{{ customMod.name }}</h3>
+                    <p style="margin-top:12px;">{{ customMod.description || 'This custom module has been enabled for your venue by the Super Admin.' }}</p>
+                    <p style="font-size:0.8rem; margin-top:16px; color:#64748b;">
+                        <i class="fas fa-info-circle"></i> Content for this module will be available soon.
+                    </p>
+                </div>
+            </div>
+
             <!-- MODULES STATUS -->
             <div v-if="currentSection === 'modules'">
                 <div class="section-header"><h2>Available Modules</h2><p style="color:#64748b;">Configured by Super Admin</p></div>
@@ -479,10 +503,10 @@
                         <thead><tr><th>Module Name</th><th>Status</th><th>Description</th></tr></thead>
                         <tbody>
                             <tr v-for="module in allModules" :key="module.id">
-                                <td><strong>{{ module.displayName }}</strong></td>
+                                <td><strong>{{ module.displayName }}</strong> <span v-if="module.isCustom" class="custom-badge">Custom</span></td>
                                 <td><span class="status-badge" :class="module.enabled ? 'status-active' : 'status-warning'">{{ module.enabled ? 'Enabled' : 'Disabled' }}</span></td>
                                 <td style="color:#64748b;">{{ module.description }}</td>
-                            </tr>
+                             </tr>
                         </tbody>
                     </table>
                 </div>
@@ -571,7 +595,6 @@
             branding: { primaryColor: '#E30613', logoUrl: '' },
             tenantModules: [],
             staffList: [],
-            // Modals
             showStaffModal: false,
             showResetModal: false,
             showInfoModal: false,
@@ -584,7 +607,6 @@
             infoMessage: '',
             infoIcon: 'fas fa-info-circle',
             infoIconColor: '#E30613',
-            // Demo Data
             events: [{ id:1, name:'Beach Party', date:'2025-06-15', status:'Live', sold:245, capacity:500 },{ id:2, name:'Jazz Night', date:'2025-06-20', status:'Draft', sold:0, capacity:200 }],
             recentScans: [{ id:'T12345', valid:true, time:'10:20 AM'},{ id:'T12346', valid:false, time:'10:05 AM'}],
             queueList: [{ id:1, name:'John Doe', position:1, status:'waiting'},{ id:2, name:'Alice Smith', position:2, status:'waiting'},{ id:3, name:'Bob Johnson', position:3, status:'waiting'}],
@@ -605,6 +627,19 @@
                 const item = this.dynamicMenu.find(i => i.id === this.currentSection);
                 return item ? item.label : 'Dashboard';
             },
+            // NEW: Get enabled custom modules for sidebar and view
+            enabledCustomModules() {
+                const customModules = [];
+                this.tenantModules.forEach(module => {
+                    if (module.enabled && module.isCustom) {
+                        customModules.push({
+                            ...module,
+                            sectionId: module.name.toLowerCase().replace(/\s+/g, '_')
+                        });
+                    }
+                });
+                return customModules;
+            },
             dynamicMenu() {
                 const menu = [
                     { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
@@ -613,27 +648,40 @@
                     { id: 'settings', label: 'Settings', icon: 'fas fa-cog' }
                 ];
                 
-                if (this.isModuleEnabled('Tickets')) {
-                    menu.splice(1, 0, { id: 'events', label: 'Events', icon: 'fas fa-calendar-alt' });
-                    menu.splice(2, 0, { id: 'tickets', label: 'Tickets / Scanner', icon: 'fas fa-qrcode' });
-                }
-                if (this.isModuleEnabled('Queue Management')) {
-                    menu.splice(3, 0, { id: 'queue', label: 'Queue System', icon: 'fas fa-hourglass-half' });
-                }
-                if (this.isModuleEnabled('Self-Serve Kiosk')) {
-                    menu.splice(4, 0, { id: 'orders', label: 'Orders', icon: 'fas fa-clipboard-list' });
-                }
-                if (this.isModuleEnabled('Shisha System')) {
-                    menu.splice(5, 0, { id: 'shisha', label: 'Shisha', icon: 'fas fa-smoking' });
-                }
-                if (this.isModuleEnabled('VVIP Management')) {
-                    menu.splice(6, 0, { id: 'vvip', label: 'VVIP Tabs', icon: 'fas fa-crown' });
-                }
-                if (this.isModuleEnabled('Virtual Booze Lockers')) {
-                    menu.splice(7, 0, { id: 'lockers', label: 'Lockers', icon: 'fas fa-lock' });
-                }
+                // Hardcoded module mappings for built-in modules
+                const moduleMapping = {
+                    'Tickets': [
+                        { id: 'events', label: 'Events', icon: 'fas fa-calendar-alt' },
+                        { id: 'tickets', label: 'Tickets / Scanner', icon: 'fas fa-qrcode' }
+                    ],
+                    'Queue Management': [{ id: 'queue', label: 'Queue System', icon: 'fas fa-hourglass-half' }],
+                    'Self-Serve Kiosk': [{ id: 'orders', label: 'Orders', icon: 'fas fa-clipboard-list' }],
+                    'Shisha System': [{ id: 'shisha', label: 'Shisha', icon: 'fas fa-smoking' }],
+                    'VVIP Management': [{ id: 'vvip', label: 'VVIP Tabs', icon: 'fas fa-crown' }],
+                    'Virtual Booze Lockers': [{ id: 'lockers', label: 'Lockers', icon: 'fas fa-lock' }]
+                };
                 
-                return menu;
+                const dynamicItems = [];
+                
+                this.tenantModules.forEach(module => {
+                    if (module.enabled) {
+                        if (moduleMapping[module.name]) {
+                            // Built-in module - use predefined mapping
+                            dynamicItems.push(...moduleMapping[module.name]);
+                        } else if (module.isCustom) {
+                            // CUSTOM MODULE - dynamically create menu item
+                            const moduleId = module.name.toLowerCase().replace(/\s+/g, '_');
+                            dynamicItems.push({
+                                id: moduleId,
+                                label: module.name,
+                                icon: module.icon || 'fas fa-plug'
+                            });
+                        }
+                    }
+                });
+                
+                // Insert dynamic modules after staff, before modules/settings
+                return [...menu.slice(0, 2), ...dynamicItems, ...menu.slice(2)];
             },
             allModules() {
                 const moduleMap = {
@@ -648,8 +696,9 @@
                     id: m.id,
                     name: m.name,
                     displayName: moduleMap[m.name]?.displayName || m.name,
-                    description: moduleMap[m.name]?.description || 'System module',
-                    enabled: m.enabled
+                    description: m.description || moduleMap[m.name]?.description || 'Custom module',
+                    enabled: m.enabled,
+                    isCustom: m.isCustom || false
                 }));
             }
         },
@@ -711,12 +760,12 @@
                 
                 if (modules.length === 0) {
                     this.tenantModules = [
-                        { id: 1, name: 'Tickets', enabled: true },
-                        { id: 2, name: 'Queue Management', enabled: true },
-                        { id: 3, name: 'Self-Serve Kiosk', enabled: false },
-                        { id: 4, name: 'Virtual Booze Lockers', enabled: true },
-                        { id: 5, name: 'Shisha System', enabled: false },
-                        { id: 6, name: 'VVIP Management', enabled: true }
+                        { id: 1, name: 'Tickets', enabled: true, isCustom: false },
+                        { id: 2, name: 'Queue Management', enabled: true, isCustom: false },
+                        { id: 3, name: 'Self-Serve Kiosk', enabled: false, isCustom: false },
+                        { id: 4, name: 'Virtual Booze Lockers', enabled: true, isCustom: false },
+                        { id: 5, name: 'Shisha System', enabled: false, isCustom: false },
+                        { id: 6, name: 'VVIP Management', enabled: true, isCustom: false }
                     ];
                 } else {
                     this.tenantModules = modules;
@@ -865,12 +914,12 @@
                 this.scannerModal = false;
             },
             callNext() { if(this.queueList.length) this.showAlert('Queue', `Calling next: ${this.queueList[0].name}`, 'fas fa-bell'); },
-            skipCurrent() { if(this.queueList.length) this.queueList.shift(); this.activeQueueCount = this.queueList.length; },
+            skipCurrent() { if(this.queueList.length) this.queueList.shift(); },
             callCustomer(id) { const customer = this.queueList.find(c => c.id === id); if(customer) this.showAlert('Queue', `Calling ${customer.name}`, 'fas fa-phone'); },
-            skipCustomer(id) { this.queueList = this.queueList.filter(c => c.id !== id); this.activeQueueCount = this.queueList.length; },
+            skipCustomer(id) { this.queueList = this.queueList.filter(c => c.id !== id); },
             updateOrderStatus(orderId, newStatus) { let order = this.orders.find(o => o.id === orderId); if(order) order.status = newStatus; },
             startShishaSession() { this.showAlert('Shisha', 'Start new shisha session', 'fas fa-smoking'); },
-            endShishaSession(id) { this.shishaSessions = this.shishaSessions.filter(s => s.id !== id); this.activeShishaSessions = this.shishaSessions.length; },
+            endShishaSession(id) { this.shishaSessions = this.shishaSessions.filter(s => s.id !== id); },
             addVvipItem() { this.showAlert('VVIP', 'Add item to VVIP tab', 'fas fa-crown'); },
             closeTab(id) { this.vvipTabs = this.vvipTabs.filter(t => t.id !== id); },
             addToTab(id) { this.showAlert('VVIP', `Add item to tab ${id}`, 'fas fa-crown'); },
