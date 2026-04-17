@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Rands | Tenant Admin Dashboard</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Vue.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            overflow-x: hidden;
+        }
+
+        /* ========== SIDEBAR STYLES ========== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 270px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            overflow-y: auto;
+            border-right: 1px solid #edf2f7;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid #eff3f8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tenant-logo {
+            width: 42px;
+            height: 42px;
+            background: #E30613;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .tenant-info h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .tenant-info p {
+            font-size: 0.7rem;
+            color: #6c7a8e;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            margin: 4px 12px;
+            border-radius: 12px;
+            color: #4a5568;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            width: 22px;
+            font-size: 1.1rem;
+        }
+
+        .nav-item:hover {
+            background: #fff0f0;
+            color: #E30613;
+        }
+
+        .nav-item.active {
+            background: #E30613;
+            color: white;
+            box-shadow: 0 4px 10px rgba(227, 6, 19, 0.2);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 0;
+            transition: margin 0.2s ease;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 270px;
+            }
+        }
+
+        .top-header {
+            background: white;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #edf2f7;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-left h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+
+        .badge-dot {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            width: 10px;
+            height: 10px;
+            background: #E30613;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .profile-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 40px;
+            background: #f8fafd;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #E30613, #b0020e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-container {
+            padding: 20px 18px;
+        }
+
+        @media (min-width: 640px) {
+            .dashboard-container {
+                padding: 28px 32px;
+            }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #edf2f7;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -12px rgba(0,0,0,0.1); }
+        .stat-icon { width: 44px; height: 44px; background: #fff0f0; border-radius: 24px; display: flex; align-items: center; justify-content: center; color: #E30613; font-size: 1.3rem; margin-bottom: 14px; }
+        .stat-title { font-size: 0.7rem; font-weight: 500; color: #6c7a8e; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-number { font-size: 1.6rem; font-weight: 800; color: #1e293b; margin-top: 4px; line-height: 1.2; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 28px 0 18px 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-primary {
+            background: #E30613;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #edf2f7;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.8rem;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-active { background: #e6f7e6; color: #10b981; }
+        .status-warning { background: #fff3e0; color: #f59e0b; }
+        .status-inactive { background: #fee2e2; color: #E30613; }
+        
+        .queue-list { background: white; border-radius: 24px; border: 1px solid #edf2f7; overflow: hidden; }
+        .queue-item { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-bottom: 1px solid #f1f5f9; }
+        @media (min-width: 480px) {
+            .queue-item { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        .item-card { background: white; border-radius: 20px; padding: 14px; margin-bottom: 12px; border: 1px solid #edf2f7; display: flex; flex-direction: column; gap: 12px; }
+        @media (min-width: 480px) {
+            .item-card { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        .role-badge { background: #e0e7ff; color: #4f46e5; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+
+        .modal-mask {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;
+            visibility: hidden; opacity: 0; transition: 0.2s;
+            padding: 16px;
+        }
+        .modal-mask.active { visibility: visible; opacity: 1; }
+        .modal-container { background: white; width: 100%; max-width: 500px; border-radius: 32px; padding: 24px; max-height: 90vh; overflow-y: auto; }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .credential-cell {
+            font-family: monospace;
+            font-size: 0.7rem;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .copy-icon { margin-left: 4px; cursor: pointer; color: #64748b; font-size: 0.75rem; }
+        .action-icons { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .menu-toggle {
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f8fafc;
+        }
+        @media (min-width: 769px) {
+            .menu-toggle { display: none; }
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            display: none;
+        }
+        .sidebar-overlay.active { display: block; }
+        @media (min-width: 769px) {
+            .sidebar-overlay { display: none !important; }
+        }
+
+        .settings-panel { margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { font-size: 0.8rem; font-weight: 500; margin-bottom: 6px; display: block; }
+
+        /* VVIP Embedded Styles */
+        .vvip-embedded-container {
+            background: #ffffff;
+            border-radius: 28px;
+            overflow: hidden;
+            margin-top: 0;
+            padding: 0;
+        }
+        .vvip-embedded-container .premium-header {
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border-radius: 24px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #cc0000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .vvip-embedded-container .nav-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            background: #f5f5f5;
+            padding: 6px;
+            border-radius: 50px;
+        }
+        .vvip-embedded-container .nav-tab {
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: #cc0000;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 40px;
+            font-size: 13px;
+            flex: 1;
+            text-align: center;
+        }
+        .vvip-embedded-container .nav-tab.active {
+            background: #cc0000;
+            color: white;
+        }
+        .vvip-embedded-container .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .vvip-embedded-container .table-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid #cc0000;
+        }
+        .vvip-embedded-container .progress-bar {
+            width: 100%;
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 6px;
+            overflow: hidden;
+        }
+        .vvip-embedded-container .progress-fill {
+            height: 100%;
+            background: #cc0000;
+            width: 0%;
+        }
+        .vvip-embedded-container .btn-small {
+            background: #cc0000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .vvip-embedded-container .guest-badge {
+            background: #cc0000;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: inline-block;
+            margin: 2px;
+            color: white;
+        }
+        .vvip-embedded-container .bands-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+        .vvip-embedded-container .bands-table th, .vvip-embedded-container .bands-table td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #ffe6e6;
+            color: #cc0000;
+            font-size: 13px;
+        }
+        .vvip-embedded-container .bands-table th {
+            background: #cc0000;
+            color: white;
+        }
+        .vvip-embedded-container .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .vvip-embedded-container .stat-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #cc0000;
+        }
+        .vvip-embedded-container .stat-card .value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #cc0000;
+        }
+        .vvip-embedded-container .order-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px;
+            border: 2px solid #cc0000;
+            margin-bottom: 16px;
+        }
+        .vvip-embedded-container .status-pending, .vvip-embedded-container .status-preparing, .vvip-embedded-container .status-ready {
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            display: inline-block;
+        }
+        .vvip-embedded-container .status-pending { background: #ffaa00; color: #cc0000; }
+        .vvip-embedded-container .status-preparing { background: #00a86b; color: white; }
+        .vvip-embedded-container .status-ready { background: #cc0000; color: white; animation: pulse 1s infinite; }
+        .vvip-embedded-container .create-form {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .vvip-embedded-container .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .vvip-embedded-container .create-form input {
+            background: #ffffff;
+            border: 1px solid #cc0000;
+            border-radius: 40px;
+            padding: 10px 14px;
+            color: #cc0000;
+            font-size: 14px;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        .vvip-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .vvip-modal.active { opacity: 1; visibility: visible; }
+        .vvip-modal-card {
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            border-radius: 32px;
+            border: 2px solid #cc0000;
+            max-width: 90%;
+            width: 320px;
+            padding: 24px;
+            text-align: center;
+        }
+        @media (max-width: 480px) {
+            .data-table th, .data-table td { padding: 10px 8px; font-size: 0.75rem; }
+            .stat-number { font-size: 1.4rem; }
+            .profile-dropdown span { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="sidebar-overlay" :class="{ active: sidebarOpen }" @click="sidebarOpen = false"></div>
+    
+    <aside class="sidebar" :class="{ open: sidebarOpen }">
+        <div class="sidebar-header">
+            <div class="tenant-logo" :style="{ backgroundColor: branding.primaryColor }">{{ tenantInitial }}</div>
+            <div class="tenant-info">
+                <h3>{{ tenantName }}</h3>
+                <p>Venue Dashboard</p>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <div v-for="item in dynamicMenu" :key="item.id" class="nav-item" :class="{ active: currentSection === item.id }" @click="currentSection = item.id; closeSidebar()">
+                <i :class="item.icon"></i>
+                <span>{{ item.label }}</span>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="menu-toggle" @click="sidebarOpen = !sidebarOpen"><i class="fas fa-bars"></i></div>
+                <div class="header-left"><h3>{{ currentSectionTitle }}</h3></div>
+            </div>
+            <div class="header-right">
+                <div class="notification-icon"><i class="far fa-bell"></i><span class="badge-dot"></span></div>
+                <div class="profile-dropdown" @click="logout">
+                    <div class="avatar">{{ adminInitial }}</div>
+                    <span style="font-size:0.8rem;">{{ adminName }}</span>
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-container">
+            <!-- DASHBOARD VIEW -->
+            <div v-if="currentSection === 'dashboard'">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-title">Total Staff</div><div class="stat-number">{{ staffList.length }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-title">Active Staff</div><div class="stat-number">{{ activeStaffCount }}</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-ticket-alt"></i></div><div class="stat-title">Tickets Sold</div><div class="stat-number">1,284</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-rand-sign"></i></div><div class="stat-title">Revenue (MTD)</div><div class="stat-number">R 48,250</div></div>
+                </div>
+                <div class="section-header"><h2>Recent Staff Activity</h2><button class="btn-outline" @click="currentSection = 'staff'; closeSidebar()">Manage Staff <i class="fas fa-arrow-right"></i></button></div>
+                <div class="table-wrapper">
+                    <table class="data-table"><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Status</th></tr></thead>
+                    <tbody><tr v-for="staff in recentStaff" :key="staff.id"><td>{{ staff.name }}</td><td><span class="role-badge">{{ staff.role }}</span></td><td>{{ staff.username }}</td><td><span class="status-badge" :class="staff.status === 'Active' ? 'status-active' : 'status-inactive'">{{ staff.status }}</span></td></tr>
+                    <tr v-if="recentStaff.length === 0"><td colspan="4" style="text-align:center; color:#999;">No staff members yet</td></tr>
+                    </tbody></table>
+                </div>
+            </div>
+
+            <!-- STAFF MANAGEMENT -->
+            <div v-if="currentSection === 'staff'">
+                <div class="section-header"><h2><i class="fas fa-users"></i> Staff Management</h2><button class="btn-primary" @click="openCreateStaffModal"><i class="fas fa-plus"></i> Add Staff</button></div>
+                <div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody><tr v-for="staff in staffList" :key="staff.id"><td><strong>{{ staff.name }}</strong></td><td><span class="role-badge">{{ staff.role }}</span></td><td><span class="credential-cell">{{ staff.username }}<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.username)"></i></span></td><td><span class="credential-cell">••••••<i class="fas fa-copy copy-icon" @click="copyToClipboard(staff.password)"></i></span></td><td><span class="status-badge" :class="staff.status === 'Active' ? 'status-active' : 'status-inactive'">{{ staff.status }}</span></td>
+                <td><div class="action-icons"><i class="fas fa-edit" @click="editStaff(staff)" style="cursor:pointer; color:#f59e0b;"></i><i class="fas fa-key" @click="resetStaffPassword(staff)" style="cursor:pointer; color:#E30613;"></i><i class="fas fa-toggle-on" v-if="staff.status === 'Active'" @click="toggleStaffStatus(staff.id)" style="cursor:pointer; color:#10b981;"></i><i class="fas fa-toggle-off" v-else @click="toggleStaffStatus(staff.id)" style="cursor:pointer; color:#94a3b8;"></i><i class="fas fa-trash-alt" @click="deleteStaff(staff.id)" style="cursor:pointer; color:#dc2626;"></i></div></td></tr>
+                <tr v-if="staffList.length === 0"><td colspan="6" style="text-align:center; padding:40px;">No staff members.</td></tr>
+                </tbody></table></div>
+            </div>
+
+            <!-- EVENTS -->
+            <div v-if="currentSection === 'events' && isModuleEnabled('Tickets')"><div class="section-header"><h2>Events</h2><button class="btn-primary" @click="openCreateEvent"><i class="fas fa-plus"></i> Create Event</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Date</th><th>Status</th><th>Tickets Sold</th></tr></thead><tbody><tr v-for="event in events" :key="event.id"><td>{{ event.name }}</td><td>{{ event.date }}</td><td><span class="status-badge" :class="event.status === 'Live' ? 'status-active' : 'status-warning'">{{ event.status }}</span></td><td>{{ event.sold }}/{{ event.capacity }}</td></tr></tbody></table></div></div>
+
+            <!-- TICKETS -->
+            <div v-if="currentSection === 'tickets' && isModuleEnabled('Tickets')"><div class="stats-grid"><div class="stat-card"><div class="stat-icon"><i class="fas fa-ticket-alt"></i></div><div class="stat-title">Total Tickets Sold</div><div class="stat-number">1,284</div></div><div class="stat-card"><div class="stat-icon"><i class="fas fa-qrcode"></i></div><div class="stat-title">Scanned Today</div><div class="stat-number">342</div></div></div><button class="btn-primary" @click="openScannerModal"><i class="fas fa-camera"></i> Open Scanner</button><div class="section-header" style="margin-top:24px;"><h2>Recent Scans</h2></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Ticket ID</th><th>Status</th><th>Scanned At</th></tr></thead><tbody><tr v-for="scan in recentScans" :key="scan.id"><td>{{ scan.id }}</td><td><span class="status-badge" :class="scan.valid ? 'status-active' : 'status-warning'">{{ scan.valid ? 'Valid' : 'Invalid' }}</span></td><td>{{ scan.time }}</td></tr></tbody></table></div></div>
+
+            <!-- QUEUE -->
+            <div v-if="currentSection === 'queue' && isModuleEnabled('Queue Management')"><div class="section-header"><h2>Live Queue</h2><div><button class="btn-outline" @click="callNext">Call Next</button><button class="btn-outline" style="margin-left:8px;" @click="skipCurrent">Skip</button></div></div><div class="queue-list"><div v-for="(customer, idx) in queueList" :key="customer.id" class="queue-item"><div><strong>#{{ customer.position }}</strong> - {{ customer.name }}</div><div><span class="badge">{{ customer.status }}</span><div class="queue-actions"><button class="btn-call" @click="callCustomer(customer.id)">Call</button><button class="btn-skip" @click="skipCustomer(customer.id)">Skip</button></div></div></div></div></div>
+
+            <!-- ORDERS MODULE -->
+            <div v-if="currentSection === 'orders' && isModuleEnabled('Self-Serve Kiosk')"><div class="section-header"><h2>Active Orders</h2></div><div v-for="order in orders" :key="order.id" class="item-card"><div><strong>Order #{{ order.id }}</strong><div class="badge">{{ order.items }}</div></div><div><span class="status-badge" :class="order.status === 'pending' ? 'status-warning' : (order.status === 'preparing' ? 'status-active' : 'status-success')">{{ order.status }}</span><button class="btn-outline" style="margin-left:8px;" @click="updateOrderStatus(order.id, 'preparing')" v-if="order.status === 'pending'">Prepare</button><button class="btn-outline" style="margin-left:8px;" @click="updateOrderStatus(order.id, 'ready')" v-if="order.status === 'preparing'">Ready</button></div></div></div>
+
+            <!-- SHISHA -->
+            <div v-if="currentSection === 'shisha' && isModuleEnabled('Shisha System')"><div class="section-header"><h2>Active Shisha Sessions</h2><button class="btn-primary" @click="startShishaSession"><i class="fas fa-plus"></i> Start Session</button></div><div v-for="session in shishaSessions" :key="session.id" class="item-card"><div><strong>Table {{ session.table }}</strong> - {{ session.customer }}<div>Started: {{ session.timeStart }}</div></div><button class="btn-outline" @click="endShishaSession(session.id)">End Session</button></div></div>
+
+            <!-- VVIP TABS - FULL EMBEDDED MANAGEMENT SYSTEM -->
+            <div v-if="currentSection === 'vvip' && isModuleEnabled('VVIP Management')" class="vvip-embedded-container" id="vvipEmbeddedApp">
+                <div class="premium-header">
+                    <div class="logo-area"><div class="logo-icon">👑</div><div class="title"><h1>VVIP MANAGEMENT CONSOLE</h1><p>Tables • Bands • Dashboard • Orders • History</p></div></div>
+                    <div class="sync-status"><div class="sync-dot"></div><div>LIVE SYNC</div></div>
+                </div>
+                <div class="nav-tabs"><button class="nav-tab active" onclick="window.vvipSwitchTab('tables')">📋 TABLES</button><button class="nav-tab" onclick="window.vvipSwitchTab('bands')">🖨️ BANDS</button><button class="nav-tab" onclick="window.vvipSwitchTab('dashboard')">📊 DASH</button><button class="nav-tab" onclick="window.vvipSwitchTab('orders')">👨‍🍳 ORDERS</button><button class="nav-tab" onclick="window.vvipSwitchTab('history')">📜 HISTORY</button></div>
+                <div id="vvipTablesTab" class="vvip-tab-content" style="display:block;"><div class="create-form"><div class="form-group"><label>📌 Table Name</label><input type="text" id="vvipNewTableName" placeholder="e.g., VIP Lounge"></div><div class="form-group"><label>👥 Capacity</label><input type="number" id="vvipNewTableCapacity" placeholder="Max guests" value="10"></div><div class="form-group"><label>💰 Tab (R)</label><input type="number" id="vvipNewTableTab" placeholder="Initial tab" value="8000"></div><button type="button" class="btn-small" onclick="window.vvipCreateTable()" style="padding:10px 20px;">+ CREATE</button></div><div id="vvipTablesList" class="tables-grid"></div></div>
+                <div id="vvipBandsTab" class="vvip-tab-content" style="display:none;"><div id="vvipBandsList"></div></div>
+                <div id="vvipDashboardTab" class="vvip-tab-content" style="display:none;"><div id="vvipDashboardContent"></div></div>
+                <div id="vvipOrdersTab" class="vvip-tab-content" style="display:none;"><div id="vvipOrdersGrid" class="orders-grid"></div></div>
+                <div id="vvipHistoryTab" class="vvip-tab-content" style="display:none;"><div id="vvipHistoryContent"></div></div>
+            </div>
+
+            <!-- LOCKERS -->
+            <div v-if="currentSection === 'lockers' && isModuleEnabled('Virtual Booze Lockers')"><div class="section-header"><h2>Locker Inventory</h2><button class="btn-primary" @click="addLockerItem"><i class="fas fa-plus"></i> Add Item</button></div><div v-for="locker in lockers" :key="locker.id" class="item-card"><div><strong>{{ locker.itemName }}</strong> - Qty: {{ locker.qty }}<div>Status: {{ locker.status }}</div></div><button class="btn-outline" @click="markUsed(locker.id)">Mark Used</button></div></div>
+
+            <!-- MODULES -->
+            <div v-if="currentSection === 'modules'"><div class="section-header"><h2>Available Modules</h2><p style="color:#64748b;">Configured by Super Admin</p></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Module Name</th><th>Status</th><th>Description</th></tr></thead><tbody><tr v-for="module in allModules" :key="module.id"><td><strong>{{ module.displayName }}</strong></td><td><span class="status-badge" :class="module.enabled ? 'status-active' : 'status-warning'">{{ module.enabled ? 'Enabled' : 'Disabled' }}</span></td><td style="color:#64748b;">{{ module.description }}</td></tr></tbody></table></div></div>
+
+            <!-- SETTINGS -->
+            <div v-if="currentSection === 'settings'"><div class="section-header"><h2>Branding & Settings</h2></div><div class="settings-panel" style="background:white; border-radius:28px; padding:24px;"><div class="form-group"><label>Tenant Name</label><input class="form-control" v-model="tenantName" @blur="saveBranding"></div><div class="form-group"><label>Logo Preview</label><input class="form-control" v-model="branding.logoUrl" placeholder="Logo URL"><div v-if="branding.logoUrl"><img :src="branding.logoUrl" style="height:40px; margin-top:8px;"></div></div><div class="form-group"><label>Primary Color</label><input type="color" v-model="branding.primaryColor" class="form-control" style="width:80px;" @change="saveBranding"></div><button class="btn-primary" @click="saveBranding">Save Changes</button></div></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-mask" :class="{ active: showStaffModal }"><div class="modal-container"><h3 style="margin-bottom:20px;">{{ isEditing ? 'Edit Staff' : 'Add New Staff' }}</h3><div class="form-group"><label>Full Name *</label><input class="form-control" v-model="staffForm.name"></div><div class="form-group"><label>Username *</label><input class="form-control" v-model="staffForm.username"></div><div class="form-group"><label>Password *</label><input type="password" class="form-control" v-model="staffForm.password"></div><div class="form-group"><label>Role *</label><select class="form-control" v-model="staffForm.role"><option value="cashier">Cashier</option><option value="manager">Manager</option><option value="bartender">Bartender</option></select></div><div style="display:flex; gap:12px; margin-top:20px;"><button class="btn-outline" @click="closeStaffModal">Cancel</button><button class="btn-primary" @click="saveStaff">{{ isEditing ? 'Update' : 'Create' }}</button></div></div></div>
+    <div class="modal-mask" :class="{ active: showResetModal }"><div class="modal-container"><h3>Reset Password</h3><p>New password for <strong>{{ resettingStaff?.name }}</strong></p><input type="password" class="form-control" v-model="newPassword" placeholder="New password"><div style="display:flex; gap:12px; margin-top:16px;"><button class="btn-outline" @click="showResetModal = false">Cancel</button><button class="btn-primary" @click="confirmResetPassword">Reset</button></div></div></div>
+    <div class="modal-mask" :class="{ active: scannerModal }"><div class="modal-container"><h3>Ticket Scanner</h3><p style="margin:20px 0;">Simulated Scanner: <input v-model="scanCode" placeholder="Ticket ID" class="form-control"></p><button class="btn-primary" @click="simulateScan">Validate Ticket</button><button class="btn-outline" style="margin-left:8px;" @click="scannerModal=false">Close</button></div></div>
+    <div class="modal-mask" :class="{ active: showInfoModal }"><div class="modal-container" style="text-align:center;"><i :class="infoIcon" style="font-size:48px; margin-bottom:16px;" :style="{ color: infoIconColor }"></i><h3>{{ infoTitle }}</h3><p style="margin:16px 0;">{{ infoMessage }}</p><button class="btn-primary" @click="showInfoModal = false">OK</button></div></div>
+    <div id="vvipGlobalModal" class="vvip-modal"><div class="vvip-modal-card"><div style="font-size:48px;" id="vvipModalIcon">👑</div><div style="font-size:24px;font-weight:800;margin:12px 0;color:#cc0000;" id="vvipModalTitle">Notification</div><div style="margin:16px 0;color:#cc0000;" id="vvipModalMessage">Message</div><button class="btn-small" onclick="window.vvipCloseModal()" style="padding:10px 28px;">Confirm</button></div></div>
+</div>
+
+<script>
+    // STORAGE KEYS
+    const STORAGE_KEYS = { TENANTS: 'qless_tenants', STAFF: 'qless_staff', TENANT_MODULES: 'qless_tenant_modules' };
+
+    // ==================== VVIP MANAGEMENT SCRIPT (EMBEDDED) ====================
+    let vvipWalletAccounts = {};
+    let vvipTables = {};
+    let vvipRevenue = 0;
+    let vvipGlobalOrders = [];
+    let vvipTransactionHistory = [];
+    let vvipVendorSales = { "Rands Smart Counter":0, "Shisha Lounge":0, "The Butcher Shop":0 };
+    
+    function vvipLoadAll() {
+        const mainWalletAccounts = JSON.parse(localStorage.getItem('rands_accounts_v2') || '[]');
+        const vvipRaw = localStorage.getItem('rands_wallet_accounts');
+        let vvipAccounts = vvipRaw ? JSON.parse(vvipRaw) : [];
+        const mergedAccounts = [...vvipAccounts];
+        mainWalletAccounts.forEach(mainAcc => {
+            const existingIdx = mergedAccounts.findIndex(acc => acc.id === mainAcc.id);
+            if (existingIdx !== -1) { mergedAccounts[existingIdx].balance = mainAcc.balance; mergedAccounts[existingIdx].name = mainAcc.name || mergedAccounts[existingIdx].name; }
+            else { mergedAccounts.push({ id: mainAcc.id, name: mainAcc.name || mainAcc.id, balance: mainAcc.balance || 0, pin: "1234", tableTab: 0, tableName: null }); }
+        });
+        localStorage.setItem('rands_wallet_accounts', JSON.stringify(mergedAccounts));
+        vvipWalletAccounts = {};
+        mergedAccounts.forEach(acc => { vvipWalletAccounts[acc.id] = acc; });
+        vvipTables = JSON.parse(localStorage.getItem('tables') || '{}');
+        vvipRevenue = parseFloat(localStorage.getItem('revenue') || '0');
+        vvipGlobalOrders = JSON.parse(localStorage.getItem('globalOrders') || '[]');
+        vvipTransactionHistory = JSON.parse(localStorage.getItem('transactionHistory') || '[]');
+        vvipVendorSales = JSON.parse(localStorage.getItem('vendorSales') || '{"Rands Smart Counter":0,"Shisha Lounge":0,"The Butcher Shop":0}');
+    }
+    
+    function vvipSaveAll() {
+        localStorage.setItem('tables', JSON.stringify(vvipTables));
+        localStorage.setItem('revenue', vvipRevenue);
+        localStorage.setItem('globalOrders', JSON.stringify(vvipGlobalOrders));
+        localStorage.setItem('transactionHistory', JSON.stringify(vvipTransactionHistory));
+        localStorage.setItem('vendorSales', JSON.stringify(vvipVendorSales));
+        localStorage.setItem('rands_wallet_accounts', JSON.stringify(Object.values(vvipWalletAccounts)));
+        const mainAccounts = JSON.parse(localStorage.getItem('rands_accounts_v2') || '[]');
+        Object.values(vvipWalletAccounts).forEach(acc => {
+            const mainIdx = mainAccounts.findIndex(m => m.id === acc.id);
+            if (mainIdx !== -1) mainAccounts[mainIdx].balance = acc.balance;
+            else mainAccounts.push({ id: acc.id, name: acc.name || acc.id, balance: acc.balance, status: "Active" });
+        });
+        localStorage.setItem('rands_accounts_v2', JSON.stringify(mainAccounts));
+    }
+    
+    function vvipShowModal(title, message, icon = "👑") {
+        document.getElementById("vvipModalTitle").innerText = title;
+        document.getElementById("vvipModalMessage").innerHTML = message;
+        document.getElementById("vvipModalIcon").innerHTML = icon;
+        document.getElementById("vvipGlobalModal").classList.add("active");
+    }
+    window.vvipCloseModal = function() { document.getElementById("vvipGlobalModal").classList.remove("active"); };
+    
+    function vvipEscapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+    
+    function vvipRenderTables() {
+        const container = document.getElementById("vvipTablesList");
+        if (!container) return;
+        if (Object.keys(vvipTables).length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:#ff9999;">✨ No tables yet.</div>'; return; }
+        container.innerHTML = Object.entries(vvipTables).map(([name, t]) => {
+            const original = t.originalTab || t.tabBalance;
+            const spent = original - t.tabBalance;
+            const percent = original > 0 ? (spent / original) * 100 : 0;
+            return `<div class="table-card"><div style="display:flex;justify-content:space-between;margin-bottom:12px;"><span style="font-size:18px;font-weight:700;">${vvipEscapeHtml(name)}</span><span style="font-weight:bold;">Tab: R${t.tabBalance}</span></div>
+            <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>👥 Guests: ${t.entriesUsed}/${t.capacity}</span><span>💰 Spent: R${spent} / R${original}</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${percent}%;"></div></div></div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><input type="text" id="vvipAssign_${name.replace(/\s/g, '_')}" placeholder="Wallet ID" style="flex:1;padding:8px 12px;border:1px solid #cc0000;border-radius:40px;"><button onclick="window.vvipAssignToTable('${vvipEscapeHtml(name).replace(/'/g, "\\'")}')" class="btn-small">➕ Assign</button><button onclick="window.vvipUnassignFromTable('${vvipEscapeHtml(name).replace(/'/g, "\\'")}')" class="btn-small">🗑️ Remove</button><button onclick="window.vvipQuickAddBottle('${vvipEscapeHtml(name).replace(/'/g, "\\'")}')" class="btn-small">🍾 Bottle</button></div>
+            <div><span style="font-size:12px;">Assigned:</span><div style="margin-top:6px;">${(t.guests || []).map(g => `<span class="guest-badge">${vvipEscapeHtml(g)}</span>`).join('') || '<span style="color:#ff9999;">No guests assigned</span>'}</div></div></div>`;
+        }).join('');
+    }
+    
+    window.vvipCreateTable = function() {
+        const name = document.getElementById("vvipNewTableName").value.trim();
+        const capacity = parseInt(document.getElementById("vvipNewTableCapacity").value);
+        const tab = parseInt(document.getElementById("vvipNewTableTab").value);
+        if (!name || capacity < 1) { vvipShowModal("Error", "Valid name and capacity required", "⚠️"); return; }
+        if (vvipTables[name]) { vvipShowModal("Duplicate", "Table already exists", "⚠️"); return; }
+        vvipTables[name] = { name: name, capacity: capacity, tabBalance: tab, entriesUsed: 0, guests: [], originalTab: tab };
+        vvipRevenue += 2000;
+        vvipSaveAll();
+        vvipRenderTables();
+        vvipShowModal("Table Created", `${name} created with R${tab} tab + R2000 setup fee`, "🎉");
+        document.getElementById("vvipNewTableName").value = "";
+    };
+    
+    window.vvipAssignToTable = function(tableName) {
+        const inputId = `vvipAssign_${tableName.replace(/\s/g, '_')}`;
+        const walletId = document.getElementById(inputId)?.value.trim();
+        if (!walletId) { vvipShowModal("Error", "Enter a Wallet ID", "⚠️"); return; }
+        if (!vvipWalletAccounts[walletId]) { if(confirm(`Wallet "${walletId}" not found. Create new?`)) { vvipWalletAccounts[walletId] = { id: walletId, name: "Guest", balance: 0, pin: "0000", tableTab: 0, tableName: null }; vvipSaveAll(); } else return; }
+        const table = vvipTables[tableName];
+        if (!table) { vvipShowModal("Error", "Table not found", "⚠️"); return; }
+        if (table.guests && table.guests.includes(walletId)) { vvipShowModal("Already Assigned", `${walletId} already at this table`, "⚠️"); return; }
+        if ((table.guests?.length || 0) >= table.capacity) { vvipShowModal("Table Full", `${tableName} at capacity`, "🚫"); return; }
+        if (!table.guests) table.guests = [];
+        table.guests.push(walletId);
+        table.entriesUsed = table.guests.length;
+        if (vvipWalletAccounts[walletId]) vvipWalletAccounts[walletId].tableName = tableName;
+        vvipSaveAll();
+        vvipRenderTables();
+        vvipShowModal("Assigned", `${walletId} → ${tableName}`, "✅");
+        if (document.getElementById(inputId)) document.getElementById(inputId).value = "";
+    };
+    
+    window.vvipUnassignFromTable = function(tableName) {
+        const walletId = prompt("Enter Wallet ID to remove:");
+        if (!walletId) return;
+        const table = vvipTables[tableName];
+        if (!table) { vvipShowModal("Error", "Table not found", "⚠️"); return; }
+        const idx = (table.guests || []).indexOf(walletId);
+        if (idx !== -1) { table.guests.splice(idx, 1); table.entriesUsed = table.guests.length; if (vvipWalletAccounts[walletId]) delete vvipWalletAccounts[walletId].tableName; vvipSaveAll(); vvipRenderTables(); vvipShowModal("Removed", `${walletId} removed`, "🗑️"); }
+        else { vvipShowModal("Not Found", `${walletId} not at this table`, "⚠️"); }
+    };
+    
+    window.vvipQuickAddBottle = function(tableName) {
+        const table = vvipTables[tableName];
+        if (!table) { vvipShowModal("Error", "Table not found", "⚠️"); return; }
+        const amount = 2500;
+        const newBalance = table.tabBalance - amount;
+        if (newBalance < 0) { vvipShowModal("Insufficient Tab", `${tableName} only has R${table.tabBalance} remaining`, "⚠️"); return; }
+        table.tabBalance = newBalance;
+        vvipTransactionHistory.unshift({ id: Date.now(), band: table.guests?.[0] || 'table', vendor: "Rands Smart Counter", item: "Premium Bottle Service", amount: amount, quantity: 1, time: new Date().toLocaleTimeString() });
+        vvipVendorSales["Rands Smart Counter"] = (vvipVendorSales["Rands Smart Counter"] || 0) + amount;
+        vvipRevenue += amount;
+        vvipSaveAll();
+        vvipRenderTables();
+        vvipShowModal("Bottle Added", `R${amount} charged. Remaining: R${newBalance}`, "🍾");
+    };
+    
+    function vvipRenderBands() {
+        const container = document.getElementById("vvipBandsList");
+        if (!container) return;
+        if (Object.keys(vvipWalletAccounts).length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:#ff9999;">💳 No wristbands registered yet.</div>'; return; }
+        container.innerHTML = `<div style="overflow-x:auto;"><table class="bands-table"><thead><tr><th>🆔 ID</th><th>👤 Name</th><th>💰 Balance</th><th>📋 Table</th><th>🖨️</th></tr></thead><tbody>${Object.entries(vvipWalletAccounts).map(([id, acc]) => `<tr><td style="font-family:monospace;">${vvipEscapeHtml(id)}</td><td>${vvipEscapeHtml(acc.name || '-')}</td><td>R${(acc.balance || 0).toLocaleString()}</td><td>${acc.tableName ? vvipEscapeHtml(acc.tableName) : '—'}</td><td><button onclick="window.vvipPrintBand('${id.replace(/'/g, "\\'")}')" class="btn-small">🖨️</button></td></tr>`).join('')}</tbody></table></div><div style="margin-top:16px;padding:12px;background:#f5f5f5;border-radius:20px;text-align:center;">💡 Total: ${Object.keys(vvipWalletAccounts).length} bands | Balance: R${Object.values(vvipWalletAccounts).reduce((s, a) => s + (a.balance || 0), 0).toLocaleString()}</div>`;
+    }
+    
+    window.vvipPrintBand = function(bandId) {
+        const account = vvipWalletAccounts[bandId];
+        if (!account) { vvipShowModal("Error", "Band not found", "⚠️"); return; }
+        const printWindow = window.open('', '_blank');
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(bandId)}`;
+        printWindow.document.write(`<!DOCTYPE html><html><head><title>VVIP Wristband</title><style>body{margin:0;padding:20px;background:white;display:flex;justify-content:center;align-items:center;min-height:100vh;}.wristband{width:320px;background:linear-gradient(145deg,#cc0000,#8b0000);border-radius:40px;padding:30px;text-align:center;color:white;}.band-id{font-size:26px;font-weight:bold;margin:15px 0;background:rgba(255,255,255,0.2);padding:10px;border-radius:50px;}.qr{background:white;padding:15px;border-radius:24px;display:inline-block;}.qr img{width:150px;height:150px;}</style></head><body><div class="wristband"><div>👑 RANDS VVIP</div><div class="band-id">${bandId}</div><div class="qr"><img src="${qrUrl}"></div><div>Present this wristband</div></div></body></html>`);
+        printWindow.document.close();
+        printWindow.print();
+    };
+    
+    function vvipRenderDashboard() {
+        const container = document.getElementById("vvipDashboardContent");
+        if (!container) return;
+        const totalTables = Object.keys(vvipTables).length;
+        const occupiedTables = Object.values(vvipTables).filter(t => t.entriesUsed > 0).length;
+        const totalGuests = Object.values(vvipTables).reduce((sum, t) => sum + (t.entriesUsed || 0), 0);
+        const totalTabSpent = Object.values(vvipTables).reduce((sum, t) => sum + ((t.originalTab || t.tabBalance) - (t.tabBalance || 0)), 0);
+        container.innerHTML = `<div class="dashboard-stats"><div class="stat-card"><div class="value">${totalTables}</div><div>Tables</div></div><div class="stat-card"><div class="value">${occupiedTables}</div><div>Occupied</div></div><div class="stat-card"><div class="value">${totalGuests}</div><div>Guests</div></div><div class="stat-card"><div class="value">R${totalTabSpent.toLocaleString()}</div><div>Spent</div></div><div class="stat-card"><div class="value">R${vvipRevenue.toLocaleString()}</div><div>Revenue</div></div></div><h3 style="margin:20px 0 12px;">📊 Table Breakdown</h3><div style="overflow-x:auto;"><table class="bands-table"><thead><tr><th>Table</th><th>Cap</th><th>Guests</th><th>Tab</th><th>Spent</th><th>%</th></tr></thead><tbody>${Object.entries(vvipTables).map(([name, t]) => { const original = t.originalTab || t.tabBalance; const spent = original - t.tabBalance; const percent = original > 0 ? (spent / original) * 100 : 0; return `<tr><td style="font-weight:bold;">${vvipEscapeHtml(name)}</td><td>${t.capacity}</td><td>${t.entriesUsed || 0}/${t.capacity}</td><td>R${t.tabBalance}</td><td>R${spent}</td><td><div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:${percent}%;"></div></div></td></tr>`; }).join('')}</tbody></table></div>`;
+    }
+    
+    function vvipRenderOrders() {
+        const container = document.getElementById("vvipOrdersGrid");
+        if (!container) return;
+        const activeOrders = vvipGlobalOrders.filter(o => o.status !== "collected");
+        if (activeOrders.length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:#ff9999;">🍽️ No active orders.</div>'; return; }
+        container.innerHTML = activeOrders.map(order => { let statusClass = "", statusText = "", readyClass = ""; if (order.status === "pending") { statusClass = "status-pending"; statusText = "PENDING"; } else if (order.status === "preparing") { statusClass = "status-preparing"; statusText = "PREPARING"; } else if (order.status === "ready") { statusClass = "status-ready"; statusText = "READY"; readyClass = "ready"; } let vendorIcon = order.vendor === "Rands Smart Counter" ? "🍺" : order.vendor === "Shisha Lounge" ? "💨" : "🥩"; return `<div class="order-card ${readyClass}"><div class="order-header" style="display:flex;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid #cc0000;padding-bottom:8px;"><span style="background:#cc0000;padding:4px 10px;border-radius:30px;color:white;">#${order.orderId}</span><span style="color:#ff9999;">${order.timestamp}</span></div><div style="margin-bottom:10px;">${vendorIcon} <strong>${order.vendor}</strong> | Band: ${order.bandId}</div><div class="${statusClass}" style="margin-bottom:10px;">${statusText}</div><div>${order.items.map(item => `<div style="display:flex;justify-content:space-between;padding:5px 0;"><span>${item.quantity}x ${item.name}</span><span>R${item.price * item.quantity}</span></div>`).join('')}</div><div style="font-size:18px;font-weight:bold;text-align:right;margin:12px 0;">Total: R${order.total}</div><button class="btn-small" onclick="window.vvipCollectOrder(${order.orderId})" style="width:100%;padding:12px;" ${order.status !== "ready" ? "disabled" : ""}>${order.status === "ready" ? "📦 COLLECT" : "⏳ WAITING"}</button></div>`; }).join('');
+    }
+    
+    window.vvipCollectOrder = function(orderId) {
+        const idx = vvipGlobalOrders.findIndex(o => o.orderId === orderId);
+        if (idx !== -1 && vvipGlobalOrders[idx].status === "ready") { vvipGlobalOrders[idx].status = "collected"; vvipSaveAll(); vvipRenderOrders(); vvipShowModal("Order Collected", `Order #${orderId} collected.`, "📦"); }
+    };
+    
+    function vvipRenderHistory() {
+        const container = document.getElementById("vvipHistoryContent");
+        if (!container) return;
+        if (vvipTransactionHistory.length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:#ff9999;">✨ No transactions yet.</div>'; return; }
+        const totalSpent = vvipTransactionHistory.reduce((sum, tx) => sum + tx.amount, 0);
+        container.innerHTML = `<div class="dashboard-stats"><div class="stat-card"><div class="value">R${totalSpent.toFixed(2)}</div><div>Total Spent</div></div><div class="stat-card"><div class="value">${vvipTransactionHistory.length}</div><div>Transactions</div></div></div><div class="transaction-list" style="background:#fff;border-radius:20px;border:1px solid #cc0000;">${vvipTransactionHistory.slice(0,50).map(tx => { let vendorIcon = tx.vendor === "Rands Smart Counter" ? "🍺" : tx.vendor === "Shisha Lounge" ? "💨" : "🥩"; return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #ffe6e6;"><div style="font-size:28px;">${vendorIcon}</div><div style="flex:1;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><span style="background:rgba(204,0,0,0.1);padding:2px 8px;border-radius:30px;">${tx.vendor}</span><span style="font-weight:800;">+R${tx.amount}</span></div><div>${tx.quantity || 1}x ${tx.item}</div><div style="font-size:10px;color:#ff9999;">⏱️ ${tx.time || new Date().toLocaleTimeString()}</div></div></div>`; }).join('')}</div>`;
+    }
+    
+    window.vvipSwitchTab = function(tab) {
+        document.querySelectorAll('#vvipEmbeddedApp .vvip-tab-content').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('#vvipEmbeddedApp .nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`vvip${tab.charAt(0).toUpperCase() + tab.slice(1)}Tab`).style.display = 'block';
+        if (event && event.target) event.target.classList.add('active');
+        if (tab === 'tables') vvipRenderTables();
+        if (tab === 'bands') vvipRenderBands();
+        if (tab === 'dashboard') vvipRenderDashboard();
+        if (tab === 'orders') vvipRenderOrders();
+        if (tab === 'history') vvipRenderHistory();
+    };
+    
+    function vvipInit() { vvipLoadAll(); vvipRenderTables(); setInterval(() => { vvipLoadAll(); const activeTab = document.querySelector('#vvipEmbeddedApp .vvip-tab-content[style*="display: block"]')?.id; if (activeTab === 'vvipTablesTab') vvipRenderTables(); else if (activeTab === 'vvipBandsTab') vvipRenderBands(); else if (activeTab === 'vvipDashboardTab') vvipRenderDashboard(); else if (activeTab === 'vvipOrdersTab') vvipRenderOrders(); else if (activeTab === 'vvipHistoryTab') vvipRenderHistory(); }, 3000); }
+    
+    // ==================== VUE MAIN APP ====================
+    new Vue({
+        el: '#app',
+        data: {
+            sidebarOpen: false,
+            currentSection: 'dashboard',
+            tenantId: null,
+            tenantName: 'Loading...',
+            adminName: 'Admin',
+            branding: { primaryColor: '#E30613', logoUrl: '' },
+            tenantModules: [],
+            staffList: [],
+            showStaffModal: false,
+            showResetModal: false,
+            showInfoModal: false,
+            isEditing: false,
+            editingStaffId: null,
+            staffForm: { name: '', username: '', password: '', role: 'cashier' },
+            resettingStaff: null,
+            newPassword: '',
+            infoTitle: '', infoMessage: '', infoIcon: 'fas fa-info-circle', infoIconColor: '#E30613',
+            events: [{ id:1, name:'Beach Party', date:'2025-06-15', status:'Live', sold:245, capacity:500 }],
+            recentScans: [{ id:'T12345', valid:true, time:'10:20 AM'}],
+            queueList: [{ id:1, name:'John Doe', position:1, status:'waiting'}],
+            orders: [{ id:101, items:'2x Burger, 1x Soda', status:'pending'}],
+            shishaSessions: [{ id:1, table:'5', customer:'VIP Group', timeStart:'09:30'}],
+            lockers: [{ id:1, itemName:'Johnnie Walker', qty:2, status:'Available'}],
+            scannerModal: false,
+            scanCode: ''
+        },
+        computed: {
+            tenantInitial() { return this.tenantName ? this.tenantName.charAt(0).toUpperCase() : 'R'; },
+            adminInitial() { return this.adminName ? this.adminName.charAt(0).toUpperCase() : 'A'; },
+            activeStaffCount() { return this.staffList.filter(s => s.status === 'Active').length; },
+            recentStaff() { return this.staffList.slice(0, 5); },
+            currentSectionTitle() { const item = this.dynamicMenu.find(i => i.id === this.currentSection); return item ? item.label : 'Dashboard'; },
+            dynamicMenu() {
+                const menu = [{ id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' }, { id: 'staff', label: 'Staff Management', icon: 'fas fa-users' }, { id: 'modules', label: 'Modules', icon: 'fas fa-puzzle-piece' }, { id: 'settings', label: 'Settings', icon: 'fas fa-cog' }];
+                if (this.isModuleEnabled('Tickets')) { menu.splice(1, 0, { id: 'events', label: 'Events', icon: 'fas fa-calendar-alt' }); menu.splice(2, 0, { id: 'tickets', label: 'Tickets / Scanner', icon: 'fas fa-qrcode' }); }
+                if (this.isModuleEnabled('Queue Management')) menu.splice(3, 0, { id: 'queue', label: 'Queue System', icon: 'fas fa-hourglass-half' });
+                if (this.isModuleEnabled('Self-Serve Kiosk')) menu.splice(4, 0, { id: 'orders', label: 'Orders', icon: 'fas fa-clipboard-list' });
+                if (this.isModuleEnabled('Shisha System')) menu.splice(5, 0, { id: 'shisha', label: 'Shisha', icon: 'fas fa-smoking' });
+                if (this.isModuleEnabled('VVIP Management')) menu.splice(6, 0, { id: 'vvip', label: 'VVIP Tabs', icon: 'fas fa-crown' });
+                if (this.isModuleEnabled('Virtual Booze Lockers')) menu.splice(7, 0, { id: 'lockers', label: 'Lockers', icon: 'fas fa-lock' });
+                return menu;
+            },
+            allModules() {
+                const moduleMap = { 'Tickets': { displayName: 'Tickets & Events', description: 'Event ticketing and QR scanning' }, 'Queue Management': { displayName: 'Queue System', description: 'Virtual queuing' }, 'Self-Serve Kiosk': { displayName: 'Orders', description: 'Food & beverage ordering' }, 'Virtual Booze Lockers': { displayName: 'Lockers', description: 'Bottle storage' }, 'Shisha System': { displayName: 'Shisha', description: 'Hookah sessions' }, 'VVIP Management': { displayName: 'VVIP Tabs', description: 'Premium account management' } };
+                return this.tenantModules.map(m => ({ id: m.id, name: m.name, displayName: moduleMap[m.name]?.displayName || m.name, description: moduleMap[m.name]?.description || 'System module', enabled: m.enabled }));
+            }
+        },
+        methods: {
+            closeSidebar() { if(window.innerWidth <= 768) this.sidebarOpen = false; },
+            showAlert(title, message, icon = 'fas fa-info-circle', iconColor = '#E30613') { this.infoTitle = title; this.infoMessage = message; this.infoIcon = icon; this.infoIconColor = iconColor; this.showInfoModal = true; },
+            copyToClipboard(text) { navigator.clipboard.writeText(text); this.showAlert('Copied!', 'Text copied', 'fas fa-check-circle', '#10b981'); },
+            isModuleEnabled(moduleName) { const module = this.tenantModules.find(m => m.name === moduleName); return module ? module.enabled : false; },
+            loadTenantData() {
+                const tenantId = sessionStorage.getItem('qless_tenant_id');
+                const tenantName = sessionStorage.getItem('qless_tenant_name');
+                const adminUser = sessionStorage.getItem('qless_user_name');
+                if (!tenantId) { this.showAlert('Session Error', 'Please log in again.', 'fas fa-exclamation-triangle', '#dc2626'); setTimeout(() => { window.location.href = 'login.html'; }, 2000); return; }
+                this.tenantId = parseInt(tenantId);
+                this.tenantName = tenantName || 'Venue';
+                this.adminName = adminUser || 'Administrator';
+                this.loadStaff(); this.loadModules(); this.loadBranding();
+                setTimeout(() => vvipInit(), 100);
+            },
+            loadStaff() { const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]'); this.staffList = allStaff.filter(s => s.tenantId === this.tenantId); },
+            saveStaffToStorage() { const allStaff = JSON.parse(localStorage.getItem(STORAGE_KEYS.STAFF) || '[]'); const otherStaff = allStaff.filter(s => s.tenantId !== this.tenantId); localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify([...otherStaff, ...this.staffList])); },
+            loadModules() { const allModules = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANT_MODULES) || '{}'); const modules = allModules[this.tenantId] || []; if (modules.length === 0) { this.tenantModules = [{ id: 1, name: 'Tickets', enabled: true }, { id: 2, name: 'Queue Management', enabled: true }, { id: 3, name: 'Self-Serve Kiosk', enabled: false }, { id: 4, name: 'Virtual Booze Lockers', enabled: true }, { id: 5, name: 'Shisha System', enabled: false }, { id: 6, name: 'VVIP Management', enabled: true }]; } else { this.tenantModules = modules; } },
+            loadBranding() { const saved = localStorage.getItem(`qless_tenant_branding_${this.tenantId}`); if (saved) { const data = JSON.parse(saved); this.tenantName = data.tenantName || this.tenantName; this.branding = data.branding || { primaryColor: '#E30613', logoUrl: '' }; } },
+            saveBranding() { const data = { tenantName: this.tenantName, branding: this.branding }; localStorage.setItem(`qless_tenant_branding_${this.tenantId}`, JSON.stringify(data)); const tenants = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANTS) || '[]'); const tenant = tenants.find(t => t.id === this.tenantId); if (tenant) tenant.businessName = this.tenantName; localStorage.setItem(STORAGE_KEYS.TENANTS, JSON.stringify(tenants)); this.showAlert('Saved', 'Branding saved!', 'fas fa-check-circle', '#10b981'); },
+            openCreateStaffModal() { this.isEditing = false; this.editingStaffId = null; this.staffForm = { name: '', username: '', password: '', role: 'cashier' }; this.showStaffModal = true; },
+            editStaff(staff) { this.isEditing = true; this.editingStaffId = staff.id; this.staffForm = { name: staff.name, username: staff.username, password: staff.password, role: staff.role }; this.showStaffModal = true; },
+            saveStaff() {
+                if (!this.staffForm.name || !this.staffForm.username || !this.staffForm.password) { this.showAlert('Missing Fields', 'Please fill all required fields', 'fas fa-exclamation-triangle', '#dc2626'); return; }
+                if (this.staffForm.password.length < 4) { this.showAlert('Invalid Password', 'Password must be at least 4 characters', 'fas fa-exclamation-triangle', '#dc2626'); return; }
+                const existingStaff = this.staffList.find(s => s.username === this.staffForm.username && s.id !== this.editingStaffId);
+                if (existingStaff) { this.showAlert('Duplicate Username', 'Username already exists', 'fas fa-exclamation-triangle', '#dc2626'); return; }
+                if (this.isEditing && this.editingStaffId) { const index = this.staffList.findIndex(s => s.id === this.editingStaffId); if (index !== -1) { this.staffList[index] = { ...this.staffList[index], name: this.staffForm.name, username: this.staffForm.username, password: this.staffForm.password, role: this.staffForm.role }; this.showAlert('Updated', 'Staff member updated', 'fas fa-check-circle', '#10b981'); } }
+                else { const newStaff = { id: Date.now(), tenantId: this.tenantId, name: this.staffForm.name, username: this.staffForm.username, password: this.staffForm.password, role: this.staffForm.role, status: 'Active', createdAt: new Date().toISOString() }; this.staffList.push(newStaff); this.showAlert('Staff Created', `${newStaff.name} added.\nUsername: ${newStaff.username}\nPassword: ${newStaff.password}`, 'fas fa-check-circle', '#10b981'); }
+                this.saveStaffToStorage(); this.closeStaffModal();
+            },
+            closeStaffModal() { this.showStaffModal = false; this.isEditing = false; this.staffForm = { name: '', username: '', password: '', role: 'cashier' }; },
+            toggleStaffStatus(staffId) { const staff = this.staffList.find(s => s.id === staffId); if (staff) { staff.status = staff.status === 'Active' ? 'Inactive' : 'Active'; this.saveStaffToStorage(); this.showAlert('Status Updated', `${staff.name} is now ${staff.status}`, 'fas fa-check-circle', '#10b981'); } },
+            deleteStaff(staffId) { const staff = this.staffList.find(s => s.id === staffId); if (staff && confirm(`Delete ${staff.name}?`)) { this.staffList = this.staffList.filter(s => s.id !== staffId); this.saveStaffToStorage(); this.showAlert('Deleted', 'Staff member removed', 'fas fa-check-circle', '#10b981'); } },
+            resetStaffPassword(staff) { this.resettingStaff = staff; this.newPassword = ''; this.showResetModal = true; },
+            confirmResetPassword() { if (!this.newPassword || this.newPassword.length < 4) { this.showAlert('Invalid Password', 'Password must be at least 4 characters', 'fas fa-exclamation-triangle', '#dc2626'); return; } const staff = this.staffList.find(s => s.id === this.resettingStaff.id); if (staff) { staff.password = this.newPassword; this.saveStaffToStorage(); this.showAlert('Password Reset', `New password for ${staff.name}: ${this.newPassword}`, 'fas fa-key', '#10b981'); } this.showResetModal = false; this.resettingStaff = null; this.newPassword = ''; },
+            openCreateEvent() { this.showAlert('Create Event', 'Event creation coming soon', 'fas fa-info-circle'); },
+            openScannerModal() { this.scannerModal = true; this.scanCode = ''; },
+            simulateScan() { this.showAlert('Ticket Validated', `Ticket ${this.scanCode} validated!`, 'fas fa-check-circle', '#10b981'); this.recentScans.unshift({ id: this.scanCode, valid: true, time: new Date().toLocaleTimeString() }); this.scannerModal = false; },
+            callNext() { if(this.queueList.length) this.showAlert('Queue', `Calling next: ${this.queueList[0].name}`, 'fas fa-bell'); },
+            skipCurrent() { if(this.queueList.length) this.queueList.shift(); },
+            callCustomer(id) { const customer = this.queueList.find(c => c.id === id); if(customer) this.showAlert('Queue', `Calling ${customer.name}`, 'fas fa-phone'); },
+            skipCustomer(id) { this.queueList = this.queueList.filter(c => c.id !== id); },
+            updateOrderStatus(orderId, newStatus) { let order = this.orders.find(o => o.id === orderId); if(order) order.status = newStatus; },
+            startShishaSession() { this.showAlert('Shisha', 'Start new shisha session', 'fas fa-smoking'); },
+            endShishaSession(id) { this.shishaSessions = this.shishaSessions.filter(s => s.id !== id); },
+            addLockerItem() { this.showAlert('Lockers', 'Add item to locker', 'fas fa-lock'); },
+            markUsed(id) { this.showAlert('Lockers', `Marked as used`, 'fas fa-check'); },
+            logout() { sessionStorage.clear(); window.location.href = 'login.html'; }
+        },
+        mounted() {
+            const isLoggedIn = sessionStorage.getItem('qless_logged_in');
+            const role = sessionStorage.getItem('qless_user_role');
+            if (!isLoggedIn || role !== 'tenant_administrator') { window.location.href = 'login.html'; return; }
+            this.loadTenantData();
+            window.addEventListener('resize', () => { if(window.innerWidth > 768) this.sidebarOpen = false; });
+        }
+    });
+</script>
+</body>
+</html>
