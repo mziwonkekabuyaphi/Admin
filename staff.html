@@ -332,6 +332,101 @@
             .menu-toggle { display: block; margin-right: 16px; font-size: 1.3rem; cursor: pointer; }
         }
         @media (min-width: 769px) { .menu-toggle { display: none; } }
+
+        /* ========== FULLSCREEN MODE STYLES ========== */
+        .fullscreen-active .sidebar,
+        .fullscreen-active .top-header .header-right,
+        .fullscreen-active .top-header .menu-toggle {
+            display: none !important;
+        }
+
+        .fullscreen-active .top-header {
+            justify-content: flex-start !important;
+            gap: 20px !important;
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10001;
+            padding: 12px 24px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .fullscreen-active .dashboard-container {
+            margin-top: 70px;
+            padding: 20px 32px;
+        }
+
+        .fullscreen-active .main-content {
+            margin-left: 0 !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            background: #f5f7fb;
+            overflow-y: auto;
+        }
+
+        .fullscreen-active .exit-fullscreen-btn {
+            display: flex !important;
+        }
+
+        .fullscreen-active .fullscreen-btn-module:not(.keep-visible) {
+            display: none;
+        }
+
+        .exit-fullscreen-btn {
+            display: none;
+            background: #E30613;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .exit-fullscreen-btn:hover {
+            background: #b0020e;
+            transform: scale(0.97);
+        }
+
+        .fullscreen-btn-module {
+            background: transparent;
+            border: 1px solid #E30613;
+            color: #E30613;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: auto;
+            transition: 0.2s;
+        }
+
+        .fullscreen-btn-module:hover {
+            background: #fff0f0;
+        }
+
+        @media (max-width: 768px) {
+            .fullscreen-active .dashboard-container {
+                padding: 16px !important;
+            }
+            .fullscreen-btn-module {
+                padding: 4px 12px;
+                font-size: 0.7rem;
+            }
+            .fullscreen-active .top-header .header-left h3 {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -366,6 +461,8 @@
                     <i class="fas fa-sign-out-alt"></i>
                 </div>
             </div>
+            <button class="fullscreen-btn-module" id="globalFullscreenBtn">🔲 Fullscreen Mode</button>
+            <button class="exit-fullscreen-btn" id="exitFullscreenBtn">✕ Exit Fullscreen</button>
         </div>
 
         <div class="dashboard-container">
@@ -388,6 +485,7 @@
 
             <!-- TICKET SCANNER MODULE -->
             <div v-if="currentSection === 'tickets' && isModuleEnabled('tickets')">
+                <div class="section-header"><h2>Ticket Scanner</h2></div>
                 <div class="scanner-area">
                     <div class="scanner-placeholder"><i class="fas fa-camera"></i></div>
                     <p style="color: white; margin-bottom: 16px;">Position camera at QR code</p>
@@ -451,10 +549,14 @@
                 <div class="section-header"><h2>Current Cart</h2><button class="btn-primary" @click="checkout"><i class="fas fa-credit-card"></i> Checkout (R{{ cartTotal }})</button></div>
                 <div class="table-wrapper">
                     <table class="data-table">
-                        <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead>
+                        <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr>
+                        </thead>
                         <tbody>
                             <tr v-for="(item, idx) in cart" :key="idx">
-                                <td>{{ item.name }}</td><td>{{ item.qty }}</td><td>R{{ item.price }}</td><td>R{{ item.qty * item.price }}</td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.qty }}</td>
+                                <td>R{{ item.price }}</td>
+                                <td>R{{ item.qty * item.price }}</td>
                                 <td><i class="fas fa-trash" style="cursor:pointer; color:#E30613;" @click="removeFromCart(idx)"></i></td>
                             </tr>
                             <tr v-if="cart.length === 0"><td colspan="5" style="text-align:center;">Cart is empty</td></tr>
@@ -575,7 +677,6 @@
                     { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt', enabled: true }
                 ];
                 
-                // Add modules based on Super Admin settings (via tenantModules)
                 if (this.isModuleEnabled('tickets')) {
                     menu.push({ id: 'tickets', label: 'Ticket Scanner', icon: 'fas fa-qrcode', enabled: true });
                 }
@@ -609,7 +710,6 @@
             closeSidebar() { if(window.innerWidth <= 768) this.sidebarOpen = false; },
             
             isModuleEnabled(moduleName) {
-                // Map frontend module names to backend module names from Super Admin
                 const moduleMap = {
                     'tickets': 'Tickets',
                     'queue': 'Queue Management',
@@ -642,7 +742,6 @@
                 this.staffName = staffDisplayName || 'Staff Member';
                 this.staffRole = staffRole || 'staff';
                 
-                // Load tenant name from tenants list
                 const tenants = JSON.parse(localStorage.getItem(STORAGE_KEYS.TENANTS) || '[]');
                 const tenant = tenants.find(t => t.id === this.tenantId);
                 this.tenantName = tenant ? tenant.businessName : 'Venue';
@@ -661,7 +760,6 @@
                 console.log('Loaded modules for tenant', this.tenantId, ':', modules);
                 
                 if (modules.length === 0) {
-                    // Default modules if none configured
                     this.tenantModules = [
                         { id: 1, name: 'Tickets', enabled: true },
                         { id: 2, name: 'Queue Management', enabled: true },
@@ -685,7 +783,6 @@
                 }
             },
             
-            // Ticket Scanner
             validateTicket() {
                 if (!this.scanCode) {
                     alert('Please enter a ticket ID');
@@ -707,7 +804,6 @@
                 if (isValid) this.scannedToday++;
             },
             
-            // Queue Management
             callNext() {
                 if (this.queueList.length) {
                     alert(`Calling next customer: ${this.queueList[0].name}`);
@@ -724,13 +820,11 @@
                 if (customer) alert(`Calling ${customer.name} to counter`);
             },
             
-            // Orders
             updateOrderStatus(orderId, newStatus) {
                 const order = this.orders.find(o => o.id === orderId);
                 if (order) order.status = newStatus;
             },
             
-            // POS
             addToCart(product) {
                 const existing = this.cart.find(item => item.id === product.id);
                 if (existing) {
@@ -756,7 +850,6 @@
                 this.todaySales += total;
             },
             
-            // Shisha
             startShishaSession() {
                 const newId = Math.max(...this.shishaSessions.map(s => s.id), 0) + 1;
                 this.shishaSessions.push({
@@ -773,12 +866,10 @@
                 alert('Shisha session ended');
             },
             
-            // VVIP
             addToTab(tabId) {
                 alert(`Add item to VVIP tab ${tabId}`);
             },
             
-            // Lockers
             markUsed(id) {
                 alert(`Locker item ${id} marked as used`);
             },
@@ -804,6 +895,45 @@
             window.addEventListener('resize', () => { 
                 if(window.innerWidth > 768) this.sidebarOpen = false; 
             });
+            
+            // ========== FULLSCREEN MODULE INITIALIZATION ==========
+            setTimeout(() => {
+                const appElement = document.querySelector('#app');
+                if (!appElement) return;
+                
+                let isFullscreen = false;
+                const exitBtn = document.getElementById('exitFullscreenBtn');
+                const fullscreenBtn = document.getElementById('globalFullscreenBtn');
+                
+                function toggleFullscreen() {
+                    if (!isFullscreen) {
+                        appElement.classList.add('fullscreen-active');
+                        isFullscreen = true;
+                        if (exitBtn) exitBtn.style.display = 'flex';
+                        if (fullscreenBtn) fullscreenBtn.style.display = 'none';
+                        const headerRight = document.querySelector('.top-header .header-right');
+                        if (headerRight) headerRight.style.display = 'none';
+                    } else {
+                        appElement.classList.remove('fullscreen-active');
+                        isFullscreen = false;
+                        if (exitBtn) exitBtn.style.display = 'none';
+                        if (fullscreenBtn) fullscreenBtn.style.display = '';
+                        const headerRight = document.querySelector('.top-header .header-right');
+                        if (headerRight) headerRight.style.display = '';
+                    }
+                }
+                
+                if (fullscreenBtn) {
+                    fullscreenBtn.removeEventListener('click', toggleFullscreen);
+                    fullscreenBtn.addEventListener('click', toggleFullscreen);
+                }
+                if (exitBtn) {
+                    exitBtn.removeEventListener('click', toggleFullscreen);
+                    exitBtn.addEventListener('click', toggleFullscreen);
+                }
+                
+                console.log('Fullscreen module initialized!');
+            }, 500);
         }
     });
 </script>
